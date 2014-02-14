@@ -1,4 +1,5 @@
 import socket
+import sys
 ANY = '0.0.0.0'
 SENDERPORT=1501
 MCAST_ADDR = '224.168.2.9'
@@ -15,3 +16,7 @@ while 1:
 	#Any subscribers to the multicast address will receive this data
 	message = raw_input("What message do you want to send?\n")
 	sock.sendto(message, (MCAST_ADDR,MCAST_PORT) )
+	if(message=='quit'):
+		print '\033[1;31mShutting down client\033[1;m'
+		sock.close()
+		sys.exit(0)
