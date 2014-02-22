@@ -38,5 +38,6 @@ if __name__ == "__main__":
              
             # user entered a message
             else :
-                msg = sys.stdin.readline()
+                msg = raw_input("What message do you want to send?\n")
+                print 'sending "' + msg + '"'
                 s.send(msg)
