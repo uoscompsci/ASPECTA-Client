@@ -30,7 +30,7 @@ if __name__ == "__main__":
             if sock == s:
                 data = sock.recv(4096)
                 if not data :
-                    print '\nDisconnected from chat server'
+                    print '\nDisconnected from server'
                     sys.exit()
                 else :
                     # print data
@@ -39,5 +39,4 @@ if __name__ == "__main__":
             # user entered a message
             else :
                 msg = raw_input("What message do you want to send?\n")
-                print 'sending "' + msg + '"'
                 s.send(msg)
