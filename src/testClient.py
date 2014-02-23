@@ -2,7 +2,7 @@
 import socket, select, string, sys
 
 host = 'localhost'
-port = 5000
+port = 5001
  
 # main function
 if __name__ == "__main__":
@@ -34,9 +34,17 @@ if __name__ == "__main__":
                     sys.exit()
                 else :
                     # print data
-                    print data
+                    try:
+                        dict = eval(data)
+                        print str(dict)
+                    except:
+                        print "ERROR: " + data
              
             # user entered a message
             else :
                 msg = raw_input("What message do you want to send?\n")
                 s.send(msg)
+                if(msg=="quit"):
+                    print '\033[1;31mShutting down client\033[1;m'
+                    sock.close()
+                    sys.exit(0)
