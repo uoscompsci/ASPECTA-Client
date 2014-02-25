@@ -3,7 +3,9 @@ import socket, select, string, sys
 
 host = 'localhost'
 port = 5001
- 
+errors = {1 : "Invalid API call",
+          2 : "Wrong number of arguments (% instead of %)"
+} 
 # main function
 if __name__ == "__main__":
      
@@ -33,12 +35,17 @@ if __name__ == "__main__":
                     print '\nDisconnected from server'
                     sys.exit()
                 else :
-                    # print data
+                    dict = eval(data)
                     try:
-                        dict = eval(data)
-                        print str(dict)
+                        errno = dict["error"]
+                        error = str(errors[errno])
+                        spliterr = error.split("%")
+                        errorStr = spliterr[0]
+                        for x in range(1,len(spliterr)): #Constructs errors which have parameters
+                            errorStr = errorStr + dict[str(x)] + spliterr[x]
+                        print "\033[1;31mERROR: " + errorStr + "\033[1;m"
                     except:
-                        print "ERROR: " + data
+                        print str(dict)
              
             # user entered a message
             else :
