@@ -3,6 +3,8 @@ import pygame
 from pygame.locals import *
 
 class client:
+    
+    quit = False
 
     def getInput(self):
         mpb=pygame.mouse.get_pressed() # mouse pressed buttons
@@ -10,6 +12,7 @@ class client:
         pos=pygame.mouse.get_pos() # mouse shift
         for event in pygame.event.get():
             if event.type == QUIT:
+                    self.quit = True
                     return
             elif event.type == pygame.KEYDOWN:
                 if event.key==pygame.K_l:
@@ -51,7 +54,7 @@ class client:
         # Initialise screen
         pygame.init()
         screen = pygame.display.set_mode((self.winWidth, self.winHeight))
-        pygame.display.set_caption('Basic Pygame program')
+        pygame.display.set_caption('Client Application')
     
         # Fill background
         background = pygame.Surface(screen.get_size())
@@ -60,7 +63,7 @@ class client:
     
         # Display some text
         font = pygame.font.Font(None, 36)
-        text = font.render("Hello There", 1, (10, 10, 10))
+        text = font.render("Press 'L' to lock", 1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = background.get_rect().centerx
         background.blit(text, textpos)
@@ -70,7 +73,7 @@ class client:
         pygame.display.flip()
     
         # Event loop
-        while 1:
+        while (self.quit == False):
             self.getInput()
             screen.blit(background, (0, 0))
             pygame.display.flip()
