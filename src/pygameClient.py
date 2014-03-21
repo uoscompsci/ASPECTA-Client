@@ -35,23 +35,23 @@ class client:
 
                 if (xloc<0):
                     xloc=0
-                elif(xloc>self.winWidth):
-                    xloc=self.winWidth
+                elif(xloc>1280):
+                    xloc=1280
                 if(yloc<0):
                     yloc = 0
-                elif(yloc>self.winHeight):
-                    yloc = self.winHeight
+                elif(yloc>1024):
+                    yloc = 1024
                 self.sender.relocateCursor(1,xloc,yloc,0)
     
     def __init__(self):
         self.mouseLock = False
         self.sender = messageSender()
-        self.winWidth = 1280
-        self.winHeight = 1024
+        self.winWidth = 640
+        self.winHeight = 480
         
         # Initialise screen
         pygame.init()
-        screen = pygame.display.set_mode((1280, 1024))
+        screen = pygame.display.set_mode((self.winWidth, self.winHeight))
         pygame.display.set_caption('Basic Pygame program')
     
         # Fill background
