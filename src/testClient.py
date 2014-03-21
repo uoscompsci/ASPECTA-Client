@@ -2,7 +2,7 @@
 import socket, select, string, sys
 
 host = 'localhost'
-port = 5000
+port = 5002
 errors = {1 : "Invalid API call",
           2 : "Wrong number of arguments (% instead of %)"
 } 
