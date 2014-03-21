@@ -29,25 +29,24 @@ class client:
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
                 pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-                virtualpos = self.sender.getCursorPosition(1)
-                xloc = int(virtualpos["x"])-xdist
-                yloc = int(virtualpos["y"])+ydist
+                
+                loc = self.sender.testMoveCursor(1,-xdist,ydist)
 
-                if (xloc<0):
-                    xloc=0
-                elif(xloc>1280):
-                    xloc=1280
-                if(yloc<0):
-                    yloc = 0
-                elif(yloc>1024):
-                    yloc = 1024
-                self.sender.relocateCursor(1,xloc,yloc,0)
+                if (loc['x']<0):
+                    loc['x']=0
+                elif(loc['x']>1280):
+                    loc['x']=1280
+                if(loc['y']<0):
+                    loc['y'] = 0
+                elif(loc['y']>1024):
+                    loc['y'] = 1024
+                self.sender.relocateCursor(1,loc['x'],loc['y'],0)
     
     def __init__(self):
         self.mouseLock = False
         self.sender = messageSender()
-        self.winWidth = 640
-        self.winHeight = 480
+        self.winWidth = 320
+        self.winHeight = 240
         
         # Initialise screen
         pygame.init()

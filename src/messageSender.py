@@ -93,6 +93,9 @@ class messageSender:
     
     def moveCursor(self, cursorNo, xDistance, yDistance):
         self.sendMessage("move_cursor," + str(cursorNo) + "," + str(xDistance) + "," + str(yDistance))
+        
+    def testMoveCursor(self, cursorNo, xDistance, yDistance):
+        return self.sendMessage("test_move_cursor," + str(cursorNo) + "," + str(xDistance) + "," + str(yDistance))
     
     def relocateCursor(self, cursorNo, x, y, surfaceNo):
         self.sendMessage("relocate_cursor," + str(cursorNo) + "," + str(x) + "," + str(y) + "," + str(surfaceNo))
