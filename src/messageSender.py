@@ -124,7 +124,7 @@ class messageSender:
     def setWindowHeight(self, windowNo, height):
         self.sendMessage("set_window_height," + str(windowNo) + "," + str(height))
         
-    def getWindowPos(self, windowNo):
+    def getWindowPosition(self, windowNo):
         return self.sendMessage("get_window_pos," + str(windowNo))
         
     def getWindowWidth(self, windowNo):
@@ -150,3 +150,126 @@ class messageSender:
         
     def getWindowName(self, windowNo):
         return self.sendMessage("get_window_name," + str(windowNo))
+    
+    def relocateCircle(self, elementNo, x, y, windowNo):
+        self.sendMessage("relocate_circle," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(windowNo))
+        
+    def getCirclePosition(self, elementNo):
+        return self.sendMessage("get_circle_pos," + str(elementNo))
+    
+    def getElementType(self, elementNo):
+        return self.sendMessage("get_element_type," + str(elementNo))
+    
+    def setCircleLineColor(self, elementNo, color):
+        self.sendMessage("set_circle_line_color," + str(elementNo) + "," + color)
+        
+    def setCircleFillColor(self, elementNo, color):
+        self.sendMessage("set_circle_fill_color," + str(elementNo) + "," + color)
+
+    def getCircleLineColor(self, elementNo):
+        return self.sendMessage("get_circle_line_color," + str(elementNo))
+        
+    def getCircleFillColor(self, elementNo):
+        return self.sendMessage("get_circle_fill_color," + str(elementNo))
+    
+    def setCircleRadius(self, elementNo, radius):
+        self.sendMessage("set_circle_radius," + str(elementNo) + "," + str(radius))
+        
+    def getCircleRadius(self, elementNo):
+        return self.sendMessage("get_circle_radius," + str(elementNo))
+    
+    def getLineStart(self, elementNo):
+        return self.sendMessage("get_line_start," + str(elementNo))
+    
+    def getLineEnd(self, elementNo):
+        return self.sendMessage("get_line_end," + str(elementNo))
+    
+    def setLineStart(self, elementNo, x, y):
+        self.sendMessage("relocate_line_start," + str(elementNo) + "," + str(x) + "," + str(y))
+    
+    def setLineEnd(self, elementNo, x, y):
+        self.sendMessage("relocate_line_end," + str(elementNo) + "," + str(x) + "," + str(y))
+    
+    def setLineColor(self, elementNo, x, y):
+        self.sendMessage("set_line_color," + str(elementNo) + "," + str(x) + "," + str(y))
+        
+    def getLineColor(self, elementNo):
+        return self.sendMessage("get_line_color," + str(elementNo))
+    
+    def addLineStripPoint(self, elementNo, x, y):
+        self.sendMessage("add_line_strip_point," + str(elementNo) + "," + str(x) + "," + str(y))
+        
+    def getLineStripPoint(self, elementNo, pointNo):
+        return self.sendMessage("get_line_strip_point," + str(elementNo) + "," + str(pointNo))
+    
+    def moveLineStripPoint(self, elementNo, pointNo, x, y):
+        self.sendMessage("relocate_line_strip_point," + str(elementNo) + "," + str(pointNo) + "," + str(x) + "," + str(y))
+        
+    def getLineStripColor(self, elementNo):
+        return self.sendMessage("get_line_strip_color," + str(elementNo))
+        
+    def setLineStripColor(self, elementNo, color):
+        self.sendMessage("set_line_strip_color," + str(elementNo) + "," + color)
+        
+    def getLineStripPointCount(self, elementNo):
+        return self.sendMessage("get_line_strip_point_count," + str(elementNo))
+    
+    def addPolygonPoint(self, elementNo, x, y):
+        self.sendMessage("add_polygon_point," + str(elementNo) + "," + str(x) + "," + str(y))
+        
+    def getPolygonPoint(self, elementNo, pointNo):
+        return self.sendMessage("get_polygon_point," + str(elementNo) + "," + str(pointNo))
+    
+    def movePolygonPoint(self, elementNo, pointNo, x, y):
+        self.sendMessage("relocate_polygon_point," + str(elementNo) + "," + str(pointNo) + "," + str(x) + "," + str(y))
+        
+    def getPolygonFillColor(self, elementNo):
+        return self.sendMessage("get_polygon_fill_color," + str(elementNo))
+    
+    def setPolygonFillColor(self, elementNo, color):
+        self.sendMessage("set_polygon_fill_color," + str(elementNo) + "," + color)
+        
+    def getPolygonLineColor(self, elementNo):
+        return self.sendMessage("get_polygon_line_color," + str(elementNo))
+    
+    def setPolygonLineColor(self, elementNo, color):
+        self.sendMessage("set_polygon_line_color," + str(elementNo) + "," + color)
+        
+    def getPolygonPointCount(self, elementNo):
+        return self.sendMessage("get_polygon_point_count," + str(elementNo))
+    
+    def setText(self, elementNo, text):
+        self.sendMessage("set_text," + str(elementNo) + "," + text)
+        
+    def getText(self, elementNo):
+        return self.sendMessage("get_text," + str(elementNo))
+    
+    def setTextPosition(self, elementNo, x, y, windowNo):
+        self.sendMessage("relocate_text," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(windowNo))
+        
+    def getTextPosition(self, elementNo):
+        return self.sendMessage("get_text_pos," + str(elementNo))
+        
+    def setPointSize(self, elementNo, pointSize):
+        self.sendMessage("set_text_point_size," + str(elementNo) + "," + str(pointSize))
+        
+    def getPointSize(self, elementNo):
+        return self.sendMessage("get_text_point_size," + str(elementNo))
+    
+    def getFont(self, elementNo):
+        return self.sendMessage("get_text_font," + str(elementNo))
+    
+    def setFont(self, elementNo, font):
+        self.sendMessage("set_text_font," + str(elementNo) + "," + font)
+        
+    def setTextColor(self, elementNo, color):
+        self.sendMessage("set_text_color," + str(elementNo) + "," + color)
+        
+    def showElement(self, elementNo):
+        self.sendMessaqe("show_element," + str(elementNo))
+        
+    def hideElement(self, elementNo):
+        self.sendMessage("hide_element," + str(elementNo))
+        
+    def checkElementVisibility(self, elementNo):
+        self.sendMessage("check_element_visibility," + str(elementNo))

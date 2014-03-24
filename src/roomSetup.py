@@ -3,7 +3,6 @@ import pygame
 from pygame.locals import *
 
 class client:
-    
     quit = False
 
     def getInput(self):
@@ -54,7 +53,7 @@ class client:
         # Initialise screen
         pygame.init()
         screen = pygame.display.set_mode((self.winWidth, self.winHeight))
-        pygame.display.set_caption('Client Application')
+        pygame.display.set_caption('Room setup program')
     
         # Fill background
         background = pygame.Surface(screen.get_size())
@@ -63,7 +62,7 @@ class client:
     
         # Display some text
         font = pygame.font.Font(None, 36)
-        text = font.render("Press 'L' to lock", 1, (10, 10, 10))
+        text = font.render("Press 'L' to lock mouse", 1, (10, 10, 10))
         textpos = text.get_rect()
         textpos.centerx = background.get_rect().centerx
         background.blit(text, textpos)
@@ -73,7 +72,7 @@ class client:
         pygame.display.flip()
     
         # Event loop
-        while (self.quit == False):
+        while(self.quit==False):
             self.getInput()
             screen.blit(background, (0, 0))
             pygame.display.flip()
