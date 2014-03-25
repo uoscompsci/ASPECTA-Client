@@ -20,7 +20,6 @@ class client:
                         pygame.mouse.set_visible(True)
                     elif(self.mouseLock == False):
                         self.mouseLock = True
-                        pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
                         pygame.mouse.set_visible(False)
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
