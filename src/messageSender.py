@@ -56,7 +56,7 @@ class messageSender:
         return self.sendMessage("new_cursor," + str(surfaceNo) + "," + str(x) + "," + str(y))
     
     def newWindow(self, surfaceNo, x, y, width, height, name):
-        return self.sendMessage("new_window," + str(surfaceNo), + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
+        return self.sendMessage("new_window," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
     
     def newCircle(self, windowNo, x, y, radius, lineCol, fillCol):
         return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + fillCol)
@@ -273,3 +273,12 @@ class messageSender:
         
     def checkElementVisibility(self, elementNo):
         self.sendMessage("check_element_visibility," + str(elementNo))
+        
+    def hideSetupSurface(self):
+        self.sendMessage("hide_setup_surface")
+        
+    def showSetupSurface(self):
+        self.sendMessage("show_setup_surface")
+        
+    def getSetupSurfaceVisibility(self):
+        self.sendMessage("get_setup_surface_visibility")

@@ -4,7 +4,7 @@ from pygame.locals import *
 
 class client:
     quit = False
-
+#    def newCircle(self, windowNo, x, y, radius, lineCol, fillCol):
     def getInput(self):
         mpb=pygame.mouse.get_pressed() # mouse pressed buttons
         kpb=pygame.key.get_pressed() # keyboard pressed buttons
@@ -27,6 +27,9 @@ class client:
                         self.sender.rotateCursorClockwise(1,10)
                     elif event.button==5:
                         self.sender.rotateCursorAnticlockwise(1,10)
+                    elif event.button==1:
+                        loc = self.sender.getCursorPosition(1)
+                        self.sender.newCircle(1, loc['x'], loc['y'], 10, "blue", "blue")
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
                 pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
@@ -69,7 +72,10 @@ class client:
         # Blit everything to the screen
         screen.blit(background, (0, 0))
         pygame.display.flip()
-    
+        
+        self.sender.showSetupSurface()
+        self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
+        self.sender.newCursor(0, 1280/2, 1024/2)
         # Event loop
         while(self.quit==False):
             self.getInput()
