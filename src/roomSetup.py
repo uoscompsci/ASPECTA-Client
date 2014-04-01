@@ -2,10 +2,35 @@ from messageSender import *
 import pygame
 from pygame.locals import *
 
+class point:
+    __slots__ = ['x','y']
+    
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+    
+    def setX(self,x):
+        self.x = x
+        
+    def setY(self,y):
+        self.y = y
+        
+    def getX(self):
+        return self.x
+    
+    def getY(self):
+        return self.y
+
 class client:
+    __slots__ = ['tl','tr','br','bl','top','right','bottom','left']
     quit = False
-#    def newCircle(self, windowNo, x, y, radius, lineCol, fillCol):
-    def getInput(self):
+    tl = None
+    tr = None
+    br = None
+    bl = None
+    dragging = 0
+
+    def getInput(self,get_point):
         mpb=pygame.mouse.get_pressed() # mouse pressed buttons
         kpb=pygame.key.get_pressed() # keyboard pressed buttons
         pos=pygame.mouse.get_pos() # mouse shift
@@ -28,8 +53,21 @@ class client:
                     elif event.button==5:
                         self.sender.rotateCursorAnticlockwise(1,10)
                     elif event.button==1:
-                        loc = self.sender.getCursorPosition(1)
-                        self.sender.newCircle(1, loc['x'], loc['y'], 10, "blue", "blue")
+                        if(get_point==True):
+                            loc = self.sender.getCursorPosition(1)
+                            self.sender.newCircle(1, loc['x'], loc['y'], 10, "blue", "blue")
+                            return loc
+                        if(get_point!=True):
+                            loc = self.sender.getCursorPosition(1)
+                            elements = self.sender.getClickedElements(0, loc["x"], loc["y"])
+                            if (len(elements)!=0):
+                                self.dragging = int(elements["0"])
+                            else:
+                                self.dragging=0
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button==1:
+                        self.dragging=0
+                        
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
                 pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
@@ -45,6 +83,11 @@ class client:
                 elif(loc['y']>1024):
                     loc['y'] = 1024
                 self.sender.relocateCursor(1,loc['x'],loc['y'],0)
+                if(self.dragging!=0):
+                    type = self.sender.getElementType(self.dragging)
+                    if(type["type"]=="circle"):
+                        self.sender.relocateCircle(self.dragging, float(loc['x']), float(loc['y']), 1)
+        return None
     
     def __init__(self):
         self.mouseLock = False
@@ -60,15 +103,11 @@ class client:
         # Fill background
         background = pygame.Surface(screen.get_size())
         background = background.convert()
-        background.fill((250, 250, 250))
+        background.fill((255, 255, 255))
     
         # Display some text
         font = pygame.font.Font(None, 36)
-        text = font.render("Press 'L' to lock mouse", 1, (10, 10, 10))
-        textpos = text.get_rect()
-        textpos.centerx = background.get_rect().centerx
-        background.blit(text, textpos)
-    
+
         # Blit everything to the screen
         screen.blit(background, (0, 0))
         pygame.display.flip()
@@ -77,9 +116,64 @@ class client:
         self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
         self.sender.newCursor(0, 1280/2, 1024/2)
         # Event loop
-        while(self.quit==False):
-            self.getInput()
+        self.mouseLock=True
+        pygame.mouse.set_visible(False)
+        
+        while(self.quit==False and self.tl==None):
+            background.fill((255, 255, 255))
+            text = font.render("Click the top left", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = background.get_rect().centerx
+            background.blit(text, textpos)
+            self.tl = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
+        self.top = self.sender.newLineStrip(1, self.tl['x'], self.tl['y'], 'blue')
             
+        while(self.quit==False and self.tr==None):
+            background.fill((255, 255, 255))
+            text = font.render("Click the top right", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = background.get_rect().centerx
+            background.blit(text, textpos)
+            self.tr = self.getInput(True)
+            screen.blit(background, (0, 0))
+            pygame.display.flip()
+        self.sender.addLineStripPoint(self.top['elementNo'], self.tr['x'], self.tr['y'])
+        self.right = self.sender.newLineStrip(1, self.tr['x'], self.tr['y'], 'blue')
+            
+        while(self.quit==False and self.br==None):
+            background.fill((255, 255, 255))
+            text =font.render("Click the bottom right", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = background.get_rect().centerx
+            background.blit(text, textpos)
+            self.br = self.getInput(True)
+            screen.blit(background, (0, 0))
+            pygame.display.flip()
+        self.sender.addLineStripPoint(self.right['elementNo'], self.br['x'], self.br['y'])
+        self.bottom = self.sender.newLineStrip(1, self.br['x'], self.br['y'], 'blue')
+            
+        while(self.quit==False and self.bl==None):
+            background.fill((255, 255, 255))
+            text = font.render("Click the bottom left", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = background.get_rect().centerx
+            background.blit(text, textpos)
+            self.bl = self.getInput(True)
+            screen.blit(background, (0, 0))
+            pygame.display.flip()
+        self.sender.addLineStripPoint(self.bottom['elementNo'], self.bl['x'], self.bl['y'])
+        self.left = self.sender.newLineStrip(1, self.bl['x'], self.bl['y'], 'blue')
+        self.sender.addLineStripPoint(self.left['elementNo'], self.tl['x'], self.tl['y'])
+        
+        while(self.quit==False):
+            background.fill((255, 255, 255))
+            text = font.render("Press 'L' to release mouse", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = background.get_rect().centerx
+            background.blit(text, textpos)
+            self.getInput(False)
+            screen.blit(background, (0, 0))
+            pygame.display.flip()
 client()

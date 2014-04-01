@@ -199,6 +199,9 @@ class messageSender:
     def addLineStripPoint(self, elementNo, x, y):
         self.sendMessage("add_line_strip_point," + str(elementNo) + "," + str(x) + "," + str(y))
         
+    def addLineStripPointAt(self, elementNo, x, y, index):
+        self.sendMessage("add_line_strip_point_at," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(index))
+        
     def getLineStripPoint(self, elementNo, pointNo):
         return self.sendMessage("get_line_strip_point," + str(elementNo) + "," + str(pointNo))
     
@@ -281,4 +284,7 @@ class messageSender:
         self.sendMessage("show_setup_surface")
         
     def getSetupSurfaceVisibility(self):
-        self.sendMessage("get_setup_surface_visibility")
+        return self.sendMessage("get_setup_surface_visibility")
+        
+    def getClickedElements(self, surfaceNo, x, y):
+        return self.sendMessage("get_clicked_elements," + str(surfaceNo) + "," + str(x) + "," + str(y))
