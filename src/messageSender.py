@@ -5,7 +5,8 @@ class messageSender:
     HOST = 'localhost'
     PORT = 5000
     ERRORS = {1 : "Invalid API call",
-              2 : "Wrong number of arguments (% instead of %)"
+              2 : "Wrong number of arguments (% instead of %)",
+              3 : "Please log in first"
     }
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
