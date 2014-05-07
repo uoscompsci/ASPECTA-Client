@@ -57,27 +57,51 @@ class messageSender:
     
     def newSurface(self):
         self.sendMessage("new_surface")
+        
+    def newSurfaceWithID(self, ID):
+        self.sendMessage("new_surface_with_ID," + str(ID))
     
     def newCursor(self, surfaceNo, x, y):
         return self.sendMessage("new_cursor," + str(surfaceNo) + "," + str(x) + "," + str(y))
     
+    def newCursorWithID(self, ID, surfaceNo, x, y):
+        return self.sendMessage("new_cursor_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y))
+    
     def newWindow(self, surfaceNo, x, y, width, height, name):
         return self.sendMessage("new_window," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
+    
+    def newWindowWithID(self, ID, surfaceNo, x, y, width, height, name):
+        return self.sendMessage("new_window_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
     
     def newCircle(self, windowNo, x, y, radius, lineCol, fillCol):
         return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + fillCol)
     
+    def newCircleWithID(self, ID, windowNo, x, y, radius, lineCol, fillCol):
+        return self.sendMessage("new_circle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + fillCol)
+    
     def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, Color):
         return self.sendMessage("new_line," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + Color)
+    
+    def newLineWithID(self, ID, windowNo, xStart, yStart, xEnd, yEnd, Color):
+        return self.sendMessage("new_line_with_ID," + str(ID) + "," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + Color)
     
     def newLineStrip(self, windowNo, x, y, Color):
         return self.sendMessage("new_line_strip," + str(windowNo) + "," + str(x) + "," + str(y) + "," + Color)
     
+    def newLineStripWithID(self, ID, windowNo, x, y, Color):
+        return self.sendMessage("new_line_strip_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + Color)
+    
     def newPolygon(self, windowNo, x, y, lineColor, fillColor):
         return self.sendMessage("new_polygon," + str(windowNo) + "," + str(x) + "," + str(y) + "," + lineColor + "," + fillColor)
     
+    def newPolygonWithID(self, ID, windowNo, x, y, lineColor, fillColor):
+        return self.sendMessage("new_polygon_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + lineColor + "," + fillColor)
+    
     def newText(self, windowNo, text, x, y, ptSize, font, color):
         return self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + color)
+    
+    def newTextWithID(self, ID, windowNo, text, x, y, ptSize, font, color):
+        return self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + color)
     
     def mouseLeftDown(self, cursorNo):
         return self.sendMessage("mouse_l," + str(cursorNo))
