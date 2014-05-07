@@ -51,6 +51,9 @@ class messageSender:
                 
     def quit(self):
         self.sendMessage("quit")
+        
+    def login(self, username):
+        self.sendMessage("login," + str(username))
     
     def newSurface(self):
         self.sendMessage("new_surface")
