@@ -103,6 +103,33 @@ class messageSender:
     def newTextWithID(self, ID, windowNo, text, x, y, ptSize, font, color):
         return self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + color)
     
+    def getSurfaceID(self, surfaceNo):
+        return self.sendMessage("get_surface_ID," + str(surfaceNo))
+    
+    def setSurfaceID(self, surfaceNo, ID):
+        self.sendMessage("set_surface_ID," + str(surfaceNo) + "," + str(ID))
+    
+    def getSurfaceOwner(self, surfaceNo):
+        self.sendMessage("get_surface_owner," + str(surfaceNo))
+        
+    def getWindowID(self, windowNo):
+        return self.sendMessage("get_window_ID," + str(windowNo))
+    
+    def setWindowID(self, windowNo, ID):
+        self.sendMessage("set_window_ID," + str(windowNo) + "," + str(ID))
+    
+    def getWindowOwner(self, windowNo):
+        self.sendMessage("get_window_owner," + str(windowNo))
+        
+    def getElementID(self, elementNo):
+        return self.sendMessage("get_element_ID," + str(elementNo))
+    
+    def setElementID(self, elementNo, ID):
+        self.sendMessage("set_element_ID," + str(elementNo) + "," + str(ID))
+    
+    def getElementOwner(self, elementNo):
+        self.sendMessage("get_element_owner," + str(elementNo))
+    
     def mouseLeftDown(self, cursorNo):
         return self.sendMessage("mouse_l," + str(cursorNo))
     
