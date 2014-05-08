@@ -6,9 +6,10 @@ class messageSender:
     PORT = 5000
     ERRORS = {1 : "Invalid API call",
               2 : "Wrong number of arguments (% instead of %)",
-              3 : "Please log in first",
-              4 : "Username already in use",
-              5 : "Already logged in"
+              3 : "User name not yet set",
+              4 : "User name already set",
+              5 : "Application name already set",
+              6 : "Application name not yet set"
     }
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
