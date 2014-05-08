@@ -55,6 +55,9 @@ class messageSender:
         
     def login(self, username):
         self.sendMessage("login," + str(username))
+        
+    def setapp(self, appname):
+        self.sendMessage("setapp," + str(appname))
     
     def newSurface(self):
         self.sendMessage("new_surface")

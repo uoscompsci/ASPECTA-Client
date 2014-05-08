@@ -125,6 +125,7 @@ class client:
         pygame.display.flip()
         
         self.sender.login("jp438")
+        self.sender.setapp("myapp")
         self.sender.showSetupSurface()
         self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
         self.sender.newCursor(0, 1280/2, 1024/2)
