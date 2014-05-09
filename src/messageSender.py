@@ -116,6 +116,9 @@ class messageSender:
     def getSurfaceOwner(self, surfaceNo):
         self.sendMessage("get_surface_owner," + str(surfaceNo))
         
+    def getSurfaceAppDetails(self, surfaceNo):
+        self.sendMessage("get_surface_app_details," + str(surfaceNo))
+        
     def getWindowID(self, windowNo):
         return self.sendMessage("get_window_ID," + str(windowNo))
     
@@ -125,6 +128,9 @@ class messageSender:
     def getWindowOwner(self, windowNo):
         self.sendMessage("get_window_owner," + str(windowNo))
         
+    def getWindowAppDetails(self, surfaceNo):
+        self.sendMessage("get_window_app_details," + str(surfaceNo))
+        
     def getElementID(self, elementNo):
         return self.sendMessage("get_element_ID," + str(elementNo))
     
@@ -133,6 +139,9 @@ class messageSender:
     
     def getElementOwner(self, elementNo):
         self.sendMessage("get_element_owner," + str(elementNo))
+        
+    def getElementAppDetails(self, surfaceNo):
+        self.sendMessage("get_element_app_details," + str(surfaceNo))
     
     def mouseLeftDown(self, cursorNo):
         return self.sendMessage("mouse_l," + str(cursorNo))
