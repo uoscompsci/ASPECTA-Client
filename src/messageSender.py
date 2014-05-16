@@ -107,6 +107,9 @@ class messageSender:
     def newTextWithID(self, ID, windowNo, text, x, y, ptSize, font, color):
         return self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + color)
     
+    def subscribeToSurface(self, surfaceNo):
+        self.sendMessage("subscribe_to_surface," + str(surfaceNo))
+    
     def getSurfaceID(self, surfaceNo):
         return self.sendMessage("get_surface_ID," + str(surfaceNo))
     
@@ -119,6 +122,9 @@ class messageSender:
     def getSurfaceAppDetails(self, surfaceNo):
         self.sendMessage("get_surface_app_details," + str(surfaceNo))
         
+    def subscribeToWindow(self, windowNo):
+        self.sendMessage("subscribe_to_window," + str(windowNo))
+        
     def getWindowID(self, windowNo):
         return self.sendMessage("get_window_ID," + str(windowNo))
     
@@ -130,6 +136,9 @@ class messageSender:
         
     def getWindowAppDetails(self, surfaceNo):
         self.sendMessage("get_window_app_details," + str(surfaceNo))
+        
+    def subscribeToElement(self, elementNo):
+        self.sendMessage("subscribe_to_element," + str(elementNo))
         
     def getElementID(self, elementNo):
         return self.sendMessage("get_element_ID," + str(elementNo))
