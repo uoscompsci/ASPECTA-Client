@@ -9,7 +9,8 @@ class messageSender:
               3 : "User name not yet set",
               4 : "User name already set",
               5 : "Application name already set",
-              6 : "Application name not yet set"
+              6 : "Application name not yet set",
+              7 : "Must be owner to change admin setting"
     }
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -122,6 +123,24 @@ class messageSender:
     def getSurfaceAppDetails(self, surfaceNo):
         self.sendMessage("get_surface_app_details," + str(surfaceNo))
         
+    def getSurfacesByID(self, ID):
+        return self.sendMessage("get_surfaces_by_ID," + str(ID))
+        
+    def getSurfacesByOwner(self, owner):
+        return self.sendMessage("get_surfaces_by_owner," + str(owner))
+        
+    def getSurfacesByAppName(self, name):
+        return self.sendMessage("get_surfaces_by_app_name," +  str(name))
+        
+    def getSurfacesByAppDetails(self, name, instance):
+        return self.sendMessage("get_surfaces_by_app_details" + str(name) + "," + str(instance))
+        
+    def becomeSurfaceAdmin(self, surfaceNo):
+        self.sendMessage("become_surface_admin," + str(surfaceNo))
+        
+    def stopBeingSurfaceAdmin(self, surfaceNo):
+        self.sendMessage("stop_being_surface_admin," + str(surfaceNo))
+        
     def subscribeToWindow(self, windowNo):
         self.sendMessage("subscribe_to_window," + str(windowNo))
         
@@ -137,6 +156,24 @@ class messageSender:
     def getWindowAppDetails(self, surfaceNo):
         self.sendMessage("get_window_app_details," + str(surfaceNo))
         
+    def getWindowsByID(self, ID):
+        return self.sendMessage("get_windows_by_ID," + str(ID))
+        
+    def getWindowsByOwner(self, owner):
+        return self.sendMessage("get_windows_by_owner," + str(owner))
+        
+    def getWindowsByAppName(self, name):
+        return self.sendMessage("get_windows_by_app_name," +  str(name))
+        
+    def getWindowssByAppDetails(self, name, instance):
+        return self.sendMessage("get_windows_by_app_details" + str(name) + "," + str(instance))
+        
+    def becomeWindowAdmin(self, windowNo):
+        self.sendMessage("become_window_admin," + str(windowNo))
+        
+    def stopBeingWindowAdmin(self, windowNo):
+        self.sendMessage("stop_being_window_admin," + str(windowNo))
+        
     def subscribeToElement(self, elementNo):
         self.sendMessage("subscribe_to_element," + str(elementNo))
         
@@ -151,6 +188,24 @@ class messageSender:
         
     def getElementAppDetails(self, surfaceNo):
         self.sendMessage("get_element_app_details," + str(surfaceNo))
+        
+    def getElementsByID(self, ID):
+        return self.sendMessage("get_elements_by_ID," + str(ID))
+        
+    def getElementsByOwner(self, owner):
+        return self.sendMessage("get_elements_by_owner," + str(owner))
+        
+    def getElementsByAppName(self, name):
+        return self.sendMessage("get_elements_by_app_name," +  str(name))
+        
+    def getElementsByAppDetails(self, name, instance):
+        return self.sendMessage("get_elements_by_app_details" + str(name) + "," + str(instance))
+        
+    def becomeElementAdmin(self, elementNo):
+        self.sendMessage("become_element_admin," + str(elementNo))
+        
+    def stopBeingElementAdmin(self, elementNo):
+        self.sendMessage("stop_being_element_admin," + str(elementNo))
     
     def mouseLeftDown(self, cursorNo):
         return self.sendMessage("mouse_l," + str(cursorNo))

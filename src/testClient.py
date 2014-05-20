@@ -4,8 +4,13 @@ import socket, select, string, sys
 host = 'localhost'
 port = 5000
 errors = {1 : "Invalid API call",
-          2 : "Wrong number of arguments (% instead of %)"
-} 
+          2 : "Wrong number of arguments (% instead of %)",
+          3 : "User name not yet set",
+          4 : "User name already set",
+          5 : "Application name already set",
+          6 : "Application name not yet set",
+          7 : "Must be owner to change admin setting"
+          }
 # main function
 if __name__ == "__main__":
      
