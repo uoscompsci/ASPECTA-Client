@@ -28,6 +28,10 @@ class client:
     tr = None
     br = None
     bl = None
+    top = []
+    bottom = []
+    left = []
+    right = []
     dragging = 0
 
     def getInput(self,get_point):
@@ -56,7 +60,7 @@ class client:
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
                             ele = self.sender.newCircle(1, loc['x'], loc['y'], 10, "blue", "blue")
-                            return (loc, ele)
+                            return (loc, ele['elementNo'])
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
                             elements = self.sender.getClickedElements(0, loc["x"], loc["y"])
@@ -87,16 +91,16 @@ class client:
                     type = self.sender.getElementType(self.dragging)
                     if(type["type"]=="circle"):
                         self.sender.relocateCircle(self.dragging, float(loc['x']), float(loc['y']), 1)
-                        if(self.dragging==self.tl[1]['elementNo']):
+                        if(self.dragging==self.tl[1]):
                             self.sender.moveLineStripPoint(self.top['elementNo'], 1, float(loc['x']), float(loc['y']))
                             self.sender.moveLineStripPoint(self.left['elementNo'], 2, float(loc['x']), float(loc['y']))
-                        if(self.dragging==self.tr[1]['elementNo']):
+                        if(self.dragging==self.tr[1]):
                             self.sender.moveLineStripPoint(self.top['elementNo'], 2, float(loc['x']), float(loc['y']))
                             self.sender.moveLineStripPoint(self.right['elementNo'], 1, float(loc['x']), float(loc['y']))
-                        if(self.dragging==self.br[1]['elementNo']):
+                        if(self.dragging==self.br[1]):
                             self.sender.moveLineStripPoint(self.right['elementNo'], 2, float(loc['x']), float(loc['y']))
                             self.sender.moveLineStripPoint(self.bottom['elementNo'], 1, float(loc['x']), float(loc['y']))
-                        if(self.dragging==self.bl[1]['elementNo']):
+                        if(self.dragging==self.bl[1]):
                             self.sender.moveLineStripPoint(self.bottom['elementNo'], 2, float(loc['x']), float(loc['y']))
                             self.sender.moveLineStripPoint(self.left['elementNo'], 1, float(loc['x']), float(loc['y']))
         return None
@@ -132,6 +136,8 @@ class client:
 
         self.mouseLock=True
         pygame.mouse.set_visible(False)
+        
+        self.sender.newText(1, "Arial", 100, 100, 30, "Arial", "red")
         
         while(self.quit==False and self.tl==None):
             background.fill((255, 255, 255))
