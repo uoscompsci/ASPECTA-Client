@@ -1,6 +1,7 @@
 from messageSender import *
 import pygame
 from pygame.locals import *
+from math import *
 
 class point:
     __slots__ = ['x','y']
@@ -32,7 +33,44 @@ class client:
     bottom = []
     left = []
     right = []
-    dragging = 0
+    topCircles = []
+    bottomCircles = []
+    leftCircles = []
+    rightCircles = []
+    dragging = []
+    
+    def getMidPoints(self, point1, point2):
+        return ((point1[0]+point2[0])/float(2), (point1[1]+point2[1])/float(2))
+    
+    def splitSide(self, side, circles):
+        count = int(self.sender.getLineStripPointCount(side['elementNo'])['count'])
+        insert = []
+        for x in range(1, count):
+            point1 = self.sender.getLineStripPoint(side['elementNo'], x-1)
+            point2 = self.sender.getLineStripPoint(side['elementNo'], x)
+            midpoint = self.getMidPoints((point1['x'],point1['y']), (point2['x'],point2['y']))
+            insert.append(midpoint)
+        for x in reversed(range(0,len(insert))):
+            self.sender.addLineStripPointAt(side['elementNo'], int(insert[x][0]), int(insert[x][1]), x+1)
+            ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, "blue", "blue")
+            if(circles == "top"):
+                self.topCircles.insert(x+1, ele['elementNo'])
+            elif(circles == "bottom"):
+                self.bottomCircles.insert(x+1, ele['elementNo'])
+            elif(circles == "left"):
+                self.leftCircles.insert(x+1, ele['elementNo'])
+            elif(circles == "right"):
+                self.rightCircles.insert(x+1, ele['elementNo'])
+            
+    def isHit(self, point1, point2):
+        a = abs(point1[0]-point2[0])
+        b = abs(point1[1]-point2[1])
+        csq = pow(a,2) + pow(b,2)
+        c = sqrt(csq)
+        if (c<10):
+            return True
+        else:
+            return False
 
     def getInput(self,get_point):
         mpb=pygame.mouse.get_pressed() # mouse pressed buttons
@@ -50,6 +88,11 @@ class client:
                     elif(self.mouseLock == False):
                         self.mouseLock = True
                         pygame.mouse.set_visible(False)
+                if event.key==pygame.K_SPACE:
+                    self.splitSide(self.top,"top")
+                    self.splitSide(self.bottom,"bottom")
+                    self.splitSide(self.left,"left")
+                    self.splitSide(self.right,"right")
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button==4:
@@ -63,14 +106,26 @@ class client:
                             return (loc, ele['elementNo'])
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
-                            elements = self.sender.getClickedElements(0, loc["x"], loc["y"])
-                            if (len(elements)!=0):
-                                self.dragging = int(elements["0"])
-                            else:
-                                self.dragging=0
+                            self.dragging = []
+                            for x in range(0,self.sender.getLineStripPointCount(self.top['elementNo'])['count']):
+                                point = self.sender.getLineStripPoint(self.top['elementNo'], x)
+                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                    self.dragging.append((int(self.top["elementNo"]),x))
+                            for x in range(0,self.sender.getLineStripPointCount(self.bottom['elementNo'])['count']):
+                                point = self.sender.getLineStripPoint(self.bottom['elementNo'], x)
+                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                    self.dragging.append((int(self.bottom["elementNo"]),x))
+                            for x in range(0,self.sender.getLineStripPointCount(self.left['elementNo'])['count']):
+                                point = self.sender.getLineStripPoint(self.left['elementNo'], x)
+                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                    self.dragging.append((int(self.left["elementNo"]),x))
+                            for x in range(0,self.sender.getLineStripPointCount(self.right['elementNo'])['count']):
+                                point = self.sender.getLineStripPoint(self.right['elementNo'], x)
+                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                    self.dragging.append((int(self.right["elementNo"]),x))
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button==1:
-                        self.dragging=0
+                        self.dragging=[]
                         
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
@@ -87,22 +142,17 @@ class client:
                 elif(loc['y']>1024):
                     loc['y'] = 1024
                 self.sender.relocateCursor(1,loc['x'],loc['y'],0)
-                if(self.dragging!=0):
-                    type = self.sender.getElementType(self.dragging)
-                    if(type["type"]=="circle"):
-                        self.sender.relocateCircle(self.dragging, float(loc['x']), float(loc['y']), 1)
-                        if(self.dragging==self.tl[1]):
-                            self.sender.moveLineStripPoint(self.top['elementNo'], 1, float(loc['x']), float(loc['y']))
-                            self.sender.moveLineStripPoint(self.left['elementNo'], 2, float(loc['x']), float(loc['y']))
-                        if(self.dragging==self.tr[1]):
-                            self.sender.moveLineStripPoint(self.top['elementNo'], 2, float(loc['x']), float(loc['y']))
-                            self.sender.moveLineStripPoint(self.right['elementNo'], 1, float(loc['x']), float(loc['y']))
-                        if(self.dragging==self.br[1]):
-                            self.sender.moveLineStripPoint(self.right['elementNo'], 2, float(loc['x']), float(loc['y']))
-                            self.sender.moveLineStripPoint(self.bottom['elementNo'], 1, float(loc['x']), float(loc['y']))
-                        if(self.dragging==self.bl[1]):
-                            self.sender.moveLineStripPoint(self.bottom['elementNo'], 2, float(loc['x']), float(loc['y']))
-                            self.sender.moveLineStripPoint(self.left['elementNo'], 1, float(loc['x']), float(loc['y']))
+                if(len(self.dragging)!=0):
+                    for x in range (0,len(self.dragging)):
+                        self.sender.moveLineStripPoint(self.dragging[x][0], self.dragging[x][1], float(loc["x"]), float(loc["y"]))
+                        if(int(self.dragging[x][0])==int(self.top['elementNo'])):
+                            self.sender.relocateCircle(self.topCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)
+                        elif(int(self.dragging[x][0])==int(self.bottom['elementNo'])):
+                            self.sender.relocateCircle(self.bottomCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)
+                        elif(int(self.dragging[x][0])==int(self.left['elementNo'])):
+                            self.sender.relocateCircle(self.leftCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)
+                        elif(int(self.dragging[x][0])==int(self.right['elementNo'])):
+                            self.sender.relocateCircle(self.rightCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)
         return None
     
     def __init__(self):
@@ -148,6 +198,7 @@ class client:
             self.tl = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
+        self.topCircles.append(self.tl[1])
         self.top = self.sender.newLineStrip(1, self.tl[0]['x'], self.tl[0]['y'], 'blue')
             
         while(self.quit==False and self.tr==None):
@@ -159,7 +210,9 @@ class client:
             self.tr = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
+        self.topCircles.append(self.tr[1])
         self.sender.addLineStripPoint(self.top['elementNo'], self.tr[0]['x'], self.tr[0]['y'])
+        self.rightCircles.append(self.tr[1])
         self.right = self.sender.newLineStrip(1, self.tr[0]['x'], self.tr[0]['y'], 'blue')
             
         while(self.quit==False and self.br==None):
@@ -171,7 +224,9 @@ class client:
             self.br = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
+        self.rightCircles.append(self.br[1])
         self.sender.addLineStripPoint(self.right['elementNo'], self.br[0]['x'], self.br[0]['y'])
+        self.bottomCircles.append(self.br[1])
         self.bottom = self.sender.newLineStrip(1, self.br[0]['x'], self.br[0]['y'], 'blue')
             
         while(self.quit==False and self.bl==None):
@@ -183,8 +238,11 @@ class client:
             self.bl = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
+        self.bottomCircles.append(self.bl[1])
         self.sender.addLineStripPoint(self.bottom['elementNo'], self.bl[0]['x'], self.bl[0]['y'])
+        self.leftCircles.append(self.bl[1])
         self.left = self.sender.newLineStrip(1, self.bl[0]['x'], self.bl[0]['y'], 'blue')
+        self.leftCircles.append(self.tl[1])
         self.sender.addLineStripPoint(self.left['elementNo'], self.tl[0]['x'], self.tl[0]['y'])
         
         while(self.quit==False):
