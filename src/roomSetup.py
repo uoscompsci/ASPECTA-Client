@@ -52,7 +52,7 @@ class client:
             insert.append(midpoint)
         for x in reversed(range(0,len(insert))):
             self.sender.addLineStripPointAt(side['elementNo'], int(insert[x][0]), int(insert[x][1]), x+1)
-            ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, "blue", "blue", 12)
+            ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, "blue", (0, 1, 0, 1), 12)
             if(circles == "top"):
                 self.topCircles.insert(x+1, ele['elementNo'])
             elif(circles == "bottom"):
@@ -105,7 +105,7 @@ class client:
                     elif event.button==1:
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
-                            ele = self.sender.newCircle(1, loc['x'], loc['y'], 10, "blue", "blue", 12)
+                            ele = self.sender.newCircle(1, loc['x'], loc['y'], 10, "blue", (1, 0, 0, 1), 12)
                             return (loc, ele['elementNo'])
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -190,7 +190,7 @@ class client:
         self.mouseLock=True
         pygame.mouse.set_visible(False)
         
-        self.sender.newText(1, "Arial", 100, 100, 30, "Arial", "red")
+        self.sender.newText(1, "Arial", 100, 100, 30, "Arial", (1,1,0,1))
         
         while(self.quit==False and self.tl==None):
             background.fill((255, 255, 255))
@@ -202,7 +202,7 @@ class client:
             screen.blit(background, (0, 0))
             pygame.display.flip()
         self.topCircles.append(self.tl[1])
-        self.top = self.sender.newLineStrip(1, self.tl[0]['x'], self.tl[0]['y'], 'blue', 5)
+        self.top = self.sender.newLineStrip(1, self.tl[0]['x'], self.tl[0]['y'], (0, 0, 1, 1), 5)
             
         while(self.quit==False and self.tr==None):
             background.fill((255, 255, 255))
@@ -216,7 +216,7 @@ class client:
         self.topCircles.append(self.tr[1])
         self.sender.addLineStripPoint(self.top['elementNo'], self.tr[0]['x'], self.tr[0]['y'])
         self.rightCircles.append(self.tr[1])
-        self.right = self.sender.newLineStrip(1, self.tr[0]['x'], self.tr[0]['y'], 'blue', 5)
+        self.right = self.sender.newLineStrip(1, self.tr[0]['x'], self.tr[0]['y'], (0, 0, 1, 1), 5)
             
         while(self.quit==False and self.br==None):
             background.fill((255, 255, 255))
@@ -230,7 +230,7 @@ class client:
         self.rightCircles.append(self.br[1])
         self.sender.addLineStripPoint(self.right['elementNo'], self.br[0]['x'], self.br[0]['y'])
         self.bottomCircles.append(self.br[1])
-        self.bottom = self.sender.newLineStrip(1, self.br[0]['x'], self.br[0]['y'], 'blue', 5)
+        self.bottom = self.sender.newLineStrip(1, self.br[0]['x'], self.br[0]['y'], (0, 0, 1, 1), 5)
             
         while(self.quit==False and self.bl==None):
             background.fill((255, 255, 255))
@@ -244,7 +244,7 @@ class client:
         self.bottomCircles.append(self.bl[1])
         self.sender.addLineStripPoint(self.bottom['elementNo'], self.bl[0]['x'], self.bl[0]['y'])
         self.leftCircles.append(self.bl[1])
-        self.left = self.sender.newLineStrip(1, self.bl[0]['x'], self.bl[0]['y'], 'blue', 5)
+        self.left = self.sender.newLineStrip(1, self.bl[0]['x'], self.bl[0]['y'], (0, 0, 1, 1), 5)
         self.leftCircles.append(self.tl[1])
         self.sender.addLineStripPoint(self.left['elementNo'], self.tl[0]['x'], self.tl[0]['y'])
         

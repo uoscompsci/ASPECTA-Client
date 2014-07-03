@@ -24,6 +24,9 @@ class messageSender:
             
         print 'Connected to remote host. Start sending messages'
         
+    def colorString(self, red, green, blue, alpha):
+        return str(red) + ":" + str(green) + ":" + str(blue) + ":" + str(alpha)
+        
     def sendMessage(self, message):
         self.s.send(message)
         if(message=="quit"):
@@ -79,22 +82,22 @@ class messageSender:
         return self.sendMessage("new_window_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
     
     def newCircle(self, windowNo, x, y, radius, lineCol, fillCol, sides):
-        return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + fillCol + "," + str(sides))
+        return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
     
     def newCircleWithID(self, ID, windowNo, x, y, radius, lineCol, fillCol, sides):
         return self.sendMessage("new_circle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + fillCol + "," + str(sides))
     
-    def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, Color, width):
-        return self.sendMessage("new_line," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + Color + "," + str(width))
+    def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, color, width):
+        return self.sendMessage("new_line," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
     
-    def newLineWithID(self, ID, windowNo, xStart, yStart, xEnd, yEnd, Color, width):
-        return self.sendMessage("new_line_with_ID," + str(ID) + "," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + Color + "," + str(width))
+    def newLineWithID(self, ID, windowNo, xStart, yStart, xEnd, yEnd, color, width):
+        return self.sendMessage("new_line_with_ID," + str(ID) + "," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
     
-    def newLineStrip(self, windowNo, x, y, Color, width):
-        return self.sendMessage("new_line_strip," + str(windowNo) + "," + str(x) + "," + str(y) + "," + Color + "," + str(width))
+    def newLineStrip(self, windowNo, x, y, color, width):
+        return self.sendMessage("new_line_strip," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
     
-    def newLineStripWithID(self, ID, windowNo, x, y, Color, width):
-        return self.sendMessage("new_line_strip_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + Color + "," + str(width))
+    def newLineStripWithID(self, ID, windowNo, x, y, color, width):
+        return self.sendMessage("new_line_strip_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
     
     def newPolygon(self, windowNo, x, y, lineColor, fillColor):
         return self.sendMessage("new_polygon," + str(windowNo) + "," + str(x) + "," + str(y) + "," + lineColor + "," + fillColor)
@@ -103,10 +106,10 @@ class messageSender:
         return self.sendMessage("new_polygon_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + lineColor + "," + fillColor)
     
     def newText(self, windowNo, text, x, y, ptSize, font, color):
-        return self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + color)
+        return self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
     
     def newTextWithID(self, ID, windowNo, text, x, y, ptSize, font, color):
-        return self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + color)
+        return self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
     
     def subscribeToSurface(self, surfaceNo):
         self.sendMessage("subscribe_to_surface," + str(surfaceNo))
@@ -298,7 +301,7 @@ class messageSender:
         self.sendMessage("set_circle_line_color," + str(elementNo) + "," + color)
         
     def setCircleFillColor(self, elementNo, color):
-        self.sendMessage("set_circle_fill_color," + str(elementNo) + "," + color)
+        self.sendMessage("set_circle_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
 
     def getCircleLineColor(self, elementNo):
         return self.sendMessage("get_circle_line_color," + str(elementNo))
@@ -330,8 +333,8 @@ class messageSender:
     def setLineEnd(self, elementNo, x, y):
         self.sendMessage("relocate_line_end," + str(elementNo) + "," + str(x) + "," + str(y))
     
-    def setLineColor(self, elementNo, x, y):
-        self.sendMessage("set_line_color," + str(elementNo) + "," + str(x) + "," + str(y))
+    def setLineColor(self, elementNo, color):
+        self.sendMessage("set_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getLineColor(self, elementNo):
         return self.sendMessage("get_line_color," + str(elementNo))
@@ -358,7 +361,7 @@ class messageSender:
         return self.sendMessage("get_line_strip_color," + str(elementNo))
         
     def setLineStripColor(self, elementNo, color):
-        self.sendMessage("set_line_strip_color," + str(elementNo) + "," + color)
+        self.sendMessage("set_line_strip_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def setLineStripWidth(self, elementNo, width):
         self.sendMessage("set_line_strip_width," + str(elementNo) + "," + str(width))
@@ -418,7 +421,7 @@ class messageSender:
         self.sendMessage("set_text_font," + str(elementNo) + "," + font)
         
     def setTextColor(self, elementNo, color):
-        self.sendMessage("set_text_color," + str(elementNo) + "," + color)
+        self.sendMessage("set_text_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def showElement(self, elementNo):
         self.sendMessaqe("show_element," + str(elementNo))
