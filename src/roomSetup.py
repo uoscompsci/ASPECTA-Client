@@ -23,16 +23,7 @@ class point:
         return self.y
 
 class client:
-    __slots__ = ['tl','tr','br','bl','top','right','bottom','left']
     quit = False
-    tl = None
-    tr = None
-    br = None
-    bl = None
-    top = []
-    bottom = []
-    left = []
-    right = []
     topCircles = []
     bottomCircles = []
     leftCircles = []
@@ -44,7 +35,6 @@ class client:
     
     def splitSide(self, circles):
         count = len(circles)
-        #count = int(self.sender.getLineStripPointCount(side['elementNo'])['count'])
         insert = []
         for x in range(1, count):
             point1 = self.sender.getCirclePosition(circles[x-1])
@@ -52,7 +42,6 @@ class client:
             midpoint = self.getMidPoints((point1['x'],point1['y']), (point2['x'],point2['y']))
             insert.append(midpoint)
         for x in reversed(range(0,len(insert))):
-            #self.sender.addLineStripPointAt(side['elementNo'], int(insert[x][0]), int(insert[x][1]), x+1)
             ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 4)
             circles.insert(x+1, ele['elementNo'])
             
@@ -141,15 +130,8 @@ class client:
                 self.sender.relocateCursor(1,loc['x'],loc['y'],0)
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
-                        #self.sender.moveLineStripPoint(self.dragging[x][0], self.dragging[x][1], float(loc["x"]), float(loc["y"]))
                         print self.dragging[x]
                         self.sender.relocateCircle(self.dragging[x], float(loc["x"]), float(loc["y"]), 1)
-                        '''elif(int(self.dragging[x][0])==int(self.bottom['elementNo'])):
-                            self.sender.relocateCircle(self.bottomCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)
-                        elif(int(self.dragging[x][0])==int(self.left['elementNo'])):
-                            self.sender.relocateCircle(self.leftCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)
-                        elif(int(self.dragging[x][0])==int(self.right['elementNo'])):
-                            self.sender.relocateCircle(self.rightCircles[int(self.dragging[x][1])], float(loc["x"]), float(loc["y"]), 1)'''
         return None
     
     def __init__(self):
@@ -185,62 +167,58 @@ class client:
         pygame.mouse.set_visible(False)
         
         self.sender.newText(1, "Arial", 100, 100, 30, "Arial", (1,1,0,1))
+        tl = None
+        bl = None
+        tr = None
+        br = None
         
-        while(self.quit==False and self.tl==None):
+        while(self.quit==False and tl==None):
             background.fill((255, 255, 255))
             text = font.render("Click the top left", 1, (10, 10, 10))
             textpos = text.get_rect()
             textpos.centerx = background.get_rect().centerx
             background.blit(text, textpos)
-            self.tl = self.getInput(True)
+            tl = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
-        self.topCircles.append(self.tl[1])
-        #self.top = self.sender.newLineStrip(1, self.tl[0]['x'], self.tl[0]['y'], (0, 0, 1, 1), 5)
+        self.topCircles.append(tl[1])
             
-        while(self.quit==False and self.tr==None):
+        while(self.quit==False and tr==None):
             background.fill((255, 255, 255))
             text = font.render("Click the top right", 1, (10, 10, 10))
             textpos = text.get_rect()
             textpos.centerx = background.get_rect().centerx
             background.blit(text, textpos)
-            self.tr = self.getInput(True)
+            tr = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
-        self.topCircles.append(self.tr[1])
-        #self.sender.addLineStripPoint(self.top['elementNo'], self.tr[0]['x'], self.tr[0]['y'])
-        self.rightCircles.append(self.tr[1])
-        #self.right = self.sender.newLineStrip(1, self.tr[0]['x'], self.tr[0]['y'], (0, 0, 1, 1), 5)
+        self.topCircles.append(tr[1])
+        self.rightCircles.append(tr[1])
             
-        while(self.quit==False and self.br==None):
+        while(self.quit==False and br==None):
             background.fill((255, 255, 255))
             text =font.render("Click the bottom right", 1, (10, 10, 10))
             textpos = text.get_rect()
             textpos.centerx = background.get_rect().centerx
             background.blit(text, textpos)
-            self.br = self.getInput(True)
+            br = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
-        self.rightCircles.append(self.br[1])
-        #self.sender.addLineStripPoint(self.right['elementNo'], self.br[0]['x'], self.br[0]['y'])
-        self.bottomCircles.append(self.br[1])
-        #self.bottom = self.sender.newLineStrip(1, self.br[0]['x'], self.br[0]['y'], (0, 0, 1, 1), 5)
+        self.rightCircles.append(br[1])
+        self.bottomCircles.append(br[1])
             
-        while(self.quit==False and self.bl==None):
+        while(self.quit==False and bl==None):
             background.fill((255, 255, 255))
             text = font.render("Click the bottom left", 1, (10, 10, 10))
             textpos = text.get_rect()
             textpos.centerx = background.get_rect().centerx
             background.blit(text, textpos)
-            self.bl = self.getInput(True)
+            bl = self.getInput(True)
             screen.blit(background, (0, 0))
             pygame.display.flip()
-        self.bottomCircles.append(self.bl[1])
-        #self.sender.addLineStripPoint(self.bottom['elementNo'], self.bl[0]['x'], self.bl[0]['y'])
-        self.leftCircles.append(self.bl[1])
-        #self.left = self.sender.newLineStrip(1, self.bl[0]['x'], self.bl[0]['y'], (0, 0, 1, 1), 5)
-        self.leftCircles.append(self.tl[1])
-        #self.sender.addLineStripPoint(self.left['elementNo'], self.tl[0]['x'], self.tl[0]['y'])
+        self.bottomCircles.append(bl[1])
+        self.leftCircles.append(bl[1])
+        self.leftCircles.append(tl[1])
         
         while(self.quit==False):
             background.fill((255, 255, 255))
