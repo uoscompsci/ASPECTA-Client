@@ -82,10 +82,10 @@ class messageSender:
         return self.sendMessage("new_window_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
     
     def newCircle(self, windowNo, x, y, radius, lineCol, fillCol, sides):
-        return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
+        return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]) + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
     
     def newCircleWithID(self, ID, windowNo, x, y, radius, lineCol, fillCol, sides):
-        return self.sendMessage("new_circle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + lineCol + "," + fillCol + "," + str(sides))
+        return self.sendMessage("new_circle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]) + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
     
     def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, color, width):
         return self.sendMessage("new_line," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
@@ -100,10 +100,10 @@ class messageSender:
         return self.sendMessage("new_line_strip_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
     
     def newPolygon(self, windowNo, x, y, lineColor, fillColor):
-        return self.sendMessage("new_polygon," + str(windowNo) + "," + str(x) + "," + str(y) + "," + lineColor + "," + fillColor)
+        return self.sendMessage("new_polygon," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
     
     def newPolygonWithID(self, ID, windowNo, x, y, lineColor, fillColor):
-        return self.sendMessage("new_polygon_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + lineColor + "," + fillColor)
+        return self.sendMessage("new_polygon_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
     
     def newText(self, windowNo, text, x, y, ptSize, font, color):
         return self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
@@ -298,7 +298,7 @@ class messageSender:
         return self.sendMessage("get_element_type," + str(elementNo))
     
     def setCircleLineColor(self, elementNo, color):
-        self.sendMessage("set_circle_line_color," + str(elementNo) + "," + color)
+        self.sendMessage("set_circle_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def setCircleFillColor(self, elementNo, color):
         self.sendMessage("set_circle_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
@@ -385,13 +385,13 @@ class messageSender:
         return self.sendMessage("get_polygon_fill_color," + str(elementNo))
     
     def setPolygonFillColor(self, elementNo, color):
-        self.sendMessage("set_polygon_fill_color," + str(elementNo) + "," + color)
+        self.sendMessage("set_polygon_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getPolygonLineColor(self, elementNo):
         return self.sendMessage("get_polygon_line_color," + str(elementNo))
     
     def setPolygonLineColor(self, elementNo, color):
-        self.sendMessage("set_polygon_line_color," + str(elementNo) + "," + color)
+        self.sendMessage("set_polygon_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getPolygonPointCount(self, elementNo):
         return self.sendMessage("get_polygon_point_count," + str(elementNo))
