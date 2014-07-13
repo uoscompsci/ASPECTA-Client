@@ -2,6 +2,7 @@ from messageSender import *
 import pygame
 from pygame.locals import *
 from math import *
+from bezier import *
 
 class point:
     __slots__ = ['x','y']
@@ -28,10 +29,21 @@ class client:
     bottomCircles = []
     leftCircles = []
     rightCircles = []
+    topCP = []
+    bottomCP = []
+    leftCP = []
+    rightCP = [] 
+    topbz = None
+    bottombz = None
+    leftbz = None
+    rightbz = None
     dragging = []
     
     def getMidPoints(self, point1, point2):
         return ((float(point1[0])+float(point2[0]))/float(2), (float(point1[1])+float(point2[1]))/float(2))
+    
+    def oppControl(self, point, control):
+        return (float(point[0])+(float(point[0])-float(control[0])),float(point[1])+(float(point[1])-float(control[1])))
     
     def splitSide(self, circles):
         count = len(circles)
@@ -39,11 +51,58 @@ class client:
         for x in range(1, count):
             point1 = self.sender.getCirclePosition(circles[x-1])
             point2 = self.sender.getCirclePosition(circles[x])
-            midpoint = self.getMidPoints((point1['x'],point1['y']), (point2['x'],point2['y']))
+            midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1]))
             insert.append(midpoint)
         for x in reversed(range(0,len(insert))):
             ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 4)
-            circles.insert(x+1, ele['elementNo'])
+            circles.insert(x+1, ele)
+        self.updateBezier("top")
+        self.updateBezier("bottom")
+        self.updateBezier("left")
+        self.updateBezier("right")
+            
+    def setControlPoints(self, side, points):
+        controlPoints = []
+        controlPoints.append(self.getMidPoints((points[0][0],points[0][1]), (points[1][0],points[1][1])))
+        for x in range(1,len(points)):
+            controlPoints.append(self.oppControl((points[x][0],points[x][1]), controlPoints[x-1]))
+        if(side=="top"):
+            self.topCP = controlPoints
+        elif(side=="bottom"):
+            self.bottomCP = controlPoints
+        elif(side=="left"):
+            self.leftCP = controlPoints
+        elif(side=="right"):
+            self.rightCP = controlPoints
+            
+    def updateBezier(self, side):
+        points = []
+        circles = []
+        if(side=="top"):
+            circles = self.topCircles
+        elif(side=="bottom"):
+            circles = self.bottomCircles
+        elif(side=="left"):
+            circles = self.leftCircles
+        elif(side=="right"):
+            circles = self.rightCircles
+        for x in range(0,len(circles)):
+            pos = self.sender.getCirclePosition(circles[x])
+            points.append((pos[0],pos[1]))
+        self.setControlPoints(side, points)
+        calc = bezierCalc()
+        if(side=="top"):
+            curve = calc.getCurvePoints(points, self.topCP, 25)
+            self.sender.setLineStripContent(self.topbz,curve)
+        elif(side=="bottom"):
+            curve = calc.getCurvePoints(points, self.bottomCP, 25)
+            self.sender.setLineStripContent(self.bottombz,curve)
+        elif(side=="left"):
+            curve = calc.getCurvePoints(points, self.leftCP, 25)
+            self.sender.setLineStripContent(self.leftbz,curve)
+        elif(side=="right"):
+            curve = calc.getCurvePoints(points, self.rightCP, 25)
+            self.sender.setLineStripContent(self.rightbz,curve)
             
     def isHit(self, point1, point2):
         a = abs(float(point1[0])-float(point2[0]))
@@ -88,26 +147,26 @@ class client:
                     elif event.button==1:
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
-                            ele = self.sender.newCircle(1, loc['x'], loc['y'], 10, (1, 0, 0, 1), (1, 0, 0, 1), 4)
-                            return (loc, ele['elementNo'])
+                            ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 4)
+                            return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
                             self.dragging = []
                             for x in range(0,len(self.topCircles)):
                                 point = self.sender.getCirclePosition(self.topCircles[x])
-                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                     self.dragging.append(self.topCircles[x])
                             for x in range(0,len(self.bottomCircles)):
                                 point = self.sender.getCirclePosition(self.bottomCircles[x])
-                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                     self.dragging.append(self.bottomCircles[x])
                             for x in range(0,len(self.leftCircles)):
                                 point = self.sender.getCirclePosition(self.leftCircles[x])
-                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                     self.dragging.append(self.leftCircles[x])
                             for x in range(0,len(self.rightCircles)):
                                 point = self.sender.getCirclePosition(self.rightCircles[x])
-                                if(self.isHit((point['x'],point['y']),(loc["x"],loc["y"]))):
+                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                     self.dragging.append(self.rightCircles[x])
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button==1:
@@ -119,19 +178,22 @@ class client:
                 
                 loc = self.sender.testMoveCursor(1,-xdist,ydist)
 
-                if (loc['x']<0):
-                    loc['x']=0
-                elif(loc['x']>1280):
-                    loc['x']=1280
-                if(loc['y']<0):
-                    loc['y'] = 0
-                elif(loc['y']>1024):
-                    loc['y'] = 1024
-                self.sender.relocateCursor(1,loc['x'],loc['y'],0)
+                if (loc[0]<0):
+                    loc[0]=0
+                elif(loc[0]>1280):
+                    loc[0]=1280
+                if(loc[1]<0):
+                    loc[1] = 0
+                elif(loc[1]>1024):
+                    loc[1] = 1024
+                self.sender.relocateCursor(1,loc[0],loc[1],0)
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
-                        print self.dragging[x]
-                        self.sender.relocateCircle(self.dragging[x], float(loc["x"]), float(loc["y"]), 1)
+                        self.sender.relocateCircle(self.dragging[x], loc[0], loc[1], 1)
+                        self.updateBezier("top")
+                        self.updateBezier("bottom")
+                        self.updateBezier("left")
+                        self.updateBezier("right")
         return None
     
     def __init__(self):
@@ -182,6 +244,8 @@ class client:
             screen.blit(background, (0, 0))
             pygame.display.flip()
         self.topCircles.append(tl[1])
+        self.topbz = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+        
             
         while(self.quit==False and tr==None):
             background.fill((255, 255, 255))
@@ -193,7 +257,9 @@ class client:
             screen.blit(background, (0, 0))
             pygame.display.flip()
         self.topCircles.append(tr[1])
+        self.sender.addLineStripPoint(self.topbz, tr[0][0], tr[0][1])
         self.rightCircles.append(tr[1])
+        self.rightbz = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
             
         while(self.quit==False and br==None):
             background.fill((255, 255, 255))
@@ -205,7 +271,9 @@ class client:
             screen.blit(background, (0, 0))
             pygame.display.flip()
         self.rightCircles.append(br[1])
+        self.sender.addLineStripPoint(self.rightbz, br[0][0], br[0][1])
         self.bottomCircles.append(br[1])
+        self.bottombz = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
             
         while(self.quit==False and bl==None):
             background.fill((255, 255, 255))
@@ -217,8 +285,11 @@ class client:
             screen.blit(background, (0, 0))
             pygame.display.flip()
         self.bottomCircles.append(bl[1])
+        self.sender.addLineStripPoint(self.bottombz, bl[0][0], bl[0][1])
         self.leftCircles.append(bl[1])
+        self.leftbz = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
         self.leftCircles.append(tl[1])
+        self.sender.addLineStripPoint(self.leftbz, tl[0][0], tl[0][1])
         
         while(self.quit==False):
             background.fill((255, 255, 255))

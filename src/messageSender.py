@@ -1,9 +1,10 @@
-import socket, sys, select
+import socket, sys, select, time, threading
 
 class messageSender:
     __slots__ = ['s']
     HOST = 'localhost'
     PORT = 5000
+    sending = 0
     ERRORS = {1 : "Invalid API call",
               2 : "Wrong number of arguments (% instead of %)",
               3 : "User name not yet set",
@@ -12,10 +13,26 @@ class messageSender:
               6 : "Application name not yet set",
               7 : "Must be owner to change admin setting"
     }
+    counter = 0
+    #movestrip = ""
+    elelocs = {} #Could act as cache inside bus in future versions (to allow multiple clients)
+    
+    '''def movingScanner(self):
+        while True:
+            self.counter += 1
+            print "Hi " + str(self.counter)
+            
+            if((self.movestrip=="")==False):
+                temp = self.movestrip
+                self.movestrip = ""
+                self.sendMessage(temp)
+            time.sleep(0.05)'''
+    
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(2)
-        
+        #thread = threading.Thread(target=self.movingScanner, args=()) #Creates the display thread
+        #thread.start() #Starts the display thread
         try:
             self.s.connect((self.HOST,self.PORT))
         except:
@@ -28,6 +45,8 @@ class messageSender:
         return str(red) + ":" + str(green) + ":" + str(blue) + ":" + str(alpha)
         
     def sendMessage(self, message):
+        self.sending+=1
+        #print "Sending " + str(self.sending)
         self.s.send(message)
         if(message=="quit"):
                     print '\033[1;31mShutting down client\033[1;m'
@@ -64,79 +83,138 @@ class messageSender:
         self.sendMessage("setapp," + str(appname))
     
     def newSurface(self):
-        self.sendMessage("new_surface")
+        sur = self.sendMessage("new_surface")
+        surNo = int(sur["surfaceNo"])
+        return surNo
         
     def newSurfaceWithID(self, ID):
-        self.sendMessage("new_surface_with_ID," + str(ID))
+        return self.sendMessage("new_surface_with_ID," + str(ID))
     
     def newCursor(self, surfaceNo, x, y):
-        return self.sendMessage("new_cursor," + str(surfaceNo) + "," + str(x) + "," + str(y))
+        cur = self.sendMessage("new_cursor," + str(surfaceNo) + "," + str(x) + "," + str(y))
+        curNo = int(cur["cursorNo"])
+        return curNo
     
     def newCursorWithID(self, ID, surfaceNo, x, y):
-        return self.sendMessage("new_cursor_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y))
+        cur = self.sendMessage("new_cursor_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y))
+        curNo = int(cur["cursorNo"])
+        return curNo
     
     def newWindow(self, surfaceNo, x, y, width, height, name):
-        return self.sendMessage("new_window," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
+        win = self.sendMessage("new_window," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
+        winNo = int(win["windowNo"])
+        return winNo
     
     def newWindowWithID(self, ID, surfaceNo, x, y, width, height, name):
-        return self.sendMessage("new_window_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
+        win = self.sendMessage("new_window_with_ID," + str(ID) + "," + str(surfaceNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + name)
+        winNo = int(win["windowNo"])
+        return winNo
     
     def newCircle(self, windowNo, x, y, radius, lineCol, fillCol, sides):
-        return self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]) + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
+        ele = self.sendMessage("new_circle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]) + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        return eleNo
     
     def newCircleWithID(self, ID, windowNo, x, y, radius, lineCol, fillCol, sides):
-        return self.sendMessage("new_circle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]) + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
+        ele = self.sendMessage("new_circle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(radius) + "," + self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]) + "," + self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]) + "," + str(sides))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        return eleNo
     
     def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, color, width):
-        return self.sendMessage("new_line," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        ele = self.sendMessage("new_line," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (xStart,yStart,xEnd,yEnd)
+        return eleNo
     
     def newLineWithID(self, ID, windowNo, xStart, yStart, xEnd, yEnd, color, width):
-        return self.sendMessage("new_line_with_ID," + str(ID) + "," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        ele = self.sendMessage("new_line_with_ID," + str(ID) + "," + str(windowNo) + "," + str(xStart) + "," + str(yStart) + "," + str(xEnd) + "," + str(yEnd) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (xStart,yStart,xEnd,yEnd)
+        return eleNo
     
     def newLineStrip(self, windowNo, x, y, color, width):
-        return self.sendMessage("new_line_strip," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        ele = self.sendMessage("new_line_strip," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = [x,y]
+        return eleNo
     
     def newLineStripWithID(self, ID, windowNo, x, y, color, width):
-        return self.sendMessage("new_line_strip_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        ele = self.sendMessage("new_line_strip_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(color[0], color[1], color[2], color[3]) + "," + str(width))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = [x,y]
+        return eleNo
     
     def newPolygon(self, windowNo, x, y, lineColor, fillColor):
-        return self.sendMessage("new_polygon," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
+        ele = self.sendMessage("new_polygon," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = [x,y]
+        return eleNo
     
     def newPolygonWithID(self, ID, windowNo, x, y, lineColor, fillColor):
-        return self.sendMessage("new_polygon_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
+        ele = self.sendMessage("new_polygon_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = [x,y]
+        return eleNo
     
     def newText(self, windowNo, text, x, y, ptSize, font, color):
-        return self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
+        ele = self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        return eleNo
     
     def newTextWithID(self, ID, windowNo, text, x, y, ptSize, font, color):
-        return self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
+        ele = self.sendMessage("new_text_with_ID," + str(ID) + "," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        return eleNo
     
     def subscribeToSurface(self, surfaceNo):
         self.sendMessage("subscribe_to_surface," + str(surfaceNo))
     
     def getSurfaceID(self, surfaceNo):
-        return self.sendMessage("get_surface_ID," + str(surfaceNo))
+        ID = self.sendMessage("get_surface_ID," + str(surfaceNo))
+        return ID["ID"]
     
     def setSurfaceID(self, surfaceNo, ID):
         self.sendMessage("set_surface_ID," + str(surfaceNo) + "," + str(ID))
     
     def getSurfaceOwner(self, surfaceNo):
-        self.sendMessage("get_surface_owner," + str(surfaceNo))
+        owner = self.sendMessage("get_surface_owner," + str(surfaceNo))
+        return owner["owner"]
         
     def getSurfaceAppDetails(self, surfaceNo):
-        self.sendMessage("get_surface_app_details," + str(surfaceNo))
+        details = self.sendMessage("get_surface_app_details," + str(surfaceNo))
+        return (details["app"],details["instance"])
         
     def getSurfacesByID(self, ID):
-        return self.sendMessage("get_surfaces_by_ID," + str(ID))
+        surfaces = self.sendMessage("get_surfaces_by_ID," + str(ID))
+        surfacelist = []
+        for x in range(0,int(surfaces["count"])):
+            surfacelist.append(int(surfaces[x]))
+        return surfacelist
         
     def getSurfacesByOwner(self, owner):
-        return self.sendMessage("get_surfaces_by_owner," + str(owner))
+        surfaces = self.sendMessage("get_surfaces_by_owner," + str(owner))
+        surfacelist = []
+        for x in range(0,int(surfaces["count"])):
+            surfacelist.append(int(surfaces[x]))
+        return surfacelist
         
     def getSurfacesByAppName(self, name):
-        return self.sendMessage("get_surfaces_by_app_name," +  str(name))
+        surfaces = self.sendMessage("get_surfaces_by_app_name," +  str(name))
+        surfacelist = []
+        for x in range(0,int(surfaces["count"])):
+            surfacelist.append(int(surfaces[x]))
+        return surfacelist
         
     def getSurfacesByAppDetails(self, name, instance):
-        return self.sendMessage("get_surfaces_by_app_details" + str(name) + "," + str(instance))
+        surfaces = self.sendMessage("get_surfaces_by_app_details" + str(name) + "," + str(instance))
+        surfacelist = []
+        for x in range(0,int(surfaces["count"])):
+            surfacelist.append(int(surfaces[x]))
+        return surfacelist
         
     def becomeSurfaceAdmin(self, surfaceNo):
         self.sendMessage("become_surface_admin," + str(surfaceNo))
@@ -148,28 +226,47 @@ class messageSender:
         self.sendMessage("subscribe_to_window," + str(windowNo))
         
     def getWindowID(self, windowNo):
-        return self.sendMessage("get_window_ID," + str(windowNo))
+        ID = self.sendMessage("get_window_ID," + str(windowNo))
+        return ID["ID"]
     
     def setWindowID(self, windowNo, ID):
         self.sendMessage("set_window_ID," + str(windowNo) + "," + str(ID))
     
     def getWindowOwner(self, windowNo):
-        self.sendMessage("get_window_owner," + str(windowNo))
+        owner = self.sendMessage("get_window_owner," + str(windowNo))
+        return owner["owner"]
         
     def getWindowAppDetails(self, surfaceNo):
-        self.sendMessage("get_window_app_details," + str(surfaceNo))
+        details = self.sendMessage("get_window_app_details," + str(surfaceNo))
+        return (details["app"],details["instance"])
         
     def getWindowsByID(self, ID):
-        return self.sendMessage("get_windows_by_ID," + str(ID))
+        windows = self.sendMessage("get_windows_by_ID," + str(ID))
+        windowlist = []
+        for x in range(0,int(windows["count"])):
+            windowlist.append(int(windows[x]))
+        return windowlist
         
     def getWindowsByOwner(self, owner):
-        return self.sendMessage("get_windows_by_owner," + str(owner))
+        windows = self.sendMessage("get_windows_by_owner," + str(owner))
+        windowlist = []
+        for x in range(0,int(windows["count"])):
+            windowlist.append(int(windows[x]))
+        return windowlist
         
     def getWindowsByAppName(self, name):
-        return self.sendMessage("get_windows_by_app_name," +  str(name))
+        windows = self.sendMessage("get_windows_by_app_name," +  str(name))
+        windowlist = []
+        for x in range(0,int(windows["count"])):
+            windowlist.append(int(windows[x]))
+        return windowlist
         
     def getWindowssByAppDetails(self, name, instance):
-        return self.sendMessage("get_windows_by_app_details" + str(name) + "," + str(instance))
+        windows = self.sendMessage("get_windows_by_app_details" + str(name) + "," + str(instance))
+        windowlist = []
+        for x in range(0,int(windows["count"])):
+            windowlist.append(int(windows[x]))
+        return windowlist
         
     def becomeWindowAdmin(self, windowNo):
         self.sendMessage("become_window_admin," + str(windowNo))
@@ -181,28 +278,47 @@ class messageSender:
         self.sendMessage("subscribe_to_element," + str(elementNo))
         
     def getElementID(self, elementNo):
-        return self.sendMessage("get_element_ID," + str(elementNo))
+        ID = self.sendMessage("get_element_ID," + str(elementNo))
+        return ID["ID"]
     
     def setElementID(self, elementNo, ID):
         self.sendMessage("set_element_ID," + str(elementNo) + "," + str(ID))
     
     def getElementOwner(self, elementNo):
-        self.sendMessage("get_element_owner," + str(elementNo))
+        owner = self.sendMessage("get_element_owner," + str(elementNo))
+        return owner["owner"]
         
     def getElementAppDetails(self, surfaceNo):
-        self.sendMessage("get_element_app_details," + str(surfaceNo))
+        details = self.sendMessage("get_element_app_details," + str(surfaceNo))
+        return (details["app"],details["instance"])
         
     def getElementsByID(self, ID):
-        return self.sendMessage("get_elements_by_ID," + str(ID))
+        elements = self.sendMessage("get_elements_by_ID," + str(ID))
+        elementlist = []
+        for x in range(0,int(elements["count"])):
+            elementlist.append(int(elements[x]))
+        return elementlist
         
     def getElementsByOwner(self, owner):
-        return self.sendMessage("get_elements_by_owner," + str(owner))
+        elements = self.sendMessage("get_elements_by_owner," + str(owner))
+        elementlist = []
+        for x in range(0,int(elements["count"])):
+            elementlist.append(int(elements[x]))
+        return elementlist
         
     def getElementsByAppName(self, name):
-        return self.sendMessage("get_elements_by_app_name," +  str(name))
+        elements = self.sendMessage("get_elements_by_app_name," +  str(name))
+        elementlist = []
+        for x in range(0,int(elements["count"])):
+            elementlist.append(int(elements[x]))
+        return elementlist
         
     def getElementsByAppDetails(self, name, instance):
-        return self.sendMessage("get_elements_by_app_details" + str(name) + "," + str(instance))
+        elements = self.sendMessage("get_elements_by_app_details" + str(name) + "," + str(instance))
+        elementlist = []
+        for x in range(0,int(elements["count"])):
+            elementlist.append(int(elements[x]))
+        return elementlist
         
     def becomeElementAdmin(self, elementNo):
         self.sendMessage("become_element_admin," + str(elementNo))
@@ -211,34 +327,42 @@ class messageSender:
         self.sendMessage("stop_being_element_admin," + str(elementNo))
     
     def mouseLeftDown(self, cursorNo):
-        return self.sendMessage("mouse_l," + str(cursorNo))
+        pt = self.sendMessage("mouse_l," + str(cursorNo))
+        return (pt["x"],pt["y"])
     
     def mouseLeftUp(self, cursorNo):
-        return self.sendMessage("mouse_lu," + str(cursorNo))
+        pt = self.sendMessage("mouse_lu," + str(cursorNo))
+        return (pt["x"],pt["y"],pt["duration"])
     
     def mouseMiddleDown(self, cursorNo):
-        return self.sendMessage("mouse_m," + str(cursorNo))
+        pt = self.sendMessage("mouse_m," + str(cursorNo))
+        return (pt["x"],pt["y"])
     
     def mouseMiddleUp(self, cursorNo):
-        return self.sendMessage("mouse_mu," + str(cursorNo))
+        pt = self.sendMessage("mouse_mu," + str(cursorNo))
+        return (pt["x"],pt["y"],pt["duration"])
     
     def mouseRightDown(self, cursorNo):
-        return self.sendMessage("mouse_r," + str(cursorNo))
+        pt = self.sendMessage("mouse_r," + str(cursorNo))
+        return (pt["x"],pt["y"])
     
     def mouseRightUp(self, cursorNo):
-        return self.sendMessage("mouse_ru," + str(cursorNo))
+        pt = self.sendMessage("mouse_ru," + str(cursorNo))
+        return (pt["x"],pt["y"],pt["duration"])
     
     def moveCursor(self, cursorNo, xDistance, yDistance):
         self.sendMessage("move_cursor," + str(cursorNo) + "," + str(xDistance) + "," + str(yDistance))
         
     def testMoveCursor(self, cursorNo, xDistance, yDistance):
-        return self.sendMessage("test_move_cursor," + str(cursorNo) + "," + str(xDistance) + "," + str(yDistance))
+        loc = self.sendMessage("test_move_cursor," + str(cursorNo) + "," + str(xDistance) + "," + str(yDistance))
+        return [loc["x"],loc["y"]]
     
     def relocateCursor(self, cursorNo, x, y, surfaceNo):
         self.sendMessage("relocate_cursor," + str(cursorNo) + "," + str(x) + "," + str(y) + "," + str(surfaceNo))
     
     def getCursorPosition(self, cursorNo):
-        return self.sendMessage("get_cursor_pos," + str(cursorNo))
+        loc = self.sendMessage("get_cursor_pos," + str(cursorNo))
+        return [loc["x"],loc["y"]]
     
     def rotateCursorClockwise(self, cursorNo, degrees):
         self.sendMessage("rotate_cursor_clockwise," + str(cursorNo) + "," + str(degrees))
@@ -247,7 +371,8 @@ class messageSender:
         self.sendMessage("rotate_cursor_anticlockwise," + str(cursorNo) + "," + str(degrees))
     
     def getCursorRotation(self, cursorNo):
-        return self.sendMessage("get_cursor_rotation," + str(cursorNo))
+        rotation = self.sendMessage("get_cursor_rotation," + str(cursorNo))
+        return rotation["rotation"]
     
     def moveWindow(self, windowNo, xDistance, yDistance):
         self.sendMessage("move_window," + str(windowNo) + "," + str(xDistance) + "," + str(yDistance))
@@ -262,13 +387,16 @@ class messageSender:
         self.sendMessage("set_window_height," + str(windowNo) + "," + str(height))
         
     def getWindowPosition(self, windowNo):
-        return self.sendMessage("get_window_pos," + str(windowNo))
+        loc = self.sendMessage("get_window_pos," + str(windowNo))
+        return [loc["x"],loc["y"]]
         
     def getWindowWidth(self, windowNo):
-        return self.sendMessage("get_window_width," + str(windowNo))
+        width = self.sendMessage("get_window_width," + str(windowNo))
+        return width["width"]
         
     def getWindowHeight(self, windowNo):
-        return self.sendMessage("get_window_height," + str(windowNo))
+        height = self.sendMessage("get_window_height," + str(windowNo))
+        return height["height"]
         
     def stretchWindowDown(self, windowNo, distance):
         self.sendMessage("stretch_window_down," + str(windowNo) + "," + str(distance))
@@ -286,16 +414,23 @@ class messageSender:
         self.sendMessage("set_window_name," + str(windowNo) + "," + name)
         
     def getWindowName(self, windowNo):
-        return self.sendMessage("get_window_name," + str(windowNo))
+        name = self.sendMessage("get_window_name," + str(windowNo))
+        return name["name"]
     
     def relocateCircle(self, elementNo, x, y, windowNo):
+        self.elelocs[elementNo] = (x,y)
         self.sendMessage("relocate_circle," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(windowNo))
         
     def getCirclePosition(self, elementNo):
-        return self.sendMessage("get_circle_pos," + str(elementNo))
+        if (self.elelocs.has_key(elementNo)):
+            return [self.elelocs[elementNo][0],self.elelocs[elementNo][1]]
+        else:
+            loc = self.sendMessage("get_circle_pos," + str(elementNo))
+            return [loc["x"],loc["y"]]
     
     def getElementType(self, elementNo):
-        return self.sendMessage("get_element_type," + str(elementNo))
+        type = self.sendMessage("get_element_type," + str(elementNo))
+        return type["type"]
     
     def setCircleLineColor(self, elementNo, color):
         self.sendMessage("set_circle_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
@@ -313,19 +448,23 @@ class messageSender:
         self.sendMessage("set_circle_radius," + str(elementNo) + "," + str(radius))
         
     def getCircleRadius(self, elementNo):
-        return self.sendMessage("get_circle_radius," + str(elementNo))
+        radius = self.sendMessage("get_circle_radius," + str(elementNo))
+        return radius["radius"]
     
     def setCircleSides(self, elementNo, sides):
         self.sendMessage("set_circle_sides," + str(elementNo) + "," + str(sides))
         
     def getCircleSides(self, elementNo):
-        return self.sendMessage("get_circle_sides," + str(elementNo))
+        sides = self.sendMessage("get_circle_sides," + str(elementNo))
+        return sides["sides"]
     
     def getLineStart(self, elementNo):
-        return self.sendMessage("get_line_start," + str(elementNo))
+        loc = self.sendMessage("get_line_start," + str(elementNo))
+        return [loc["x"],loc["y"]]
     
     def getLineEnd(self, elementNo):
-        return self.sendMessage("get_line_end," + str(elementNo))
+        loc = self.sendMessage("get_line_end," + str(elementNo))
+        return [loc["x"],loc["y"]]
     
     def setLineStart(self, elementNo, x, y):
         self.sendMessage("relocate_line_start," + str(elementNo) + "," + str(x) + "," + str(y))
@@ -343,7 +482,8 @@ class messageSender:
         self.sendMessage("set_line_width," + str(elementNo) + "," + str(width))
         
     def getLineWidth(self, elementNo):
-        return self.sendMessage("get_line_width," + str(elementNo))
+        width = self.sendMessage("get_line_width," + str(elementNo))
+        return width["width"]
     
     def addLineStripPoint(self, elementNo, x, y):
         self.sendMessage("add_line_strip_point," + str(elementNo) + "," + str(x) + "," + str(y))
@@ -352,7 +492,8 @@ class messageSender:
         self.sendMessage("add_line_strip_point_at," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(index))
         
     def getLineStripPoint(self, elementNo, pointNo):
-        return self.sendMessage("get_line_strip_point," + str(elementNo) + "," + str(pointNo))
+        loc = self.sendMessage("get_line_strip_point," + str(elementNo) + "," + str(pointNo))
+        return [loc["x"],loc["y"]]
     
     def moveLineStripPoint(self, elementNo, pointNo, x, y):
         self.sendMessage("relocate_line_strip_point," + str(elementNo) + "," + str(pointNo) + "," + str(x) + "," + str(y))
@@ -367,16 +508,25 @@ class messageSender:
         self.sendMessage("set_line_strip_width," + str(elementNo) + "," + str(width))
         
     def getLineStripWidth(self, elementNo):
-        return self.sendMessage("get_line_strip_width," + str(elementNo))
+        width = self.sendMessage("get_line_strip_width," + str(elementNo))
+        return width["width"]
         
     def getLineStripPointCount(self, elementNo):
-        return self.sendMessage("get_line_strip_point_count," + str(elementNo))
+        count = self.sendMessage("get_line_strip_point_count," + str(elementNo))
+        return count["count"]
+    
+    def setLineStripContent(self, elementNo, content):
+        converted = str(content[0][0]) + ":" + str(content[0][1])
+        for x in range(1,len(content)):
+            converted = converted + ";" + str(content[x][0]) + ":" + str(content[x][1])
+        self.sendMessage("set_line_strip_content," + str(elementNo) + "," + converted)
     
     def addPolygonPoint(self, elementNo, x, y):
         self.sendMessage("add_polygon_point," + str(elementNo) + "," + str(x) + "," + str(y))
         
     def getPolygonPoint(self, elementNo, pointNo):
-        return self.sendMessage("get_polygon_point," + str(elementNo) + "," + str(pointNo))
+        loc = self.sendMessage("get_polygon_point," + str(elementNo) + "," + str(pointNo))
+        return (loc["x"],loc["y"])
     
     def movePolygonPoint(self, elementNo, pointNo, x, y):
         self.sendMessage("relocate_polygon_point," + str(elementNo) + "," + str(pointNo) + "," + str(x) + "," + str(y))
@@ -394,28 +544,33 @@ class messageSender:
         self.sendMessage("set_polygon_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getPolygonPointCount(self, elementNo):
-        return self.sendMessage("get_polygon_point_count," + str(elementNo))
+        count = self.sendMessage("get_polygon_point_count," + str(elementNo))
+        return count["count"]
     
     def setText(self, elementNo, text):
         self.sendMessage("set_text," + str(elementNo) + "," + text)
         
     def getText(self, elementNo):
-        return self.sendMessage("get_text," + str(elementNo))
+        text = self.sendMessage("get_text," + str(elementNo))
+        return text["text"]
     
     def setTextPosition(self, elementNo, x, y, windowNo):
         self.sendMessage("relocate_text," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(windowNo))
         
     def getTextPosition(self, elementNo):
-        return self.sendMessage("get_text_pos," + str(elementNo))
+        loc = self.sendMessage("get_text_pos," + str(elementNo))
+        return [loc["x"],loc["y"]]
         
     def setPointSize(self, elementNo, pointSize):
         self.sendMessage("set_text_point_size," + str(elementNo) + "," + str(pointSize))
         
     def getPointSize(self, elementNo):
-        return self.sendMessage("get_text_point_size," + str(elementNo))
+        size = self.sendMessage("get_text_point_size," + str(elementNo))
+        return size["size"]
     
     def getFont(self, elementNo):
-        return self.sendMessage("get_text_font," + str(elementNo))
+        font = self.sendMessage("get_text_font," + str(elementNo))
+        return font["font"]
     
     def setFont(self, elementNo, font):
         self.sendMessage("set_text_font," + str(elementNo) + "," + font)
@@ -430,7 +585,8 @@ class messageSender:
         self.sendMessage("hide_element," + str(elementNo))
         
     def checkElementVisibility(self, elementNo):
-        self.sendMessage("check_element_visibility," + str(elementNo))
+        visibility = self.sendMessage("check_element_visibility," + str(elementNo))
+        return visibility["visible"]
         
     def hideSetupSurface(self):
         self.sendMessage("hide_setup_surface")
@@ -442,4 +598,8 @@ class messageSender:
         return self.sendMessage("get_setup_surface_visibility")
         
     def getClickedElements(self, surfaceNo, x, y):
-        return self.sendMessage("get_clicked_elements," + str(surfaceNo) + "," + str(x) + "," + str(y))
+        elements = self.sendMessage("get_clicked_elements," + str(surfaceNo) + "," + str(x) + "," + str(y))
+        elementlist = []
+        for x in range(0,int(elements["count"])):
+            elementlist.append(int(elements[x]))
+        return elementlist
