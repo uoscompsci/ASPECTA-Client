@@ -115,8 +115,8 @@ class client:
             return False
 
     def getInput(self,get_point):
-        mpb=pygame.mouse.get_pressed() # mouse pressed buttons
-        kpb=pygame.key.get_pressed() # keyboard pressed buttons
+        #mpb=pygame.mouse.get_pressed() # mouse pressed buttons
+        #kpb=pygame.key.get_pressed() # keyboard pressed buttons
         pos=pygame.mouse.get_pos() # mouse shift
         for event in pygame.event.get():
             if event.type == QUIT:
