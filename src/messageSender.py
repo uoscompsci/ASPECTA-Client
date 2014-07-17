@@ -14,26 +14,35 @@ class messageSender:
               7 : "Must be owner to change admin setting"
     }
     counter = 0
-    #movestrip = ""
     elelocs = {} #Could act as cache inside bus in future versions (to allow multiple clients)
     eletrack = {}
+    stripLock = threading.Lock()
+    sendlock = threading.Lock()
     
-    '''def movingScanner(self):
+    def eleUpdater(self):
         while True:
-            self.counter += 1
-            print "Hi " + str(self.counter)
-            
-            if((self.movestrip=="")==False):
-                temp = self.movestrip
-                self.movestrip = ""
-                self.sendMessage(temp)
-            time.sleep(0.05)'''
+            #print str(self.eletrack)
+            strips = 0
+            for x in range(1,len(self.elelocs)+1):
+                if(self.eletrack[x][0] == True):
+                    if(self.eletrack[x][1] == "lineStrip"):
+                        strips += 1
+                        self.stripLock.acquire()
+                        converted = str(self.elelocs[x][0][0]) + ":" + str(self.elelocs[x][0][1])
+                        for y in range(0,len(self.elelocs[x])):
+                            converted += ";" + str(self.elelocs[x][y][0]) + ":" + str(self.elelocs[x][y][1])
+                        self.sendMessage("set_line_strip_content," + str(x) + "," + converted)
+                        self.stripLock.release()
+                    elif(self.eletrack[x][1] == "circle"):
+                        self.sendMessage("relocate_circle," + str(x) + "," + str(self.elelocs[x][0]) + "," + str(self.elelocs[x][1]) + "," + str(1))
+                    self.eletrack[x][0]=False
+            time.sleep(0.0333)
     
     def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(2)
-        #thread = threading.Thread(target=self.movingScanner, args=()) #Creates the display thread
-        #thread.start() #Starts the display thread
+        thread = threading.Thread(target=self.eleUpdater, args=()) #Creates the display thread
+        thread.start() #Starts the display thread
         try:
             self.s.connect((self.HOST,self.PORT))
         except:
@@ -46,6 +55,7 @@ class messageSender:
         return str(red) + ":" + str(green) + ":" + str(blue) + ":" + str(alpha)
         
     def sendMessage(self, message):
+        self.sendlock.acquire()
         self.sending+=1
         #print "Sending " + str(self.sending)
         self.s.send(message)
@@ -70,8 +80,10 @@ class messageSender:
                     for x in range(1,len(spliterr)):
                         errorStr = errorStr + dict[str(x)] + spliterr[x]
                     print "\033[1;31mERROR: " + errorStr + "\033[1;m"
+                    self.sendlock.release()
                     return dict
                 except:
+                    self.sendlock.release()
                     return dict
                 
     def quit(self):
@@ -431,7 +443,6 @@ class messageSender:
     def relocateCircle(self, elementNo, x, y, windowNo):
         self.elelocs[elementNo] = (x,y)
         self.eletrack[elementNo][0] = True
-        self.sendMessage("relocate_circle," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(windowNo))
         
     def getCirclePosition(self, elementNo):
         if (self.elelocs.has_key(elementNo)):
@@ -498,14 +509,16 @@ class messageSender:
         return width["width"]
     
     def addLineStripPoint(self, elementNo, x, y):
+        self.stripLock.acquire()
         self.elelocs[elementNo].append([x,y])
         self.eletrack[elementNo][0] = True
-        self.sendMessage("add_line_strip_point," + str(elementNo) + "," + str(x) + "," + str(y))
+        self.stripLock.release()
         
     def addLineStripPointAt(self, elementNo, x, y, index):
+        self.stripLock.acquire()
         self.elelocs[elementNo].insert(index,[x,y])
         self.eletrack[elementNo][0] = True
-        self.sendMessage("add_line_strip_point_at," + str(elementNo) + "," + str(x) + "," + str(y) + "," + str(index))
+        self.stripLock.release()
         
     def getLineStripPoint(self, elementNo, pointNo):
         if(self.elelocs.has_key(elementNo)):
@@ -515,9 +528,10 @@ class messageSender:
             return [loc["x"],loc["y"]]
     
     def moveLineStripPoint(self, elementNo, pointNo, x, y):
+        self.stripLock.acquire()
         self.elelocs[elementNo][pointNo] = [x,y]
         self.eletrack[elementNo][0] = True
-        self.sendMessage("relocate_line_strip_point," + str(elementNo) + "," + str(pointNo) + "," + str(x) + "," + str(y))
+        self.stripLock.release()
         
     def getLineStripColor(self, elementNo):
         return self.sendMessage("get_line_strip_color," + str(elementNo))
@@ -537,13 +551,13 @@ class messageSender:
         return count["count"]
     
     def setLineStripContent(self, elementNo, content):
-        converted = str(content[0][0]) + ":" + str(content[0][1])
+        self.stripLock.acquire()
+        self.elelock = True
         self.elelocs[elementNo] = [[content[0][0],content[0][1]]]
         for x in range(1,len(content)):
-            converted = converted + ";" + str(content[x][0]) + ":" + str(content[x][1])
             self.elelocs[elementNo].append([content[x][0],content[x][1]])
         self.eletrack[elementNo][0] = True
-        self.sendMessage("set_line_strip_content," + str(elementNo) + "," + converted)
+        self.stripLock.release()
     
     def addPolygonPoint(self, elementNo, x, y):
         self.sendMessage("add_polygon_point," + str(elementNo) + "," + str(x) + "," + str(y))
