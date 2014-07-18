@@ -1,9 +1,8 @@
 import socket, sys, select, time, threading
+from ConfigParser import SafeConfigParser
 
 class messageSender:
-    __slots__ = ['s']
-    HOST = 'localhost'
-    PORT = 5000
+    __slots__ = ['s', 'host', 'port', 'refreshrate']
     sending = 0
     ERRORS = {1 : "Invalid API call",
               2 : "Wrong number of arguments (% instead of %)",
@@ -13,7 +12,6 @@ class messageSender:
               6 : "Application name not yet set",
               7 : "Must be owner to change admin setting"
     }
-    counter = 0
     elelocs = {} #Could act as cache inside bus in future versions (to allow multiple clients)
     eletrack = {}
     stripLock = threading.Lock()
@@ -36,15 +34,20 @@ class messageSender:
                     elif(self.eletrack[x][1] == "circle"):
                         self.sendMessage("relocate_circle," + str(x) + "," + str(self.elelocs[x][0]) + "," + str(self.elelocs[x][1]) + "," + str(1))
                     self.eletrack[x][0]=False
-            time.sleep(0.0333)
+            time.sleep(self.refreshrate)
     
     def __init__(self):
+        parser = SafeConfigParser()
+        parser.read("config.ini")
+        self.refreshrate = 1/(int(parser.get('library','MovesPerSecond')))
+        self.host = parser.get('connection','host')
+        self.port = int(parser.get('connection','port'))
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(2)
         thread = threading.Thread(target=self.eleUpdater, args=()) #Creates the display thread
         thread.start() #Starts the display thread
         try:
-            self.s.connect((self.HOST,self.PORT))
+            self.s.connect((self.host,self.port))
         except:
             print 'Unable to connect'
             sys.exit()

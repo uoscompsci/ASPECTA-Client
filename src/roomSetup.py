@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 from math import *
 from bezier import *
+from ConfigParser import SafeConfigParser
 
 class point:
     __slots__ = ['x','y']
@@ -24,6 +25,7 @@ class point:
         return self.y
 
 class client:
+    __slots__ = ['ppe', 'topbz', 'bottombz', 'leftbz', 'rightbz']
     quit = False
     topCircles = []
     bottomCircles = []
@@ -33,10 +35,6 @@ class client:
     bottomCP = []
     leftCP = []
     rightCP = [] 
-    topbz = None
-    bottombz = None
-    leftbz = None
-    rightbz = None
     dragging = []
     
     def getMidPoints(self, point1, point2):
@@ -92,16 +90,16 @@ class client:
         self.setControlPoints(side, points)
         calc = bezierCalc()
         if(side=="top"):
-            curve = calc.getCurvePoints(points, self.topCP, 25)
+            curve = calc.getCurvePoints(points, self.topCP, self.ppe)
             self.sender.setLineStripContent(self.topbz,curve)
         elif(side=="bottom"):
-            curve = calc.getCurvePoints(points, self.bottomCP, 25)
+            curve = calc.getCurvePoints(points, self.bottomCP, self.ppe)
             self.sender.setLineStripContent(self.bottombz,curve)
         elif(side=="left"):
-            curve = calc.getCurvePoints(points, self.leftCP, 25)
+            curve = calc.getCurvePoints(points, self.leftCP, self.ppe)
             self.sender.setLineStripContent(self.leftbz,curve)
         elif(side=="right"):
-            curve = calc.getCurvePoints(points, self.rightCP, 25)
+            curve = calc.getCurvePoints(points, self.rightCP, self.ppe)
             self.sender.setLineStripContent(self.rightbz,curve)
             
     def isHit(self, point1, point2):
@@ -197,6 +195,9 @@ class client:
         return None
     
     def __init__(self):
+        parser = SafeConfigParser()
+        parser.read("config.ini")
+        self.ppe = int(parser.get('RoomSetup','PointsPerEdge'))
         self.mouseLock = False
         self.sender = messageSender()
         self.winWidth = 320
