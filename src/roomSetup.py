@@ -197,7 +197,7 @@ class client:
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
-        self.ppe = int(parser.get('RoomSetup','PointsPerEdge'))
+        self.ppe = parser.getint('RoomSetup','PointsPerEdge')
         self.mouseLock = False
         self.sender = messageSender()
         self.winWidth = 320
@@ -229,7 +229,7 @@ class client:
         self.mouseLock=True
         pygame.mouse.set_visible(False)
         
-        self.sender.newText(1, "Arial", 100, 100, 30, "Arial", (1,1,0,1))
+        #self.sender.newText(1, "Arial", 100, 100, 30, "Arial", (1,1,0,1))
         tl = None
         bl = None
         tr = None

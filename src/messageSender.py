@@ -39,9 +39,9 @@ class messageSender:
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
-        self.refreshrate = 1/(int(parser.get('library','MovesPerSecond')))
+        self.refreshrate = 1/(parser.getint('library','MovesPerSecond'))
         self.host = parser.get('connection','host')
-        self.port = int(parser.get('connection','port'))
+        self.port = parser.getint('connection','port')
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(2)
         thread = threading.Thread(target=self.eleUpdater, args=()) #Creates the display thread
