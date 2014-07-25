@@ -38,26 +38,23 @@ class client:
     leftCP = []
     rightCP = [] 
     dragging = []
-    bezierTUpdate = False
-    bezierBUpdate = False
-    bezierLUpdate = False
-    bezierRUpdate = False
+    bezierUpdates = [False,False,False,False] #[top,bottom,left,right]
     refreshrate = 0
     
     def bezierUpdateTracker(self):
         while(True):
-            if (self.bezierTUpdate==True):
+            if (self.bezierUpdates[0]==True):
                 self.updateBezier("top")
-                self.bezierTUpdate = False
-            if (self.bezierBUpdate==True):
+                self.bezierUpdates[0] = False
+            if (self.bezierUpdates[1]==True):
                 self.updateBezier("bottom")
-                self.bezierBUpdate = False
-            if(self.bezierLUpdate == True):
+                self.bezierUpdates[1] = False
+            if(self.bezierUpdates[2] == True):
                 self.updateBezier("left")
-                self.bezierLUpdate = False
-            if(self.bezierRUpdate == True):
+                self.bezierUpdates[2] = False
+            if(self.bezierUpdates[3] == True):
                 self.updateBezier("right")
-                self.bezierRUpdate = False
+                self.bezierUpdates[3] = False
             time.sleep(self.refreshrate)
     
     def getMidPoints(self, point1, point2):
@@ -78,13 +75,13 @@ class client:
             ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 4)
             circles.insert(x+1, ele)
         if(side == "top"):
-            self.bezierTUpdate = True
+            self.bezierUpdates[0] = True
         elif(side == "bottom"):
-            self.bezierBUpdate = True
+            self.bezierUpdates[1] = True
         elif(side == "left"):
-            self.bezierLUpdate = True
+            self.bezierUpdates[2] = True
         elif(side == "right"):
-            self.bezierRUpdate = True
+            self.bezierUpdates[3] = True
             
     def setControlPoints(self, side, points):
         controlPoints = []
@@ -216,13 +213,13 @@ class client:
                     for x in range (0,len(self.dragging)):
                         self.sender.relocateCircle(self.dragging[x], loc[0], loc[1], 1)
                         if(self.topCircles.__contains__(self.dragging[x])):
-                            self.bezierTUpdate = True
+                            self.bezierUpdates[0] = True
                         if(self.bottomCircles.__contains__(self.dragging[x])):
-                            self.bezierBUpdate = True
+                            self.bezierUpdates[1] = True
                         if(self.leftCircles.__contains__(self.dragging[x])):
-                            self.bezierLUpdate = True
+                            self.bezierUpdates[2] = True
                         if(self.rightCircles.__contains__(self.dragging[x])):
-                            self.bezierRUpdate = True
+                            self.bezierUpdates[3] = True
         return None
     
     def __init__(self):
