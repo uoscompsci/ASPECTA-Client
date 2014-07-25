@@ -1,5 +1,7 @@
 from messageSender import *
 import pygame
+import threading
+import time
 from pygame.locals import *
 from math import *
 from bezier import *
@@ -36,6 +38,27 @@ class client:
     leftCP = []
     rightCP = [] 
     dragging = []
+    bezierTUpdate = False
+    bezierBUpdate = False
+    bezierLUpdate = False
+    bezierRUpdate = False
+    refreshrate = 0
+    
+    def bezierUpdateTracker(self):
+        while(True):
+            if (self.bezierTUpdate==True):
+                self.updateBezier("top")
+                self.bezierTUpdate = False
+            if (self.bezierBUpdate==True):
+                self.updateBezier("bottom")
+                self.bezierBUpdate = False
+            if(self.bezierLUpdate == True):
+                self.updateBezier("left")
+                self.bezierLUpdate = False
+            if(self.bezierRUpdate == True):
+                self.updateBezier("right")
+                self.bezierRUpdate = False
+            time.sleep(self.refreshrate)
     
     def getMidPoints(self, point1, point2):
         return ((float(point1[0])+float(point2[0]))/float(2), (float(point1[1])+float(point2[1]))/float(2))
@@ -43,7 +66,7 @@ class client:
     def oppControl(self, point, control):
         return (float(point[0])+(float(point[0])-float(control[0])),float(point[1])+(float(point[1])-float(control[1])))
     
-    def splitSide(self, circles):
+    def splitSide(self, circles, side):
         count = len(circles)
         insert = []
         for x in range(1, count):
@@ -54,10 +77,14 @@ class client:
         for x in reversed(range(0,len(insert))):
             ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 4)
             circles.insert(x+1, ele)
-        self.updateBezier("top")
-        self.updateBezier("bottom")
-        self.updateBezier("left")
-        self.updateBezier("right")
+        if(side == "top"):
+            self.bezierTUpdate = True
+        elif(side == "bottom"):
+            self.bezierBUpdate = True
+        elif(side == "left"):
+            self.bezierLUpdate = True
+        elif(side == "right"):
+            self.bezierRUpdate = True
             
     def setControlPoints(self, side, points):
         controlPoints = []
@@ -129,13 +156,13 @@ class client:
                         self.mouseLock = True
                         pygame.mouse.set_visible(False)
                 elif event.key==pygame.K_UP:
-                    self.splitSide(self.topCircles)
+                    self.splitSide(self.topCircles, "top")
                 elif event.key==pygame.K_DOWN:
-                    self.splitSide(self.bottomCircles)
+                    self.splitSide(self.bottomCircles, "bottom")
                 elif event.key==pygame.K_LEFT:
-                    self.splitSide(self.leftCircles)
+                    self.splitSide(self.leftCircles, "left")
                 elif event.key==pygame.K_RIGHT:
-                    self.splitSide(self.rightCircles)
+                    self.splitSide(self.rightCircles, "right")
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button==4:
@@ -188,16 +215,17 @@ class client:
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
                         self.sender.relocateCircle(self.dragging[x], loc[0], loc[1], 1)
-                        self.updateBezier("top")
-                        self.updateBezier("bottom")
-                        self.updateBezier("left")
-                        self.updateBezier("right")
+                        self.bezierTUpdate = True
+                        self.bezierBUpdate = True
+                        self.bezierLUpdate = True
+                        self.bezierRUpdate = True
         return None
     
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
         self.ppe = parser.getint('RoomSetup','PointsPerEdge')
+        self.refreshrate = 1/(parser.getint('library','MovesPerSecond'))
         self.mouseLock = False
         self.sender = messageSender()
         self.winWidth = 320
@@ -291,6 +319,9 @@ class client:
         self.leftbz = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
         self.leftCircles.append(tl[1])
         self.sender.addLineStripPoint(self.leftbz, tl[0][0], tl[0][1])
+        
+        thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
+        thread.start() #Starts the display thread
         
         while(self.quit==False):
             background.fill((255, 255, 255))
