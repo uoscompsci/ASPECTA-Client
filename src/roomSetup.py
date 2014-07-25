@@ -215,10 +215,14 @@ class client:
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
                         self.sender.relocateCircle(self.dragging[x], loc[0], loc[1], 1)
-                        self.bezierTUpdate = True
-                        self.bezierBUpdate = True
-                        self.bezierLUpdate = True
-                        self.bezierRUpdate = True
+                        if(self.topCircles.__contains__(self.dragging[x])):
+                            self.bezierTUpdate = True
+                        if(self.bottomCircles.__contains__(self.dragging[x])):
+                            self.bezierBUpdate = True
+                        if(self.leftCircles.__contains__(self.dragging[x])):
+                            self.bezierLUpdate = True
+                        if(self.rightCircles.__contains__(self.dragging[x])):
+                            self.bezierRUpdate = True
         return None
     
     def __init__(self):
