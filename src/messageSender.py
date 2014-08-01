@@ -248,6 +248,24 @@ class messageSender:
     def stopBeingSurfaceAdmin(self, surfaceNo):
         self.sendMessage("stop_being_surface_admin," + str(surfaceNo))
         
+    def setSurfaceEdges(self, surfaceNo, topPoints, bottomPoints, leftPoints, rightPoints):
+        topString = str(topPoints[0][0]) + ":" + str(topPoints[0][1])
+        bottomString = str(bottomPoints[0][0]) + ":" + str(bottomPoints[0][1])
+        leftString = str(leftPoints[0][0]) + ":" + str(leftPoints[0][1])
+        rightString = str(rightPoints[0][0]) + ":" + str(rightPoints[0][1])
+        for x in range(1,len(topPoints)):
+            topString += (";" + str(topPoints[x][0]) + ":" + str(topPoints[x][1]))
+        for x in range(1,len(bottomPoints)):
+            bottomString += (";" + str(bottomPoints[x][0]) + ":" + str(bottomPoints[x][1]))
+        for x in range(1,len(leftPoints)):
+            leftString += (";" + str(leftPoints[x][0]) + ":" + str(leftPoints[x][1]))
+        for x in range(1,len(rightPoints)):
+            rightString += (";" + str(rightPoints[x][0]) + ":" + str(rightPoints[x][1]))
+        self.sendMessage("set_surface_edges," + str(surfaceNo) + "," + topPoints + "," + bottomPoints + "," + leftPoints + "," + rightPoints)
+        
+    def undefineSurface(self, surfaceNo):
+        self.sendMessage("undefine_surface")
+        
     def subscribeToWindow(self, windowNo):
         self.sendMessage("subscribe_to_window," + str(windowNo))
         
