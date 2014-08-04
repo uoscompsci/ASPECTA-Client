@@ -160,6 +160,20 @@ class client:
                     self.splitSide(self.leftCircles, "left")
                 elif event.key==pygame.K_RIGHT:
                     self.splitSide(self.rightCircles, "right")
+                elif event.key==pygame.K_SPACE:
+                    topPoints = []
+                    for x in range(0,len(self.topCircles)):
+                        topPoints.append(self.sender.getCirclePosition(self.topCircles[x]))
+                    bottomPoints = []
+                    for x in range(0,len(self.bottomCircles)):
+                        bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[x]))
+                    leftPoints = []
+                    for x in range(0,len(self.leftCircles)):
+                        leftPoints.append(self.sender.getCirclePosition(self.leftCircles[x]))
+                    rightPoints = []
+                    for x in range(0,len(self.rightCircles)):
+                        rightPoints.append(self.sender.getCirclePosition(self.rightCircles[x]))
+                    self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button==4:
@@ -252,6 +266,7 @@ class client:
         self.sender.login("jp438")
         self.sender.setapp("myapp")
         self.sender.showSetupSurface()
+        self.warpedSurf = self.sender.newSurface()
         self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
         self.sender.newCursor(0, 1280/2, 1024/2)
 

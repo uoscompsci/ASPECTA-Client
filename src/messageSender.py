@@ -261,7 +261,7 @@ class messageSender:
             leftString += (";" + str(leftPoints[x][0]) + ":" + str(leftPoints[x][1]))
         for x in range(1,len(rightPoints)):
             rightString += (";" + str(rightPoints[x][0]) + ":" + str(rightPoints[x][1]))
-        self.sendMessage("set_surface_edges," + str(surfaceNo) + "," + topPoints + "," + bottomPoints + "," + leftPoints + "," + rightPoints)
+        self.sendMessage("set_surface_edges," + str(surfaceNo) + "," + topString + "," + bottomString + "," + leftString + "," + rightString)
         
     def undefineSurface(self, surfaceNo):
         self.sendMessage("undefine_surface")
