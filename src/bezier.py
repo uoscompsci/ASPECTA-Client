@@ -2,8 +2,18 @@ import math
 
 class bezierCalc:
     
+    def getMidPoints(self, point1, point2):
+        return ((float(point1[0])+float(point2[0]))/float(2), (float(point1[1])+float(point2[1]))/float(2))
+
     def oppControl(self, point, control):
         return (float(point[0])+(float(point[0])-float(control[0])),float(point[1])+(float(point[1])-float(control[1])))
+    
+    def getControlPoints(self, points):
+        controlPoints = []
+        controlPoints.append(self.getMidPoints((points[0][0],points[0][1]), (points[1][0],points[1][1])))
+        for x in range(1,len(points)):
+            controlPoints.append(self.oppControl((points[x][0],points[x][1]), controlPoints[x-1]))
+        return controlPoints
     
     def calculateBezierPoint(self,points,controlPoints,t):
         t = round(t,2)
@@ -37,7 +47,8 @@ class bezierCalc:
             points.append(point)
         return points
     
-    def getCurvePoints(self,points,controlPoints,num):
+    def getCurvePoints(self,points,num):
+        controlPoints = self.getControlPoints(points)
         end = len(points)-1
         x = 0
         diff = float(end)/num

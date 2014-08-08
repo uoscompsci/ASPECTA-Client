@@ -69,7 +69,7 @@ class client:
         for x in range(1, count):
             point1 = self.sender.getCirclePosition(circles[x-1])
             point2 = self.sender.getCirclePosition(circles[x])
-            midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1]))
+            midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1])) 
             insert.append(midpoint)
         for x in reversed(range(0,len(insert))):
             ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 4)
@@ -82,20 +82,6 @@ class client:
             self.bezierUpdates[2] = True
         elif(side == "right"):
             self.bezierUpdates[3] = True
-            
-    def setControlPoints(self, side, points):
-        controlPoints = []
-        controlPoints.append(self.getMidPoints((points[0][0],points[0][1]), (points[1][0],points[1][1])))
-        for x in range(1,len(points)):
-            controlPoints.append(self.oppControl((points[x][0],points[x][1]), controlPoints[x-1]))
-        if(side=="top"):
-            self.topCP = controlPoints
-        elif(side=="bottom"):
-            self.bottomCP = controlPoints
-        elif(side=="left"):
-            self.leftCP = controlPoints
-        elif(side=="right"):
-            self.rightCP = controlPoints
             
     def updateBezier(self, side):
         points = []
@@ -111,19 +97,18 @@ class client:
         for x in range(0,len(circles)):
             pos = self.sender.getCirclePosition(circles[x])
             points.append((pos[0],pos[1]))
-        self.setControlPoints(side, points)
         calc = bezierCalc()
         if(side=="top"):
-            curve = calc.getCurvePoints(points, self.topCP, self.ppe)
+            curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.topbz,curve)
         elif(side=="bottom"):
-            curve = calc.getCurvePoints(points, self.bottomCP, self.ppe)
+            curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.bottombz,curve)
         elif(side=="left"):
-            curve = calc.getCurvePoints(points, self.leftCP, self.ppe)
+            curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.leftbz,curve)
         elif(side=="right"):
-            curve = calc.getCurvePoints(points, self.rightCP, self.ppe)
+            curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.rightbz,curve)
             
     def isHit(self, point1, point2):
@@ -166,13 +151,15 @@ class client:
                         topPoints.append(self.sender.getCirclePosition(self.topCircles[x]))
                     bottomPoints = []
                     for x in range(0,len(self.bottomCircles)):
-                        bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[x]))
+                        bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[len(self.bottomCircles) - 1 - x]))
                     leftPoints = []
                     for x in range(0,len(self.leftCircles)):
                         leftPoints.append(self.sender.getCirclePosition(self.leftCircles[x]))
                     rightPoints = []
                     for x in range(0,len(self.rightCircles)):
-                        rightPoints.append(self.sender.getCirclePosition(self.rightCircles[x]))
+                        rightPoints.append(self.sender.getCirclePosition(self.rightCircles[len(self.rightCircles) - 1 - x]))
+                    #print "left = " + str(leftPoints)
+                    #print "right = " + str(rightPoints)
                     self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -222,10 +209,10 @@ class client:
                     loc[1] = 0
                 elif(loc[1]>1024):
                     loc[1] = 1024
-                self.sender.relocateCursor(1,loc[0],loc[1],0)
+                self.sender.relocateCursor(1,float(loc[0]),float(loc[1]),0)
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
-                        self.sender.relocateCircle(self.dragging[x], loc[0], loc[1], 1)
+                        self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
                         if(self.topCircles.__contains__(self.dragging[x])):
                             self.bezierUpdates[0] = True
                         if(self.bottomCircles.__contains__(self.dragging[x])):
