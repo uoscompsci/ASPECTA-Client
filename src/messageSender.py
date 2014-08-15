@@ -32,7 +32,7 @@ class messageSender:
                         self.sendMessage("set_line_strip_content," + str(x) + "," + converted)
                         self.stripLock.release()
                     elif(self.eletrack[x][1] == "circle"):
-                        self.sendMessage("relocate_circle," + str(x) + "," + str(self.elelocs[x][0]) + "," + str(self.elelocs[x][1]) + "," + str(1))
+                        self.sendMessage("relocate_circle," + str(x) + "," + str(self.elelocs[x][0]) + "," + str(self.elelocs[x][1]))
                     self.eletrack[x][0]=False
             time.sleep(self.refreshrate)
     
@@ -63,8 +63,8 @@ class messageSender:
         #print "Sending " + str(self.sending)
         self.s.send(message)
         if(message=="quit"):
-                    print '\033[1;31mShutting down client\033[1;m'
-                    sys.exit(0)
+            print '\033[1;31mShutting down client\033[1;m'
+            sys.exit(0)
         socket_list = [sys.stdin, self.s]
         read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
         
@@ -358,7 +358,14 @@ class messageSender:
         return elementlist
         
     def getElementsByAppDetails(self, name, instance):
-        elements = self.sendMessage("get_elements_by_app_details" + str(name) + "," + str(instance))
+        elements = self.sendMessage("get_elements_by_app_details," + str(name) + "," + str(instance))
+        elementlist = []
+        for x in range(0,int(elements["count"])):
+            elementlist.append(int(elements[x]))
+        return elementlist
+    
+    def getElementsOnWindow(self, surfaceNo):
+        elements = self.sendMessage("get_elements_on_window," + str(surfaceNo))
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))

@@ -161,6 +161,8 @@ class client:
                     #print "left = " + str(leftPoints)
                     #print "right = " + str(rightPoints)
                     self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
+                elif event.key==pygame.K_ESCAPE:
+                    self.sender.quit()
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button==4:
@@ -256,6 +258,12 @@ class client:
         self.warpedSurf = self.sender.newSurface()
         self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
         self.sender.newCursor(0, 1280/2, 1024/2)
+        
+        window = self.sender.newWindow(self.warpedSurf, 200, 200, 100, 100, "Bob")
+        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 10)
+        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,1,1), 10)
+        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 10)
+        #self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 10)
 
         self.mouseLock=True
         pygame.mouse.set_visible(False)
