@@ -194,8 +194,24 @@ class client:
                                 if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                     self.dragging.append(self.rightCircles[x])
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    if event.button==1:
+                    if (event.button==1 and len(self.topCircles)>1 and len(self.bottomCircles)>1 and len(self.leftCircles)>1 and len(self.rightCircles)>1):
                         self.dragging=[]
+                        topPoints = []
+                        for x in range(0,len(self.topCircles)):
+                            topPoints.append(self.sender.getCirclePosition(self.topCircles[x]))
+                        bottomPoints = []
+                        for x in range(0,len(self.bottomCircles)):
+                            bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[len(self.bottomCircles) - 1 - x]))
+                        leftPoints = []
+                        for x in range(0,len(self.leftCircles)):
+                            leftPoints.append(self.sender.getCirclePosition(self.leftCircles[x]))
+                        rightPoints = []
+                        for x in range(0,len(self.rightCircles)):
+                            rightPoints.append(self.sender.getCirclePosition(self.rightCircles[len(self.rightCircles) - 1 - x]))
+                        #print "left = " + str(leftPoints)
+                        #print "right = " + str(rightPoints)
+                        self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
+                        
                         
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
@@ -260,15 +276,21 @@ class client:
         self.sender.newCursor(0, 1280/2, 1024/2)
         
         window = self.sender.newWindow(self.warpedSurf, 200, 200, 100, 100, "Bob")
-        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 10)
-        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,1,1), 10)
-        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 10)
-        #self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 10)
+        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 20)
+        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 20)
+        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 20)
+        self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 20)
+        self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 20)
+        self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 20)
 
         self.mouseLock=True
         pygame.mouse.set_visible(False)
         
-        #self.sender.newText(1, "Arial", 100, 100, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 100, 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
+        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 200, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 300, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 400, 30, "Arial", (1,1,0,1))
         tl = None
         bl = None
         tr = None

@@ -13,7 +13,20 @@ class bezierCalc:
         controlPoints.append(self.getMidPoints((points[0][0],points[0][1]), (points[1][0],points[1][1])))
         for x in range(1,len(points)):
             controlPoints.append(self.oppControl((points[x][0],points[x][1]), controlPoints[x-1]))
+        for x in range(0,len(controlPoints)):
+            controlPoints[x] = self.findThird(points[x],controlPoints[x])
         return controlPoints
+    
+    def findThird(self, point1, point2):
+        xdiff = float(point2[0] - point1[0])
+        ydiff = float(point2[1] - point1[1])
+        csq = pow(xdiff,2) + pow(ydiff,2)
+        c = math.sqrt(csq)
+        xdiff = xdiff/c
+        ydiff = ydiff/c
+        xdiff = xdiff * (c/3*2)
+        ydiff = ydiff * (c/3*2)
+        return(point1[0]+xdiff,point1[1]+ydiff)
     
     def calculateBezierPoint(self,points,controlPoints,t):
         t = round(t,2)
