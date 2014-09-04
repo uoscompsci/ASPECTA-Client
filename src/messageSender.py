@@ -182,6 +182,34 @@ class messageSender:
         self.eletrack[eleNo] = [True,"polygon"]
         return eleNo
     
+    def newTexRectangle(self, windowNo, x, y, width, height, texture):
+        ele = self.sendMessage("new_texrectangle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + str(texture))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        self.eletrack[eleNo] = [True,"texrectangle"]
+        return eleNo
+    
+    def newTexRectangleWithID(self, ID, windowNo, x, y, width, height, texture):
+        ele = self.sendMessage("new_texrectangle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + str(texture))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        self.eletrack[eleNo] = [True,"texrectangle"]
+        return eleNo
+    
+    def newRectangle(self, windowNo, x, y, width, height, lineColor, fillColor):
+        ele = self.sendMessage("new_rectangle," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        self.eletrack[eleNo] = [True,"rectangle"]
+        return eleNo
+    
+    def newRectangleWithID(self, ID, windowNo, x, y, width, height, lineColor, fillColor):
+        ele = self.sendMessage("new_rectangle_with_ID," + str(ID) + "," + str(windowNo) + "," + str(x) + "," + str(y) + "," + str(width) + "," + str(height) + "," + self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]) + "," + self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3]))
+        eleNo = int(ele["elementNo"])
+        self.elelocs[eleNo] = (x,y)
+        self.eletrack[eleNo] = [True,"rectangle"]
+        return eleNo
+    
     def newText(self, windowNo, text, x, y, ptSize, font, color):
         ele = self.sendMessage("new_text," + str(windowNo) + "," + text + "," + str(x) + "," + str(y) + "," + str(ptSize) + "," + font + "," + self.colorString(color[0], color[1], color[2], color[3]))
         eleNo = int(ele["elementNo"])
@@ -612,6 +640,91 @@ class messageSender:
     def getPolygonPointCount(self, elementNo):
         count = self.sendMessage("get_polygon_point_count," + str(elementNo))
         return count["count"]
+    
+    def setRectangleTopLeft(self, elementNo, x, y):
+        self.sendMessage("set_rectangle_top_left," + str(elementNo) + "," + str(x) + "," + str(y))
+        
+    def getRectangleTopLeft(self, elementNo):
+        pos = self.sendMessage("get_rectangle_top_left," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getRectangleTopRight(self, elementNo):
+        pos = self.sendMessage("get_rectangle_top_right," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getRectangleBottomRight(self, elementNo):
+        pos = self.sendMessage("get_rectangle_bottom_right," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getRectangleBottomLeft(self, elementNo):
+        pos = self.sendMessage("get_rectangle_bottom_left," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def setRectangleWidth(self, elementNo, width):
+        self.sendMessage("set_rectangle_width," + str(elementNo) + "," + str(width))
+        
+    def getRectangleWidth(self, elementNo):
+        width = self.sendMessage("get_rectangle_width," + str(elementNo))
+        return float(width["width"])
+        
+    def setRectangleHeight(self, elementNo, height):
+        self.sendMessage("set_rectangle_height," + str(elementNo) + "," + str(height))
+        
+    def getRectangleHeight(self, elementNo):
+        height = self.sendMessage("get_rectangle_height," + str(elementNo))
+        return float(height["height"])
+    
+    def setRectangleFillColor(self, elementNo, color):
+        self.sendMessage("set_rectangle_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
+        
+    def getRectangleFillColor(self, elementNo):
+        return self.sendMessage("get_rectangle_fill_color," + str(elementNo))
+    
+    def setRectangleLineColor(self, elementNo, color):
+        self.sendMessage("set_rectangle_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
+        
+    def getRectangleLineColor(self, elementNo):
+        return self.sendMessage("get_rectangle_line_color," + str(elementNo))
+    
+    def setTexRectangleTopLeft(self, elementNo, x, y):
+        self.sendMessage("set_texrectangle_top_left," + str(elementNo) + "," + str(x) + "," + str(y))
+        
+    def getTexRectangleTopLeft(self, elementNo):
+        pos = self.sendMessage("get_texrectangle_top_left," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getTexRectangleTopRight(self, elementNo):
+        pos = self.sendMessage("get_texrectangle_top_right," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getTexRectangleBottomRight(self, elementNo):
+        pos = self.sendMessage("get_texrectangle_bottom_right," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getTexRectangleBottomLeft(self, elementNo):
+        pos = self.sendMessage("get_texrectangle_bottom_left," + str(elementNo))
+        return (float(pos["x"]),float(pos["y"]))
+    
+    def getTexRectangleTexture(self, elementNo):
+        tex = self.sendMessage("get_texrectangle_texture," + str(elementNo))
+        return tex["texture"]
+    
+    def setTexRectangleTexture(self, elementNo, texture):
+        self.sendMessage("set_texrectangle_texture," + str(elementNo) + "," + str(texture))
+    
+    def setTexRectangleWidth(self, elementNo, width):
+        self.sendMessage("set_texrectangle_width," + str(elementNo) + "," + str(width))
+        
+    def getTexRectangleWidth(self, elementNo):
+        width = self.sendMessage("get_texrectangle_width," + str(elementNo))
+        return float(width["width"])
+        
+    def setTexRectangleHeight(self, elementNo, height):
+        self.sendMessage("set_texrectangle_height," + str(elementNo) + "," + str(height))
+        
+    def getTexRectangleHeight(self, elementNo):
+        height = self.sendMessage("get_texrectangle_height," + str(elementNo))
+        return float(height["height"])
     
     def setText(self, elementNo, text):
         self.sendMessage("set_text," + str(elementNo) + "," + text)

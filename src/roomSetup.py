@@ -98,16 +98,21 @@ class client:
             pos = self.sender.getCirclePosition(circles[x])
             points.append((pos[0],pos[1]))
         calc = bezierCalc()
+        #print "Showing " + side
         if(side=="top"):
+            #print "Top points = " + str(points)
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.topbz,curve)
         elif(side=="bottom"):
+            #print "Bottom points = " + str(points)
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.bottombz,curve)
         elif(side=="left"):
+            #print "Left points = " + str(points)
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.leftbz,curve)
         elif(side=="right"):
+            #print "Right points = " + str(points)
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.rightbz,curve)
             
@@ -276,12 +281,15 @@ class client:
         self.sender.newCursor(0, 1280/2, 1024/2)
         
         window = self.sender.newWindow(self.warpedSurf, 200, 200, 100, 100, "Bob")
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
         self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 20)
         self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 20)
         self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 20)
         self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 20)
         self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 20)
         self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 20)
+        
+        #self.sender.newRectangle(window, 200, 200, 100, 200, (1,1,1,1), (0,0,1,1))
 
         self.mouseLock=True
         pygame.mouse.set_visible(False)
@@ -365,4 +373,5 @@ class client:
             self.getInput(False)
             screen.blit(background, (0, 0))
             pygame.display.flip()
+
 client()
