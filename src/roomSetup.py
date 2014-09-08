@@ -72,7 +72,7 @@ class client:
             midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1])) 
             insert.append(midpoint)
         for x in reversed(range(0,len(insert))):
-            ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 4)
+            ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
             circles.insert(x+1, ele)
         if(side == "top"):
             self.bezierUpdates[0] = True
@@ -177,7 +177,7 @@ class client:
                     elif event.button==1:
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
-                            ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 4)
+                            ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
                             return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -282,12 +282,13 @@ class client:
         
         window = self.sender.newWindow(self.warpedSurf, 200, 200, 100, 100, "Bob")
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
-        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 20)
-        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 20)
-        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 20)
-        self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 20)
-        self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 20)
-        self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 20)
+        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
+        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
+        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 50)
+        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 50)
+        self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 50)
+        self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 50)
+        self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 50)
         
         #self.sender.newRectangle(window, 200, 200, 100, 200, (1,1,1,1), (0,0,1,1))
 
@@ -299,6 +300,15 @@ class client:
         self.sender.newText(window, "Hello World  | dlroW olleH", 100, 200, 30, "Arial", (1,1,0,1))
         self.sender.newText(window, "Hello World  | dlroW olleH", 100, 300, 30, "Arial", (1,1,0,1))
         self.sender.newText(window, "Hello World  | dlroW olleH", 100, 400, 30, "Arial", (1,1,0,1))
+        
+        ele = self.sender.newPolygon(window, 100, 100, (1,1,1,1), (0.5,0.5,0.5,1))
+        self.sender.addPolygonPoint(ele, 200, 150)
+        self.sender.addPolygonPoint(ele, 200, 200)
+        self.sender.addPolygonPoint(ele, 150, 175)
+        self.sender.addPolygonPoint(ele, 75, 175)
+        self.sender.addPolygonPoint(ele, 50, 150)
+        #self.sender.addPolygonPoint(ele, 200, 150)
+        #self.sender.addPolygonPoint(ele, 200, 150)
         tl = None
         bl = None
         tr = None
