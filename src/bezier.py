@@ -61,9 +61,7 @@ class bezierCalc:
         return points
     
     def getCurvePoints(self,points,num):
-        #print ("Curve Points = " + str(points))
         controlPoints = self.getControlPoints(points)
-        #print ("Control Points = " + str(controlPoints))
         end = len(points)-1
         x = 0
         diff = float(end)/num

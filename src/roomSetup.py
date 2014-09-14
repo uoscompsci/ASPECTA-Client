@@ -108,11 +108,9 @@ class client:
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.bottombz,curve)
         elif(side=="left"):
-            #print "Left points = " + str(points)
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.leftbz,curve)
         elif(side=="right"):
-            #print "Right points = " + str(points)
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.rightbz,curve)
             
