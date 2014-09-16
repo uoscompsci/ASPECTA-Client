@@ -98,13 +98,10 @@ class client:
             pos = self.sender.getCirclePosition(circles[x])
             points.append((pos[0],pos[1]))
         calc = bezierCalc()
-        #print "Showing " + side
         if(side=="top"):
-            #print "Top points = " + str(points)
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.topbz,curve)
         elif(side=="bottom"):
-            #print "Bottom points = " + str(points)
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.bottombz,curve)
         elif(side=="left"):
@@ -279,13 +276,14 @@ class client:
         self.sender.newCursor(0, 1280/2, 1024/2)
         
         window = self.sender.newWindow(self.warpedSurf, 200, 200, 100, 100, "Bob")
+        self.sender.newCursor(self.warpedSurf, 512/2, 512/2)
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
         self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 50)
         self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 50)
         self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 50)
-        self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 50)
+        self.blueCirc = self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 50)
         self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 50)
         
         #self.sender.newRectangle(window, 200, 200, 100, 200, (1,1,1,1), (0,0,1,1))
@@ -371,10 +369,19 @@ class client:
         
         thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
         thread.start() #Starts the display thread
-        
+        dirleft = True
         while(self.quit==False):
             background.fill((255, 255, 255))
             text = font.render("Press 'L' to release mouse", 1, (10, 10, 10))
+            pos = self.sender.getCirclePosition(self.blueCirc)
+            if(pos[0]>=512):
+                dirleft = False
+            if(pos[0]<=0):
+                dirleft = True
+            if(dirleft):
+                self.sender.relocateCircle(self.blueCirc, pos[0]+0.1, pos[1], window)
+            else:
+                self.sender.relocateCircle(self.blueCirc, pos[0]-0.1, pos[1], window)
             textpos = text.get_rect()
             textpos.centerx = background.get_rect().centerx
             background.blit(text, textpos)
