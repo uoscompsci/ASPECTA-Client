@@ -241,6 +241,68 @@ class client:
                             self.bezierUpdates[3] = True
         return None
     
+    def defineSurface(self):
+        tl = None
+        bl = None
+        tr = None
+        br = None
+        
+        while(self.quit==False and tl==None):
+            self.background.fill((255, 255, 255))
+            text = self.font.render("Click the top left", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = self.background.get_rect().centerx
+            self.background.blit(text, textpos)
+            tl = self.getInput(True)
+            self.screen.blit(self.background, (0, 0))
+            pygame.display.flip()
+        self.topCircles.append(tl[1])
+        self.topbz = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+            
+        while(self.quit==False and tr==None):
+            self.background.fill((255, 255, 255))
+            text = self.font.render("Click the top right", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = self.background.get_rect().centerx
+            self.background.blit(text, textpos)
+            tr = self.getInput(True)
+            self.screen.blit(self.background, (0, 0))
+            pygame.display.flip()
+        self.topCircles.append(tr[1])
+        self.sender.addLineStripPoint(self.topbz, tr[0][0], tr[0][1])
+        self.rightCircles.append(tr[1])
+        self.rightbz = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
+            
+        while(self.quit==False and br==None):
+            self.background.fill((255, 255, 255))
+            text = self.font.render("Click the bottom right", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = self.background.get_rect().centerx
+            self.background.blit(text, textpos)
+            br = self.getInput(True)
+            self.screen.blit(self.background, (0, 0))
+            pygame.display.flip()
+        self.rightCircles.append(br[1])
+        self.sender.addLineStripPoint(self.rightbz, br[0][0], br[0][1])
+        self.bottomCircles.append(br[1])
+        self.bottombz = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
+            
+        while(self.quit==False and bl==None):
+            self.background.fill((255, 255, 255))
+            text = self.font.render("Click the bottom left", 1, (10, 10, 10))
+            textpos = text.get_rect()
+            textpos.centerx = self.background.get_rect().centerx
+            self.background.blit(text, textpos)
+            bl = self.getInput(True)
+            self.screen.blit(self.background, (0, 0))
+            pygame.display.flip()
+        self.bottomCircles.append(bl[1])
+        self.sender.addLineStripPoint(self.bottombz, bl[0][0], bl[0][1])
+        self.leftCircles.append(bl[1])
+        self.leftbz = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
+        self.leftCircles.append(tl[1])
+        self.sender.addLineStripPoint(self.leftbz, tl[0][0], tl[0][1])
+    
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
@@ -253,19 +315,19 @@ class client:
         
         # Initialise screen
         pygame.init()
-        screen = pygame.display.set_mode((self.winWidth, self.winHeight))
+        self.screen = pygame.display.set_mode((self.winWidth, self.winHeight))
         pygame.display.set_caption('Room setup program')
     
         # Fill background
-        background = pygame.Surface(screen.get_size())
-        background = background.convert()
-        background.fill((255, 255, 255))
+        self.background = pygame.Surface(self.screen.get_size())
+        self.background = self.background.convert()
+        self.background.fill((255, 255, 255))
     
         # Display some text
-        font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font(None, 36)
 
         # Blit everything to the screen
-        screen.blit(background, (0, 0))
+        self.screen.blit(self.background, (0, 0))
         pygame.display.flip()
         
         self.sender.login("jp438")
@@ -305,74 +367,17 @@ class client:
         self.sender.addPolygonPoint(ele, 50, 150)
         #self.sender.addPolygonPoint(ele, 200, 150)
         #self.sender.addPolygonPoint(ele, 200, 150)
-        tl = None
-        bl = None
-        tr = None
-        br = None
         
-        while(self.quit==False and tl==None):
-            background.fill((255, 255, 255))
-            text = font.render("Click the top left", 1, (10, 10, 10))
-            textpos = text.get_rect()
-            textpos.centerx = background.get_rect().centerx
-            background.blit(text, textpos)
-            tl = self.getInput(True)
-            screen.blit(background, (0, 0))
-            pygame.display.flip()
-        self.topCircles.append(tl[1])
-        self.topbz = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+        self.surfaceCounter = 0
         
-            
-        while(self.quit==False and tr==None):
-            background.fill((255, 255, 255))
-            text = font.render("Click the top right", 1, (10, 10, 10))
-            textpos = text.get_rect()
-            textpos.centerx = background.get_rect().centerx
-            background.blit(text, textpos)
-            tr = self.getInput(True)
-            screen.blit(background, (0, 0))
-            pygame.display.flip()
-        self.topCircles.append(tr[1])
-        self.sender.addLineStripPoint(self.topbz, tr[0][0], tr[0][1])
-        self.rightCircles.append(tr[1])
-        self.rightbz = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
-            
-        while(self.quit==False and br==None):
-            background.fill((255, 255, 255))
-            text =font.render("Click the bottom right", 1, (10, 10, 10))
-            textpos = text.get_rect()
-            textpos.centerx = background.get_rect().centerx
-            background.blit(text, textpos)
-            br = self.getInput(True)
-            screen.blit(background, (0, 0))
-            pygame.display.flip()
-        self.rightCircles.append(br[1])
-        self.sender.addLineStripPoint(self.rightbz, br[0][0], br[0][1])
-        self.bottomCircles.append(br[1])
-        self.bottombz = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
-            
-        while(self.quit==False and bl==None):
-            background.fill((255, 255, 255))
-            text = font.render("Click the bottom left", 1, (10, 10, 10))
-            textpos = text.get_rect()
-            textpos.centerx = background.get_rect().centerx
-            background.blit(text, textpos)
-            bl = self.getInput(True)
-            screen.blit(background, (0, 0))
-            pygame.display.flip()
-        self.bottomCircles.append(bl[1])
-        self.sender.addLineStripPoint(self.bottombz, bl[0][0], bl[0][1])
-        self.leftCircles.append(bl[1])
-        self.leftbz = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
-        self.leftCircles.append(tl[1])
-        self.sender.addLineStripPoint(self.leftbz, tl[0][0], tl[0][1])
+        self.defineSurface()
         
         thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
         thread.start() #Starts the display thread
         dirleft = True
         while(self.quit==False):
-            background.fill((255, 255, 255))
-            text = font.render("Press 'L' to release mouse", 1, (10, 10, 10))
+            self.background.fill((255, 255, 255))
+            text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))
             pos = self.sender.getCirclePosition(self.blueCirc)
             if(pos[0]>=512):
                 dirleft = False
@@ -383,10 +388,9 @@ class client:
             else:
                 self.sender.relocateCircle(self.blueCirc, pos[0]-0.1, pos[1], window)
             textpos = text.get_rect()
-            textpos.centerx = background.get_rect().centerx
-            background.blit(text, textpos)
+            textpos.centerx = self.background.get_rect().centerx
+            self.background.blit(text, textpos)
             self.getInput(False)
-            screen.blit(background, (0, 0))
+            self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-
 client()
