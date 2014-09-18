@@ -38,6 +38,7 @@ class client:
     leftbz = {}
     rightbz = {}
     dragging = []
+    warpedSurf = {}
     bezierUpdates = {} #[top,bottom,left,right]
     refreshrate = 0
     
@@ -146,6 +147,8 @@ class client:
                     self.splitSide(self.leftCircles[0], "left",0)
                 elif event.key==pygame.K_RIGHT:
                     self.splitSide(self.rightCircles[0], "right",0)
+                elif event.key==pygame.K_p:
+                    self.defineSurface()
                 elif event.key==pygame.K_SPACE:
                     for y in range(0,len(self.topCircles)):
                         topPoints = []
@@ -162,7 +165,7 @@ class client:
                             rightPoints.append(self.sender.getCirclePosition(self.rightCircles[y][len(self.rightCircles[y]) - 1 - x]))
                         #print "left = " + str(leftPoints)
                         #print "right = " + str(rightPoints)
-                        self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
+                        self.sender.setSurfaceEdges(self.warpedSurf[y], topPoints, bottomPoints, leftPoints, rightPoints)
                 elif event.key==pygame.K_ESCAPE:
                     self.sender.quit()
             if(self.mouseLock==True):
@@ -215,7 +218,7 @@ class client:
                                     rightPoints.append(self.sender.getCirclePosition(self.rightCircles[w][len(self.rightCircles[w]) - 1 - x]))
                                 #print "left = " + str(leftPoints)
                                 #print "right = " + str(rightPoints)
-                                self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
+                                self.sender.setSurfaceEdges(self.warpedSurf[w], topPoints, bottomPoints, leftPoints, rightPoints)
                         
                         
                 xdist = (self.winWidth/2)-pos[0]
@@ -236,15 +239,15 @@ class client:
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
                         self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
-                        for x in range(0,len(self.bezierUpdates)):
+                        for y in range(0,len(self.bezierUpdates)):
                             if(self.topCircles[x].__contains__(self.dragging[x])):
-                                self.bezierUpdates[x][0] = True
+                                self.bezierUpdates[y][0] = True
                             if(self.bottomCircles[x].__contains__(self.dragging[x])):
-                                self.bezierUpdates[x][1] = True
+                                self.bezierUpdates[y][1] = True
                             if(self.leftCircles[x].__contains__(self.dragging[x])):
-                                self.bezierUpdates[x][2] = True
+                                self.bezierUpdates[y][2] = True
                             if(self.rightCircles[x].__contains__(self.dragging[x])):
-                                self.bezierUpdates[x][3] = True
+                                self.bezierUpdates[y][3] = True
         return None
     
     def defineSurface(self):
@@ -346,12 +349,12 @@ class client:
         self.sender.login("jp438")
         self.sender.setapp("myapp")
         self.sender.showSetupSurface()
-        self.warpedSurf = self.sender.newSurface()
+        self.warpedSurf[0] = self.sender.newSurface()
         self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
         self.sender.newCursor(0, 1280/2, 1024/2)
         
-        window = self.sender.newWindow(self.warpedSurf, 200, 200, 100, 100, "Bob")
-        self.sender.newCursor(self.warpedSurf, 512/2, 512/2)
+        window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
+        self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
@@ -380,6 +383,29 @@ class client:
         self.sender.addPolygonPoint(ele, 50, 150)
         #self.sender.addPolygonPoint(ele, 200, 150)
         #self.sender.addPolygonPoint(ele, 200, 150)
+        
+        self.warpedSurf[1] = self.sender.newSurface()
+        self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
+        window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
+        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
+        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
+        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
+        
+        ele = self.sender.newPolygon(window, 100, 100, (1,1,1,1), (0.5,0.5,0.5,1))
+        self.sender.addPolygonPoint(ele, 200, 150)
+        self.sender.addPolygonPoint(ele, 200, 200)
+        self.sender.addPolygonPoint(ele, 150, 175)
+        self.sender.addPolygonPoint(ele, 75, 175)
+        self.sender.addPolygonPoint(ele, 50, 150)
+        #self.sender.addPolygonPoint(ele, 200, 150)
+        #self.sender.addPolygonPoint(ele, 200, 150)
+        
+        self.warpedSurf[2] = self.sender.newSurface()
+        self.warpedSurf[3] = self.sender.newSurface()
         
         self.surfaceCounter = 0
         
