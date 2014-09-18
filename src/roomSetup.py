@@ -140,13 +140,21 @@ class client:
                         self.mouseLock = True
                         pygame.mouse.set_visible(False)
                 elif event.key==pygame.K_UP:
-                    self.splitSide(self.topCircles[0], "top",0)
+                    self.splitSide(self.topCircles[self.splitid], "top",self.splitid)
                 elif event.key==pygame.K_DOWN:
-                    self.splitSide(self.bottomCircles[0], "bottom",0)
+                    self.splitSide(self.bottomCircles[self.splitid], "bottom",self.splitid)
                 elif event.key==pygame.K_LEFT:
-                    self.splitSide(self.leftCircles[0], "left",0)
+                    self.splitSide(self.leftCircles[self.splitid], "left",self.splitid)
                 elif event.key==pygame.K_RIGHT:
-                    self.splitSide(self.rightCircles[0], "right",0)
+                    self.splitSide(self.rightCircles[self.splitid], "right",self.splitid)
+                elif event.key==pygame.K_1:
+                    self.splitid = 0
+                elif event.key==pygame.K_2:
+                    self.splitid = 1
+                elif event.key==pygame.K_3:
+                    self.splitid = 2
+                elif event.key==pygame.K_4:
+                    self.splitid = 3
                 elif event.key==pygame.K_p:
                     self.defineSurface()
                 elif event.key==pygame.K_SPACE:
@@ -240,13 +248,17 @@ class client:
                     for x in range (0,len(self.dragging)):
                         self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
                         for y in range(0,len(self.bezierUpdates)):
-                            if(self.topCircles[x].__contains__(self.dragging[x])):
+                            if(self.topCircles[y].__contains__(self.dragging[x])):
+                                print "Update top of " + str(y)
                                 self.bezierUpdates[y][0] = True
-                            if(self.bottomCircles[x].__contains__(self.dragging[x])):
+                            if(self.bottomCircles[y].__contains__(self.dragging[x])):
+                                print "Update bottom of " + str(y)
                                 self.bezierUpdates[y][1] = True
-                            if(self.leftCircles[x].__contains__(self.dragging[x])):
+                            if(self.leftCircles[y].__contains__(self.dragging[x])):
+                                print "Update left of " + str(y)
                                 self.bezierUpdates[y][2] = True
-                            if(self.rightCircles[x].__contains__(self.dragging[x])):
+                            if(self.rightCircles[y].__contains__(self.dragging[x])):
+                                print "Update right of " + str(y)
                                 self.bezierUpdates[y][3] = True
         return None
     
@@ -341,6 +353,8 @@ class client:
     
         # Display some text
         self.font = pygame.font.Font(None, 36)
+        
+        self.splitid = 0
 
         # Blit everything to the screen
         self.screen.blit(self.background, (0, 0))
@@ -385,9 +399,9 @@ class client:
         #self.sender.addPolygonPoint(ele, 200, 150)
         
         self.warpedSurf[1] = self.sender.newSurface()
-        self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
+        self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "american_gothic.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
         self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
@@ -405,7 +419,25 @@ class client:
         #self.sender.addPolygonPoint(ele, 200, 150)
         
         self.warpedSurf[2] = self.sender.newSurface()
+        self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
+        window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "van_gough.jpg")
+        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
+        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
+        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
+        
         self.warpedSurf[3] = self.sender.newSurface()
+        self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
+        window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "the_scream.jpg")
+        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
+        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
+        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
         
         self.surfaceCounter = 0
         
