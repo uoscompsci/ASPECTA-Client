@@ -27,35 +27,36 @@ class point:
         return self.y
 
 class client:
-    __slots__ = ['ppe', 'topbz', 'bottombz', 'leftbz', 'rightbz']
+    __slots__ = ['ppe']
     quit = False
-    topCircles = []
-    bottomCircles = []
-    leftCircles = []
-    rightCircles = []
-    topCP = []
-    bottomCP = []
-    leftCP = []
-    rightCP = [] 
+    topCircles = {}
+    bottomCircles = {}
+    leftCircles = {}
+    rightCircles = {}
+    topbz = {}
+    bottombz = {}
+    leftbz = {}
+    rightbz = {}
     dragging = []
-    bezierUpdates = [False,False,False,False] #[top,bottom,left,right]
+    bezierUpdates = {} #[top,bottom,left,right]
     refreshrate = 0
     
     def bezierUpdateTracker(self):
         while(True):
-            if (self.bezierUpdates[0]==True):
-                self.updateBezier("top")
-                self.bezierUpdates[0] = False
-            if (self.bezierUpdates[1]==True):
-                self.updateBezier("bottom")
-                self.bezierUpdates[1] = False
-            if(self.bezierUpdates[2] == True):
-                self.updateBezier("left")
-                self.bezierUpdates[2] = False
-            if(self.bezierUpdates[3] == True):
-                self.updateBezier("right")
-                self.bezierUpdates[3] = False
-            time.sleep(self.refreshrate)
+            for x in range(0,len(self.bezierUpdates)):
+                if (self.bezierUpdates[x][0]==True):
+                    self.updateBezier("top",x)
+                    self.bezierUpdates[x][0] = False
+                if (self.bezierUpdates[x][1]==True):
+                    self.updateBezier("bottom",x)
+                    self.bezierUpdates[x][1] = False
+                if(self.bezierUpdates[x][2] == True):
+                    self.updateBezier("left",x)
+                    self.bezierUpdates[x][2] = False
+                if(self.bezierUpdates[x][3] == True):
+                    self.updateBezier("right",x)
+                    self.bezierUpdates[x][3] = False
+                time.sleep(self.refreshrate)
     
     def getMidPoints(self, point1, point2):
         return ((float(point1[0])+float(point2[0]))/float(2), (float(point1[1])+float(point2[1]))/float(2))
@@ -63,7 +64,7 @@ class client:
     def oppControl(self, point, control):
         return (float(point[0])+(float(point[0])-float(control[0])),float(point[1])+(float(point[1])-float(control[1])))
     
-    def splitSide(self, circles, side):
+    def splitSide(self, circles, side, surface):
         count = len(circles)
         insert = []
         for x in range(1, count):
@@ -75,41 +76,41 @@ class client:
             ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
             circles.insert(x+1, ele)
         if(side == "top"):
-            self.bezierUpdates[0] = True
+            self.bezierUpdates[surface][0] = True
         elif(side == "bottom"):
-            self.bezierUpdates[1] = True
+            self.bezierUpdates[surface][1] = True
         elif(side == "left"):
-            self.bezierUpdates[2] = True
+            self.bezierUpdates[surface][2] = True
         elif(side == "right"):
-            self.bezierUpdates[3] = True
+            self.bezierUpdates[surface][3] = True
             
-    def updateBezier(self, side):
+    def updateBezier(self, side, surface):
         points = []
         circles = []
         if(side=="top"):
-            circles = self.topCircles
+            circles = self.topCircles[surface]
         elif(side=="bottom"):
-            circles = self.bottomCircles
+            circles = self.bottomCircles[surface]
         elif(side=="left"):
-            circles = self.leftCircles
+            circles = self.leftCircles[surface]
         elif(side=="right"):
-            circles = self.rightCircles
+            circles = self.rightCircles[surface]
         for x in range(0,len(circles)):
             pos = self.sender.getCirclePosition(circles[x])
             points.append((pos[0],pos[1]))
         calc = bezierCalc()
         if(side=="top"):
             curve = calc.getCurvePoints(points, self.ppe)
-            self.sender.setLineStripContent(self.topbz,curve)
+            self.sender.setLineStripContent(self.topbz[surface],curve)
         elif(side=="bottom"):
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
-            self.sender.setLineStripContent(self.bottombz,curve)
+            self.sender.setLineStripContent(self.bottombz[surface],curve)
         elif(side=="left"):
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
-            self.sender.setLineStripContent(self.leftbz,curve)
+            self.sender.setLineStripContent(self.leftbz[surface],curve)
         elif(side=="right"):
             curve = calc.getCurvePoints(points, self.ppe)
-            self.sender.setLineStripContent(self.rightbz,curve)
+            self.sender.setLineStripContent(self.rightbz[surface],curve)
             
     def isHit(self, point1, point2):
         a = abs(float(point1[0])-float(point2[0]))
@@ -138,29 +139,30 @@ class client:
                         self.mouseLock = True
                         pygame.mouse.set_visible(False)
                 elif event.key==pygame.K_UP:
-                    self.splitSide(self.topCircles, "top")
+                    self.splitSide(self.topCircles[0], "top",0)
                 elif event.key==pygame.K_DOWN:
-                    self.splitSide(self.bottomCircles, "bottom")
+                    self.splitSide(self.bottomCircles[0], "bottom",0)
                 elif event.key==pygame.K_LEFT:
-                    self.splitSide(self.leftCircles, "left")
+                    self.splitSide(self.leftCircles[0], "left",0)
                 elif event.key==pygame.K_RIGHT:
-                    self.splitSide(self.rightCircles, "right")
+                    self.splitSide(self.rightCircles[0], "right",0)
                 elif event.key==pygame.K_SPACE:
-                    topPoints = []
-                    for x in range(0,len(self.topCircles)):
-                        topPoints.append(self.sender.getCirclePosition(self.topCircles[x]))
-                    bottomPoints = []
-                    for x in range(0,len(self.bottomCircles)):
-                        bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[len(self.bottomCircles) - 1 - x]))
-                    leftPoints = []
-                    for x in range(0,len(self.leftCircles)):
-                        leftPoints.append(self.sender.getCirclePosition(self.leftCircles[x]))
-                    rightPoints = []
-                    for x in range(0,len(self.rightCircles)):
-                        rightPoints.append(self.sender.getCirclePosition(self.rightCircles[len(self.rightCircles) - 1 - x]))
-                    #print "left = " + str(leftPoints)
-                    #print "right = " + str(rightPoints)
-                    self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
+                    for y in range(0,len(self.topCircles)):
+                        topPoints = []
+                        for x in range(0,len(self.topCircles[y])):
+                            topPoints.append(self.sender.getCirclePosition(self.topCircles[y][x]))
+                        bottomPoints = []
+                        for x in range(0,len(self.bottomCircles[y])):
+                            bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[y][len(self.bottomCircles[y]) - 1 - x]))
+                        leftPoints = []
+                        for x in range(0,len(self.leftCircles[y])):
+                            leftPoints.append(self.sender.getCirclePosition(self.leftCircles[y][x]))
+                        rightPoints = []
+                        for x in range(0,len(self.rightCircles[y])):
+                            rightPoints.append(self.sender.getCirclePosition(self.rightCircles[y][len(self.rightCircles[y]) - 1 - x]))
+                        #print "left = " + str(leftPoints)
+                        #print "right = " + str(rightPoints)
+                        self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
                 elif event.key==pygame.K_ESCAPE:
                     self.sender.quit()
             if(self.mouseLock==True):
@@ -177,40 +179,43 @@ class client:
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
                             self.dragging = []
-                            for x in range(0,len(self.topCircles)):
-                                point = self.sender.getCirclePosition(self.topCircles[x])
-                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                    self.dragging.append(self.topCircles[x])
-                            for x in range(0,len(self.bottomCircles)):
-                                point = self.sender.getCirclePosition(self.bottomCircles[x])
-                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                    self.dragging.append(self.bottomCircles[x])
-                            for x in range(0,len(self.leftCircles)):
-                                point = self.sender.getCirclePosition(self.leftCircles[x])
-                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                    self.dragging.append(self.leftCircles[x])
-                            for x in range(0,len(self.rightCircles)):
-                                point = self.sender.getCirclePosition(self.rightCircles[x])
-                                if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                    self.dragging.append(self.rightCircles[x])
+                            for z in range(0,len(self.topCircles)):
+                                for x in range(0,len(self.topCircles[z])):
+                                    point = self.sender.getCirclePosition(self.topCircles[z][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.dragging.append(self.topCircles[z][x])
+                                for x in range(0,len(self.bottomCircles[z])):
+                                    point = self.sender.getCirclePosition(self.bottomCircles[z][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.dragging.append(self.bottomCircles[z][x])
+                                for x in range(0,len(self.leftCircles[z])):
+                                    point = self.sender.getCirclePosition(self.leftCircles[z][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.dragging.append(self.leftCircles[z][x])
+                                for x in range(0,len(self.rightCircles[z])):
+                                    point = self.sender.getCirclePosition(self.rightCircles[z][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.dragging.append(self.rightCircles[z][x])
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    if (event.button==1 and len(self.topCircles)>1 and len(self.bottomCircles)>1 and len(self.leftCircles)>1 and len(self.rightCircles)>1):
-                        self.dragging=[]
-                        topPoints = []
-                        for x in range(0,len(self.topCircles)):
-                            topPoints.append(self.sender.getCirclePosition(self.topCircles[x]))
-                        bottomPoints = []
-                        for x in range(0,len(self.bottomCircles)):
-                            bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[len(self.bottomCircles) - 1 - x]))
-                        leftPoints = []
-                        for x in range(0,len(self.leftCircles)):
-                            leftPoints.append(self.sender.getCirclePosition(self.leftCircles[x]))
-                        rightPoints = []
-                        for x in range(0,len(self.rightCircles)):
-                            rightPoints.append(self.sender.getCirclePosition(self.rightCircles[len(self.rightCircles) - 1 - x]))
-                        #print "left = " + str(leftPoints)
-                        #print "right = " + str(rightPoints)
-                        self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
+                    if(event.button==1):
+                        for w in range(0,len(self.topCircles)):
+                            if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
+                                self.dragging=[]
+                                topPoints = []
+                                for x in range(0,len(self.topCircles[w])):
+                                    topPoints.append(self.sender.getCirclePosition(self.topCircles[w][x]))
+                                bottomPoints = []
+                                for x in range(0,len(self.bottomCircles[w])):
+                                    bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w]) - 1 - x]))
+                                leftPoints = []
+                                for x in range(0,len(self.leftCircles[w])):
+                                    leftPoints.append(self.sender.getCirclePosition(self.leftCircles[w][x]))
+                                rightPoints = []
+                                for x in range(0,len(self.rightCircles[w])):
+                                    rightPoints.append(self.sender.getCirclePosition(self.rightCircles[w][len(self.rightCircles[w]) - 1 - x]))
+                                #print "left = " + str(leftPoints)
+                                #print "right = " + str(rightPoints)
+                                self.sender.setSurfaceEdges(self.warpedSurf, topPoints, bottomPoints, leftPoints, rightPoints)
                         
                         
                 xdist = (self.winWidth/2)-pos[0]
@@ -231,14 +236,15 @@ class client:
                 if(len(self.dragging)!=0):
                     for x in range (0,len(self.dragging)):
                         self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
-                        if(self.topCircles.__contains__(self.dragging[x])):
-                            self.bezierUpdates[0] = True
-                        if(self.bottomCircles.__contains__(self.dragging[x])):
-                            self.bezierUpdates[1] = True
-                        if(self.leftCircles.__contains__(self.dragging[x])):
-                            self.bezierUpdates[2] = True
-                        if(self.rightCircles.__contains__(self.dragging[x])):
-                            self.bezierUpdates[3] = True
+                        for x in range(0,len(self.bezierUpdates)):
+                            if(self.topCircles[x].__contains__(self.dragging[x])):
+                                self.bezierUpdates[x][0] = True
+                            if(self.bottomCircles[x].__contains__(self.dragging[x])):
+                                self.bezierUpdates[x][1] = True
+                            if(self.leftCircles[x].__contains__(self.dragging[x])):
+                                self.bezierUpdates[x][2] = True
+                            if(self.rightCircles[x].__contains__(self.dragging[x])):
+                                self.bezierUpdates[x][3] = True
         return None
     
     def defineSurface(self):
@@ -246,6 +252,12 @@ class client:
         bl = None
         tr = None
         br = None
+        
+        self.topCircles[self.surfaceCounter] = []
+        self.bottomCircles[self.surfaceCounter] = []
+        self.leftCircles[self.surfaceCounter] = []
+        self.rightCircles[self.surfaceCounter] = []
+        self.bezierUpdates[self.surfaceCounter] = [False,False,False,False]
         
         while(self.quit==False and tl==None):
             self.background.fill((255, 255, 255))
@@ -256,8 +268,8 @@ class client:
             tl = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.topCircles.append(tl[1])
-        self.topbz = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+        self.topCircles[self.surfaceCounter].append(tl[1])
+        self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
             
         while(self.quit==False and tr==None):
             self.background.fill((255, 255, 255))
@@ -268,10 +280,10 @@ class client:
             tr = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.topCircles.append(tr[1])
-        self.sender.addLineStripPoint(self.topbz, tr[0][0], tr[0][1])
-        self.rightCircles.append(tr[1])
-        self.rightbz = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
+        self.topCircles[self.surfaceCounter].append(tr[1])
+        self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
+        self.rightCircles[self.surfaceCounter].append(tr[1])
+        self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
             
         while(self.quit==False and br==None):
             self.background.fill((255, 255, 255))
@@ -282,10 +294,10 @@ class client:
             br = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.rightCircles.append(br[1])
-        self.sender.addLineStripPoint(self.rightbz, br[0][0], br[0][1])
-        self.bottomCircles.append(br[1])
-        self.bottombz = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
+        self.rightCircles[self.surfaceCounter].append(br[1])
+        self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
+        self.bottomCircles[self.surfaceCounter].append(br[1])
+        self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
             
         while(self.quit==False and bl==None):
             self.background.fill((255, 255, 255))
@@ -296,12 +308,13 @@ class client:
             bl = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.bottomCircles.append(bl[1])
-        self.sender.addLineStripPoint(self.bottombz, bl[0][0], bl[0][1])
-        self.leftCircles.append(bl[1])
-        self.leftbz = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
-        self.leftCircles.append(tl[1])
-        self.sender.addLineStripPoint(self.leftbz, tl[0][0], tl[0][1])
+        self.bottomCircles[self.surfaceCounter].append(bl[1])
+        self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
+        self.leftCircles[self.surfaceCounter].append(bl[1])
+        self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
+        self.leftCircles[self.surfaceCounter].append(tl[1])
+        self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
+        self.surfaceCounter += 1
     
     def __init__(self):
         parser = SafeConfigParser()
