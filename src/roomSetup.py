@@ -122,6 +122,21 @@ class client:
             return True
         else:
             return False
+        
+    def updateMesh(self, surface):
+        topPoints = []
+        for x in range(0,len(self.topCircles[surface])):
+            topPoints.append(self.sender.getCirclePosition(self.topCircles[surface][x]))
+        bottomPoints = []
+        for x in range(0,len(self.bottomCircles[surface])):
+            bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[surface][len(self.bottomCircles[surface]) - 1 - x]))
+        leftPoints = []
+        for x in range(0,len(self.leftCircles[surface])):
+            leftPoints.append(self.sender.getCirclePosition(self.leftCircles[surface][x]))
+        rightPoints = []
+        for x in range(0,len(self.rightCircles[surface])):
+            rightPoints.append(self.sender.getCirclePosition(self.rightCircles[surface][len(self.rightCircles[surface]) - 1 - x]))
+        self.sender.setSurfaceEdges(self.warpedSurf[surface], topPoints, bottomPoints, leftPoints, rightPoints)
 
     def getInput(self,get_point):
         #mpb=pygame.mouse.get_pressed() # mouse pressed buttons
@@ -141,12 +156,16 @@ class client:
                         pygame.mouse.set_visible(False)
                 elif event.key==pygame.K_UP:
                     self.splitSide(self.topCircles[self.splitid], "top",self.splitid)
+                    self.updateMesh(self.splitid)
                 elif event.key==pygame.K_DOWN:
                     self.splitSide(self.bottomCircles[self.splitid], "bottom",self.splitid)
+                    self.updateMesh(self.splitid)
                 elif event.key==pygame.K_LEFT:
                     self.splitSide(self.leftCircles[self.splitid], "left",self.splitid)
+                    self.updateMesh(self.splitid)
                 elif event.key==pygame.K_RIGHT:
                     self.splitSide(self.rightCircles[self.splitid], "right",self.splitid)
+                    self.updateMesh(self.splitid)
                 elif event.key==pygame.K_1:
                     self.splitid = 0
                 elif event.key==pygame.K_2:
@@ -159,21 +178,7 @@ class client:
                     self.defineSurface()
                 elif event.key==pygame.K_SPACE:
                     for y in range(0,len(self.topCircles)):
-                        topPoints = []
-                        for x in range(0,len(self.topCircles[y])):
-                            topPoints.append(self.sender.getCirclePosition(self.topCircles[y][x]))
-                        bottomPoints = []
-                        for x in range(0,len(self.bottomCircles[y])):
-                            bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[y][len(self.bottomCircles[y]) - 1 - x]))
-                        leftPoints = []
-                        for x in range(0,len(self.leftCircles[y])):
-                            leftPoints.append(self.sender.getCirclePosition(self.leftCircles[y][x]))
-                        rightPoints = []
-                        for x in range(0,len(self.rightCircles[y])):
-                            rightPoints.append(self.sender.getCirclePosition(self.rightCircles[y][len(self.rightCircles[y]) - 1 - x]))
-                        #print "left = " + str(leftPoints)
-                        #print "right = " + str(rightPoints)
-                        self.sender.setSurfaceEdges(self.warpedSurf[y], topPoints, bottomPoints, leftPoints, rightPoints)
+                        self.updateMesh(y)
                 elif event.key==pygame.K_ESCAPE:
                     self.sender.quit()
             if(self.mouseLock==True):
@@ -212,23 +217,8 @@ class client:
                         for w in range(0,len(self.topCircles)):
                             if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
                                 self.dragging=[]
-                                topPoints = []
-                                for x in range(0,len(self.topCircles[w])):
-                                    topPoints.append(self.sender.getCirclePosition(self.topCircles[w][x]))
-                                bottomPoints = []
-                                for x in range(0,len(self.bottomCircles[w])):
-                                    bottomPoints.append(self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w]) - 1 - x]))
-                                leftPoints = []
-                                for x in range(0,len(self.leftCircles[w])):
-                                    leftPoints.append(self.sender.getCirclePosition(self.leftCircles[w][x]))
-                                rightPoints = []
-                                for x in range(0,len(self.rightCircles[w])):
-                                    rightPoints.append(self.sender.getCirclePosition(self.rightCircles[w][len(self.rightCircles[w]) - 1 - x]))
-                                #print "left = " + str(leftPoints)
-                                #print "right = " + str(rightPoints)
-                                self.sender.setSurfaceEdges(self.warpedSurf[w], topPoints, bottomPoints, leftPoints, rightPoints)
-                        
-                        
+                                self.updateMesh(w)
+                                
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
                 pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
