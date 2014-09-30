@@ -86,23 +86,24 @@ class client:
     
     def splitSide(self, circles, side, surface):
         count = len(circles)
-        insert = []
-        for x in range(1, count):
-            point1 = self.sender.getCirclePosition(circles[x-1])
-            point2 = self.sender.getCirclePosition(circles[x])
-            midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1])) 
-            insert.append(midpoint)
-        for x in reversed(range(0,len(insert))):
-            ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
-            circles.insert(x+1, ele)
-        if(side == "top"):
-            self.bezierUpdates[surface][0] = True
-        elif(side == "bottom"):
-            self.bezierUpdates[surface][1] = True
-        elif(side == "left"):
-            self.bezierUpdates[surface][2] = True
-        elif(side == "right"):
-            self.bezierUpdates[surface][3] = True
+        if(count<17):
+            insert = []
+            for x in range(1, count):
+                point1 = self.sender.getCirclePosition(circles[x-1])
+                point2 = self.sender.getCirclePosition(circles[x])
+                midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1])) 
+                insert.append(midpoint)
+            for x in reversed(range(0,len(insert))):
+                ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, (1, 0, 0, 1), (1, 0, 1, 1), 20)
+                circles.insert(x+1, ele)
+            if(side == "top"):
+                self.bezierUpdates[surface][0] = True
+            elif(side == "bottom"):
+                self.bezierUpdates[surface][1] = True
+            elif(side == "left"):
+                self.bezierUpdates[surface][2] = True
+            elif(side == "right"):
+                self.bezierUpdates[surface][3] = True
             
     def updateBezier(self, side, surface):
         points = []
@@ -173,15 +174,6 @@ class client:
                     elif(self.mouseLock == False):
                         self.mouseLock = True
                         pygame.mouse.set_visible(False)
-                elif event.key==pygame.K_p:
-                    self.defineSurface()
-                    self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
-                    self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
-                    self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
-                    self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
-                elif event.key==pygame.K_SPACE:
-                    for y in range(0,len(self.topCircles)):
-                        self.updateMesh(y)
                 elif event.key==pygame.K_ESCAPE:
                     self.sender.quit()
             if(self.mouseLock==True):
@@ -190,6 +182,8 @@ class client:
                         self.sender.rotateCursorClockwise(1,10)
                     elif event.button==5:
                         self.sender.rotateCursorAnticlockwise(1,10)
+                    elif event.button==2:
+                        self.mClickTime=datetime.datetime.now()
                     elif event.button==3:
                         self.rClickTime=datetime.datetime.now()
                         loc = self.sender.getCursorPosition(1)
@@ -221,7 +215,7 @@ class client:
                         self.ldown=True
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
-                            ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
+                            ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
                             return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -275,6 +269,16 @@ class client:
                             if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
                                 self.dragging=[]
                                 self.updateMesh(w)
+                    if(event.button==2):
+                        mClickRelTime=datetime.datetime.now()
+                        self.mdown=False
+                        elapsedSecs = (mClickRelTime-self.mClickTime).total_seconds()
+                        if(elapsedSecs<0.25):
+                            self.defineSurface()
+                            self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
+                            self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
+                            self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
+                            self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
                     if(event.button==3):
                         rClickRelTime=datetime.datetime.now()
                         elapsedSecs = (rClickRelTime-self.rClickTime).total_seconds()
