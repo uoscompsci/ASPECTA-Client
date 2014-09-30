@@ -6,6 +6,7 @@ from pygame.locals import *
 from math import *
 from bezier import *
 from ConfigParser import SafeConfigParser
+import datetime
 
 class point:
     __slots__ = ['x','y']
@@ -37,6 +38,8 @@ class client:
     bottombz = {}
     leftbz = {}
     rightbz = {}
+    symbolicDrag = {}
+    rightDragging = []
     dragging = []
     warpedSurf = {}
     bezierUpdates = {} #[top,bottom,left,right]
@@ -64,6 +67,22 @@ class client:
     
     def oppControl(self, point, control):
         return (float(point[0])+(float(point[0])-float(control[0])),float(point[1])+(float(point[1])-float(control[1])))
+    
+    def reduceSide(self, circles, side, surface):
+        if(len(circles)>3):
+            count = (len(circles)-1)/2
+            for x in list(reversed(range(0,count))):
+                circle = circles[2*x+1]
+                circles.pop(2*x+1)
+                self.sender.removeElement(circle, 1)
+            if(side == "top"):
+                self.bezierUpdates[surface][0] = True
+            elif(side == "bottom"):
+                self.bezierUpdates[surface][1] = True
+            elif(side == "left"):
+                self.bezierUpdates[surface][2] = True
+            elif(side == "right"):
+                self.bezierUpdates[surface][3] = True
     
     def splitSide(self, circles, side, surface):
         count = len(circles)
@@ -154,28 +173,12 @@ class client:
                     elif(self.mouseLock == False):
                         self.mouseLock = True
                         pygame.mouse.set_visible(False)
-                elif event.key==pygame.K_UP:
-                    self.splitSide(self.topCircles[self.splitid], "top",self.splitid)
-                    self.updateMesh(self.splitid)
-                elif event.key==pygame.K_DOWN:
-                    self.splitSide(self.bottomCircles[self.splitid], "bottom",self.splitid)
-                    self.updateMesh(self.splitid)
-                elif event.key==pygame.K_LEFT:
-                    self.splitSide(self.leftCircles[self.splitid], "left",self.splitid)
-                    self.updateMesh(self.splitid)
-                elif event.key==pygame.K_RIGHT:
-                    self.splitSide(self.rightCircles[self.splitid], "right",self.splitid)
-                    self.updateMesh(self.splitid)
-                elif event.key==pygame.K_1:
-                    self.splitid = 0
-                elif event.key==pygame.K_2:
-                    self.splitid = 1
-                elif event.key==pygame.K_3:
-                    self.splitid = 2
-                elif event.key==pygame.K_4:
-                    self.splitid = 3
                 elif event.key==pygame.K_p:
                     self.defineSurface()
+                    self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
+                    self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
+                    self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
+                    self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
                 elif event.key==pygame.K_SPACE:
                     for y in range(0,len(self.topCircles)):
                         self.updateMesh(y)
@@ -187,7 +190,35 @@ class client:
                         self.sender.rotateCursorClockwise(1,10)
                     elif event.button==5:
                         self.sender.rotateCursorAnticlockwise(1,10)
+                    elif event.button==3:
+                        self.rClickTime=datetime.datetime.now()
+                        loc = self.sender.getCursorPosition(1)
+                        self.rightDragging = []
+                        for z in range(0,len(self.topCircles)):
+                            point = self.sender.getCirclePosition(self.topCircles[z][0])
+                            if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                self.rightDragging.append(self.topCircles[z][0])
+                                
+                            end = len(self.topCircles[z])-1
+                            point = self.sender.getCirclePosition(self.topCircles[z][end])
+                            if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                self.rightDragging.append(self.topCircles[z][end])
+                             
+                            point = self.sender.getCirclePosition(self.bottomCircles[z][0])
+                            if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                self.rightDragging.append(self.bottomCircles[z][0])
+                                
+                            end = len(self.bottomCircles[z])-1
+                            point = self.sender.getCirclePosition(self.bottomCircles[z][end])
+                            if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                self.rightDragging.append(self.bottomCircles[z][end])
+                            if(len(self.rightDragging)>0):
+                                cirpos = self.sender.getCirclePosition(self.rightDragging[0])
+                                self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
+                                self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
                     elif event.button==1:
+                        self.lClickTime=datetime.datetime.now()
+                        self.ldown=True
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
                             ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
@@ -214,11 +245,82 @@ class client:
                                         self.dragging.append(self.rightCircles[z][x])
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if(event.button==1):
+                        lClickRelTime=datetime.datetime.now()
+                        self.ldown=False
+                        elapsedSecs = (lClickRelTime-self.lClickTime).total_seconds()
+                        if(elapsedSecs<0.15):
+                            loc = self.sender.getCursorPosition(1)
+                            for w in range(0,len(self.topCircles)):
+                                for x in range(1,len(self.topCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.topCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.splitSide(self.topCircles[w], "top",w)
+                                        self.updateMesh(w)
+                                for x in range(1,len(self.bottomCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.splitSide(self.bottomCircles[w], "bottom",w)
+                                        self.updateMesh(w)
+                                for x in range(1,len(self.leftCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.leftCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.splitSide(self.leftCircles[w], "left",w)
+                                        self.updateMesh(w)
+                                for x in range(1,len(self.rightCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.rightCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        self.splitSide(self.rightCircles[w], "right",w)
+                                        self.updateMesh(w)
                         for w in range(0,len(self.topCircles)):
                             if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
                                 self.dragging=[]
                                 self.updateMesh(w)
-                                
+                    if(event.button==3):
+                        rClickRelTime=datetime.datetime.now()
+                        elapsedSecs = (rClickRelTime-self.rClickTime).total_seconds()
+                        hit = False
+                        if(elapsedSecs<0.15):
+                            loc = self.sender.getCursorPosition(1)
+                            for w in range(0,len(self.topCircles)):
+                                for x in range(1,len(self.topCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.topCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        hit = True
+                                if (hit==True):
+                                    hit=False
+                                    self.reduceSide(self.topCircles[w], "top",w)
+                                    self.updateMesh(w)
+                                for x in range(1,len(self.bottomCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        hit = True
+                                if (hit==True):
+                                    hit=False
+                                    self.reduceSide(self.bottomCircles[w], "bottom",w)
+                                    self.updateMesh(w)
+                                for x in range(1,len(self.leftCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.leftCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        hit = True
+                                if (hit==True):
+                                    hit=False
+                                    self.reduceSide(self.leftCircles[w], "left",w)
+                                    self.updateMesh(w)
+                                for x in range(1,len(self.rightCircles[w])-1):
+                                    point = self.sender.getCirclePosition(self.rightCircles[w][x])
+                                    if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+                                        hit = True
+                                if (hit==True):
+                                    hit=False
+                                    self.reduceSide(self.rightCircles[w], "right",w)
+                                    self.updateMesh(w)
+                        self.rightDragging=[]
+                        if(len(self.symbolicDrag)>0):
+                            self.sender.removeElement(self.symbolicDrag[0], 1)
+                            self.sender.removeElement(self.symbolicDrag[1], 1)
+                        self.symbolicDrag = {}       
+                
+                                                
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
                 pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
@@ -239,17 +341,16 @@ class client:
                         self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
                         for y in range(0,len(self.bezierUpdates)):
                             if(self.topCircles[y].__contains__(self.dragging[x])):
-                                print "Update top of " + str(y)
                                 self.bezierUpdates[y][0] = True
                             if(self.bottomCircles[y].__contains__(self.dragging[x])):
-                                print "Update bottom of " + str(y)
                                 self.bezierUpdates[y][1] = True
                             if(self.leftCircles[y].__contains__(self.dragging[x])):
-                                print "Update left of " + str(y)
                                 self.bezierUpdates[y][2] = True
                             if(self.rightCircles[y].__contains__(self.dragging[x])):
-                                print "Update right of " + str(y)
                                 self.bezierUpdates[y][3] = True
+                if(len(self.rightDragging)!=0):
+                    self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
+                    self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
         return None
     
     def defineSurface(self):
@@ -432,6 +533,10 @@ class client:
         self.surfaceCounter = 0
         
         self.defineSurface()
+        self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
+        self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
+        self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
+        self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
         
         thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
         thread.start() #Starts the display thread

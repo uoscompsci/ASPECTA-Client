@@ -782,3 +782,6 @@ class messageSender:
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
         return elementlist
+    
+    def removeElement(self, elementNo, windowNo):
+        self.sendMessage("remove_element," + str(elementNo) + "," + str(windowNo))
