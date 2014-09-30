@@ -86,7 +86,7 @@ class client:
     
     def splitSide(self, circles, side, surface):
         count = len(circles)
-        if(count<17):
+        if(count<17): #Restrict to a maximum of 15 waypoints per side
             insert = []
             for x in range(1, count):
                 point1 = self.sender.getCirclePosition(circles[x-1])
@@ -94,7 +94,7 @@ class client:
                 midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1])) 
                 insert.append(midpoint)
             for x in reversed(range(0,len(insert))):
-                ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, (1, 0, 0, 1), (1, 0, 1, 1), 20)
+                ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
                 circles.insert(x+1, ele)
             if(side == "top"):
                 self.bezierUpdates[surface][0] = True
@@ -425,6 +425,19 @@ class client:
         self.leftCircles[self.surfaceCounter].append(tl[1])
         self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
         self.surfaceCounter += 1
+        
+    def blueCircleAnimation(self):
+        while(1):
+            time.sleep(1.0/30)
+            pos = self.sender.getCirclePosition(self.blueCirc)
+            if(pos[0]>=512):
+                self.dirleft = False
+            if(pos[0]<=0):
+                self.dirleft = True
+            if(self.dirleft):
+                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], self.window)
+            else:
+                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], self.window)
     
     def __init__(self):
         parser = SafeConfigParser()
@@ -544,19 +557,13 @@ class client:
         
         thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
         thread.start() #Starts the display thread
-        dirleft = True
+        self.dirleft = True
+        self.window = window
+        circAnim = threading.Thread(target=self.blueCircleAnimation, args=()) #Creates the display thread
+        circAnim.start() #Starts the display thread
         while(self.quit==False):
             self.background.fill((255, 255, 255))
             text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))
-            pos = self.sender.getCirclePosition(self.blueCirc)
-            if(pos[0]>=512):
-                dirleft = False
-            if(pos[0]<=0):
-                dirleft = True
-            if(dirleft):
-                self.sender.relocateCircle(self.blueCirc, pos[0]+0.1, pos[1], window)
-            else:
-                self.sender.relocateCircle(self.blueCirc, pos[0]-0.1, pos[1], window)
             textpos = text.get_rect()
             textpos.centerx = self.background.get_rect().centerx
             self.background.blit(text, textpos)
