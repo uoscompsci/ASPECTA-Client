@@ -41,8 +41,10 @@ class client:
     symbolicDrag = {}
     rightDragging = []
     dragging = []
+    hideable = []
     warpedSurf = {}
     bezierUpdates = {} #[top,bottom,left,right]
+    setuplines = True
     refreshrate = 0
     
     def bezierUpdateTracker(self):
@@ -95,6 +97,7 @@ class client:
                 insert.append(midpoint)
             for x in reversed(range(0,len(insert))):
                 ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+                self.hideable.append(ele)
                 circles.insert(x+1, ele)
             if(side == "top"):
                 self.bezierUpdates[surface][0] = True
@@ -176,6 +179,15 @@ class client:
                         pygame.mouse.set_visible(False)
                 elif event.key==pygame.K_ESCAPE:
                     self.sender.quit()
+                elif event.key==pygame.K_v:
+                    if (self.setuplines == False):
+                        for q in range(0,len(self.hideable)):
+                            self.sender.hideElement(self.hideable[q])
+                        self.setuplines = True
+                    else:
+                        for q in range(0,len(self.hideable)):
+                            self.sender.showElement(self.hideable[q])
+                        self.setuplines = False
             if(self.mouseLock==True):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button==4:
@@ -216,6 +228,7 @@ class client:
                         if(get_point==True):
                             loc = self.sender.getCursorPosition(1)
                             ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
+                            self.hideable.append(ele)
                             return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -383,6 +396,7 @@ class client:
             pygame.display.flip()
         self.topCircles[self.surfaceCounter].append(tl[1])
         self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+        self.hideable.append(self.topbz[self.surfaceCounter])
             
         while(self.quit==False and tr==None):
             self.background.fill((255, 255, 255))
@@ -397,6 +411,7 @@ class client:
         self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
         self.rightCircles[self.surfaceCounter].append(tr[1])
         self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
+        self.hideable.append(self.rightbz[self.surfaceCounter])
             
         while(self.quit==False and br==None):
             self.background.fill((255, 255, 255))
@@ -411,6 +426,7 @@ class client:
         self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
         self.bottomCircles[self.surfaceCounter].append(br[1])
         self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
+        self.hideable.append(self.bottombz[self.surfaceCounter])
             
         while(self.quit==False and bl==None):
             self.background.fill((255, 255, 255))
@@ -425,6 +441,7 @@ class client:
         self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
         self.leftCircles[self.surfaceCounter].append(bl[1])
         self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
+        self.hideable.append(self.leftbz[self.surfaceCounter])
         self.leftCircles[self.surfaceCounter].append(tl[1])
         self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
         self.surfaceCounter += 1
@@ -447,7 +464,6 @@ class client:
         parser.read("config.ini")
         self.ppe = parser.getint('RoomSetup','PointsPerEdge')
         self.refreshrate = 1/(parser.getint('library','MovesPerSecond'))
-        #self.mouseLock = True
         self.sender = messageSender()
         self.winWidth = 320
         self.winHeight = 240

@@ -758,7 +758,7 @@ class messageSender:
         self.sendMessage("set_text_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def showElement(self, elementNo):
-        self.sendMessaqe("show_element," + str(elementNo))
+        self.sendMessage("show_element," + str(elementNo))
         
     def hideElement(self, elementNo):
         self.sendMessage("hide_element," + str(elementNo))
