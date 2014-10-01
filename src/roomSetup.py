@@ -322,15 +322,19 @@ class client:
                         if(len(self.symbolicDrag)>0):
                             self.sender.removeElement(self.symbolicDrag[0], 1)
                             self.sender.removeElement(self.symbolicDrag[1], 1)
-                        self.symbolicDrag = {}       
-                
-                                                
+                        self.symbolicDrag = {}
+        return None
+    
+    def mouseMovement(self):
+        while(True):
+            if(self.mouseLock==True):
+                pos=pygame.mouse.get_pos()
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
                 pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
                 
                 loc = self.sender.testMoveCursor(1,-xdist,ydist)
-
+        
                 if (loc[0]<0):
                     loc[0]=0
                 elif(loc[0]>1280):
@@ -355,7 +359,6 @@ class client:
                 if(len(self.rightDragging)!=0):
                     self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
                     self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
-        return None
     
     def defineSurface(self):
         tl = None
@@ -444,7 +447,7 @@ class client:
         parser.read("config.ini")
         self.ppe = parser.getint('RoomSetup','PointsPerEdge')
         self.refreshrate = 1/(parser.getint('library','MovesPerSecond'))
-        self.mouseLock = False
+        #self.mouseLock = True
         self.sender = messageSender()
         self.winWidth = 320
         self.winHeight = 240
@@ -487,9 +490,6 @@ class client:
         self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 50)
         
         #self.sender.newRectangle(window, 200, 200, 100, 200, (1,1,1,1), (0,0,1,1))
-
-        self.mouseLock=True
-        pygame.mouse.set_visible(False)
         
         self.sender.newText(window, "Hello World  | dlroW olleH", 100, 100, 30, "Arial", (1,1,0,1))
         self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
@@ -548,6 +548,12 @@ class client:
         self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
         
         self.surfaceCounter = 0
+        
+        self.mouseLock=True
+        pygame.mouse.set_visible(False)
+        
+        mouseThread = threading.Thread(target=self.mouseMovement, args=()) #Creates the display thread
+        mouseThread.start() #Starts the display thread
         
         self.defineSurface()
         self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
