@@ -48,7 +48,7 @@ class client:
     refreshrate = 0
     
     def bezierUpdateTracker(self):
-        while(True):
+        while(self.quit==False):
             for x in range(0,len(self.bezierUpdates)):
                 if (self.bezierUpdates[x][0]==True):
                     self.updateBezier("top",x)
@@ -179,6 +179,8 @@ class client:
                         pygame.mouse.set_visible(False)
                 elif event.key==pygame.K_ESCAPE:
                     self.sender.quit()
+                    time.sleep(0.1)
+                    self.quit = True
                 elif event.key==pygame.K_v:
                     if (self.setuplines == False):
                         for q in range(0,len(self.hideable)):
@@ -339,7 +341,7 @@ class client:
         return None
     
     def mouseMovement(self):
-        while(True):
+        while(self.quit==False):
             time.sleep(1.0/30)
             if(self.mouseLock==True):
                 pos=pygame.mouse.get_pos()
@@ -396,9 +398,10 @@ class client:
             tl = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.topCircles[self.surfaceCounter].append(tl[1])
-        self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
-        self.hideable.append(self.topbz[self.surfaceCounter])
+        if(self.quit==False):
+            self.topCircles[self.surfaceCounter].append(tl[1])
+            self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+            self.hideable.append(self.topbz[self.surfaceCounter])
             
         while(self.quit==False and tr==None):
             self.background.fill((255, 255, 255))
@@ -409,11 +412,12 @@ class client:
             tr = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.topCircles[self.surfaceCounter].append(tr[1])
-        self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
-        self.rightCircles[self.surfaceCounter].append(tr[1])
-        self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
-        self.hideable.append(self.rightbz[self.surfaceCounter])
+        if(self.quit==False):
+            self.topCircles[self.surfaceCounter].append(tr[1])
+            self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
+            self.rightCircles[self.surfaceCounter].append(tr[1])
+            self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
+            self.hideable.append(self.rightbz[self.surfaceCounter])
             
         while(self.quit==False and br==None):
             self.background.fill((255, 255, 255))
@@ -424,11 +428,12 @@ class client:
             br = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.rightCircles[self.surfaceCounter].append(br[1])
-        self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
-        self.bottomCircles[self.surfaceCounter].append(br[1])
-        self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
-        self.hideable.append(self.bottombz[self.surfaceCounter])
+        if(self.quit==False):
+            self.rightCircles[self.surfaceCounter].append(br[1])
+            self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
+            self.bottomCircles[self.surfaceCounter].append(br[1])
+            self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
+            self.hideable.append(self.bottombz[self.surfaceCounter])
             
         while(self.quit==False and bl==None):
             self.background.fill((255, 255, 255))
@@ -439,17 +444,18 @@ class client:
             bl = self.getInput(True)
             self.screen.blit(self.background, (0, 0))
             pygame.display.flip()
-        self.bottomCircles[self.surfaceCounter].append(bl[1])
-        self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
-        self.leftCircles[self.surfaceCounter].append(bl[1])
-        self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
-        self.hideable.append(self.leftbz[self.surfaceCounter])
-        self.leftCircles[self.surfaceCounter].append(tl[1])
-        self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
-        self.surfaceCounter += 1
+        if(self.quit==False):
+            self.bottomCircles[self.surfaceCounter].append(bl[1])
+            self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
+            self.leftCircles[self.surfaceCounter].append(bl[1])
+            self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
+            self.hideable.append(self.leftbz[self.surfaceCounter])
+            self.leftCircles[self.surfaceCounter].append(tl[1])
+            self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
+            self.surfaceCounter += 1
         
     def blueCircleAnimation(self):
-        while(1):
+        while(self.quit==False):
             time.sleep(1.0/30)
             pos = self.sender.getCirclePosition(self.blueCirc)
             if(pos[0]>=512):
@@ -574,24 +580,27 @@ class client:
         mouseThread.start() #Starts the display thread
         
         self.defineSurface()
-        self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
-        self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
-        self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
-        self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
-        
-        thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
-        thread.start() #Starts the display thread
-        self.dirleft = True
-        self.window = window
-        circAnim = threading.Thread(target=self.blueCircleAnimation, args=()) #Creates the display thread
-        circAnim.start() #Starts the display thread
-        while(self.quit==False):
-            self.background.fill((255, 255, 255))
-            text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))
-            textpos = text.get_rect()
-            textpos.centerx = self.background.get_rect().centerx
-            self.background.blit(text, textpos)
-            self.getInput(False)
-            self.screen.blit(self.background, (0, 0))
-            pygame.display.flip()
+        if(self.quit==False):
+            self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
+            self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
+            self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
+            self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
+            
+            thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
+            thread.start() #Starts the display thread
+            self.dirleft = True
+            self.window = window
+            circAnim = threading.Thread(target=self.blueCircleAnimation, args=()) #Creates the display thread
+            circAnim.start() #Starts the display thread
+            while(self.quit==False):
+                self.background.fill((255, 255, 255))
+                text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))
+                textpos = text.get_rect()
+                textpos.centerx = self.background.get_rect().centerx
+                self.background.blit(text, textpos)
+                self.getInput(False)
+                self.screen.blit(self.background, (0, 0))
+                pygame.display.flip()
+        time.sleep(0.2)
+        pygame.quit()
 client()

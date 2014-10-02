@@ -16,9 +16,10 @@ class messageSender:
     eletrack = {}
     stripLock = threading.Lock()
     sendlock = threading.Lock()
+    loop = True
     
     def eleUpdater(self):
-        while True:
+        while self.loop:
             #print str(self.eletrack)
             strips = 0
             for x in range(1,len(self.elelocs)+1):
@@ -64,7 +65,7 @@ class messageSender:
         self.s.send(message)
         if(message=="quit"):
             print '\033[1;31mShutting down client\033[1;m'
-            sys.exit(0)
+            self.loop==False
         socket_list = [sys.stdin, self.s]
         read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
         
@@ -72,7 +73,7 @@ class messageSender:
             data = sock.recv(4096)
             if not data:
                 print '\nDisconnected from server'
-                sys.exit()
+                self.loop==False
             else:
                 dict = eval(data)
                 try:
@@ -91,6 +92,7 @@ class messageSender:
                 
     def quit(self):
         self.sendMessage("quit")
+        self.loop=False
         
     def login(self, username):
         self.sendMessage("login," + str(username))
