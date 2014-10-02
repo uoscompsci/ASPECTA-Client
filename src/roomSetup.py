@@ -340,38 +340,40 @@ class client:
     
     def mouseMovement(self):
         while(True):
+            time.sleep(1/30)
             if(self.mouseLock==True):
                 pos=pygame.mouse.get_pos()
                 xdist = (self.winWidth/2)-pos[0]
                 ydist = (self.winHeight/2)-pos[1]
-                pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-                
-                loc = self.sender.testMoveCursor(1,-xdist,ydist)
-        
-                if (loc[0]<0):
-                    loc[0]=0
-                elif(loc[0]>1280):
-                    loc[0]=1280
-                if(loc[1]<0):
-                    loc[1] = 0
-                elif(loc[1]>1024):
-                    loc[1] = 1024
-                self.sender.relocateCursor(1,float(loc[0]),float(loc[1]),0)
-                if(len(self.dragging)!=0):
-                    for x in range (0,len(self.dragging)):
-                        self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
-                        for y in range(0,len(self.bezierUpdates)):
-                            if(self.topCircles[y].__contains__(self.dragging[x])):
-                                self.bezierUpdates[y][0] = True
-                            if(self.bottomCircles[y].__contains__(self.dragging[x])):
-                                self.bezierUpdates[y][1] = True
-                            if(self.leftCircles[y].__contains__(self.dragging[x])):
-                                self.bezierUpdates[y][2] = True
-                            if(self.rightCircles[y].__contains__(self.dragging[x])):
-                                self.bezierUpdates[y][3] = True
-                if(len(self.rightDragging)!=0):
-                    self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
-                    self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
+                if (not(xdist==0 and ydist==0)):
+                    pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
+                    
+                    loc = self.sender.testMoveCursor(1,-xdist,ydist)
+            
+                    if (loc[0]<0):
+                        loc[0]=0
+                    elif(loc[0]>1280):
+                        loc[0]=1280
+                    if(loc[1]<0):
+                        loc[1] = 0
+                    elif(loc[1]>1024):
+                        loc[1] = 1024
+                    self.sender.relocateCursor(1,float(loc[0]),float(loc[1]),0)
+                    if(len(self.dragging)!=0):
+                        for x in range (0,len(self.dragging)):
+                            self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
+                            for y in range(0,len(self.bezierUpdates)):
+                                if(self.topCircles[y].__contains__(self.dragging[x])):
+                                    self.bezierUpdates[y][0] = True
+                                if(self.bottomCircles[y].__contains__(self.dragging[x])):
+                                    self.bezierUpdates[y][1] = True
+                                if(self.leftCircles[y].__contains__(self.dragging[x])):
+                                    self.bezierUpdates[y][2] = True
+                                if(self.rightCircles[y].__contains__(self.dragging[x])):
+                                    self.bezierUpdates[y][3] = True
+                    if(len(self.rightDragging)!=0):
+                        self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
+                        self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
     
     def defineSurface(self):
         tl = None
