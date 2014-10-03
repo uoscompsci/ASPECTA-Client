@@ -62,7 +62,7 @@ class client:
                 if(self.bezierUpdates[x][3] == True):
                     self.updateBezier("right",x)
                     self.bezierUpdates[x][3] = False
-                time.sleep(0.0/30)
+            time.sleep(0.0/30)
     
     def getMidPoints(self, point1, point2):
         return ((float(point1[0])+float(point2[0]))/float(2), (float(point1[1])+float(point2[1]))/float(2))
