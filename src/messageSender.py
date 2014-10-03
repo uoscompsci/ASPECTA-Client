@@ -65,7 +65,7 @@ class messageSender:
         self.s.send(message)
         if(message=="quit"):
             print '\033[1;31mShutting down client\033[1;m'
-            self.loop==False
+            self.loop=False
         socket_list = [sys.stdin, self.s]
         read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
         
@@ -73,7 +73,7 @@ class messageSender:
             data = sock.recv(4096)
             if not data:
                 print '\nDisconnected from server'
-                self.loop==False
+                self.loop=False
             else:
                 dict = eval(data)
                 try:

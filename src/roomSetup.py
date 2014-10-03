@@ -342,7 +342,7 @@ class client:
     
     def mouseMovement(self):
         while(self.quit==False):
-            time.sleep(1.0/30)
+            time.sleep(1.0/60)
             if(self.mouseLock==True):
                 pos=pygame.mouse.get_pos()
                 xdist = (self.winWidth/2)-pos[0]
