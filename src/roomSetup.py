@@ -160,6 +160,9 @@ class client:
         for x in range(0,len(self.rightCircles[surface])):
             rightPoints.append(self.sender.getCirclePosition(self.rightCircles[surface][len(self.rightCircles[surface]) - 1 - x]))
         self.sender.setSurfaceEdges(self.warpedSurf[surface], topPoints, bottomPoints, leftPoints, rightPoints)
+        
+    def createConnectionLine(self, start, end):
+        print "HI!"
 
     def getInput(self,get_point):
         #mpb=pygame.mouse.get_pressed() # mouse pressed buttons
@@ -203,25 +206,27 @@ class client:
                         loc = self.sender.getCursorPosition(1)
                         self.rightDragging = []
                         for z in range(0,len(self.topCircles)):
+                            hit = False
                             point = self.sender.getCirclePosition(self.topCircles[z][0])
                             if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                self.rightDragging.append(self.topCircles[z][0])
-                                
+                                self.rightDragging.append((self.topCircles[z][0],"tl",z))
+                                hit = True
                             end = len(self.topCircles[z])-1
                             point = self.sender.getCirclePosition(self.topCircles[z][end])
                             if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                self.rightDragging.append(self.topCircles[z][end])
-                             
+                                self.rightDragging.append((self.topCircles[z][end],"tr",z))
+                                hit = True
                             point = self.sender.getCirclePosition(self.bottomCircles[z][0])
                             if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                self.rightDragging.append(self.bottomCircles[z][0])
-                                
+                                self.rightDragging.append((self.bottomCircles[z][0],"br",z))
+                                hit = True
                             end = len(self.bottomCircles[z])-1
                             point = self.sender.getCirclePosition(self.bottomCircles[z][end])
                             if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-                                self.rightDragging.append(self.bottomCircles[z][end])
-                            if(len(self.rightDragging)>0):
-                                cirpos = self.sender.getCirclePosition(self.rightDragging[0])
+                                self.rightDragging.append((self.bottomCircles[z][end],"bl",z))
+                                hit = True
+                            if(hit==True):
+                                cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
                                 self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
                                 self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
                     elif event.button==1:
@@ -386,10 +391,33 @@ class client:
                                     hit=False
                                     self.reduceSide(self.rightCircles[w], "right",w)
                                     self.updateMesh(w)
-                        self.rightDragging=[]
+                        dropPoint = None
                         if(len(self.symbolicDrag)>0):
+                            dropPoint = self.sender.getCirclePosition(self.symbolicDrag[1])
                             self.sender.removeElement(self.symbolicDrag[0], 1)
                             self.sender.removeElement(self.symbolicDrag[1], 1)
+                        for rDragInd in range(0,len(self.rightDragging)):
+                            temp = self.rightDragging[rDragInd]
+                            loc = self.sender.getCirclePosition(temp[0])
+                            corner = temp[1]
+                            surface = temp[2]
+                            for w in range(0,len(self.topCircles)):
+                                if (w != surface):
+                                    point = self.sender.getCirclePosition(self.topCircles[w][0])
+                                    if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
+                                        self.createConnectionLine((surface,corner),(w,"tl"))
+                                    end = len(self.topCircles[w])-1
+                                    point = self.sender.getCirclePosition(self.topCircles[w][end])
+                                    if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
+                                        self.createConnectionLine((surface,corner),(w,"tr"))
+                                    point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+                                    if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
+                                        self.createConnectionLine((surface,corner),(w,"br"))
+                                    end = len(self.bottomCircles[w])-1
+                                    point = self.sender.getCirclePosition(self.bottomCircles[w][end])
+                                    if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
+                                        self.createConnectionLine((surface,corner),(w,"bl"))
+                        self.rightDragging=[]
                         self.symbolicDrag = {}
         return None
     
