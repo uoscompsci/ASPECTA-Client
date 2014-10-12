@@ -163,31 +163,44 @@ class client:
         self.sender.setSurfaceEdges(self.warpedSurf[surface], topPoints, bottomPoints, leftPoints, rightPoints)
         
     def createConnectionLine(self, start, end):
-        startLoc = None
-        if(start[1]=="tl"):
-            startLoc = self.sender.getCirclePosition(self.topCircles[start[0]][0])
-        elif(start[1]=="tr"):
-            topend = len(self.topCircles[start[0]])-1
-            startLoc = self.sender.getCirclePosition(self.topCircles[start[0]][topend])
-        elif(start[1]=="br"):
-            startLoc = self.sender.getCirclePosition(self.bottomCircles[start[0]][0])
-        elif(start[1]=="bl"):
-            botend = len(self.bottomCircles[start[0]])-1
-            startLoc = self.sender.getCirclePosition(self.bottomCircles[start[0]][botend])
-        endLoc = None
-        if(end[1]=="tl"):
-            endLoc = self.sender.getCirclePosition(self.topCircles[end[0]][0])
-        elif(end[1]=="tr"):
-            topend = len(self.topCircles[end[0]])-1
-            endLoc = self.sender.getCirclePosition(self.topCircles[end[0]][topend])
-        elif(end[1]=="br"):
-            endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][0])
-        elif(end[1]=="bl"):
-            print str(self.bottomCircles[end[0]])
-            botend = len(self.bottomCircles[end[0]])-1
-            endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][botend])
-        ele = self.sender.newLine(1, startLoc[0], startLoc[1], endLoc[0], endLoc[1], (1,0,0,1), 3)
-        self.connections.append([start,end,ele])
+        found = False
+        for x in range(0,len(self.connections)):
+            if (start[0]==self.connections[x][0][0] and start[1]==self.connections[x][0][1] and end[0]==self.connections[x][1][0] and end[1]==self.connections[x][1][1]):
+                found = True
+                self.sender.removeElement(self.connections[x][2], 1)
+                self.connections.pop(x)
+            elif (end[0]==self.connections[x][0][0] and end[1]==self.connections[x][0][1] and start[0]==self.connections[x][1][0] and start[1]==self.connections[x][1][1]):
+                found = True
+                self.sender.removeElement(self.connections[x][2], 1)
+                self.connections.pop(x)
+        if(found==False):
+            startLoc = None
+            if(start[1]=="tl"):
+                startLoc = self.sender.getCirclePosition(self.topCircles[start[0]][0])
+            elif(start[1]=="tr"):
+                topend = len(self.topCircles[start[0]])-1
+                startLoc = self.sender.getCirclePosition(self.topCircles[start[0]][topend])
+            elif(start[1]=="br"):
+                startLoc = self.sender.getCirclePosition(self.bottomCircles[start[0]][0])
+            elif(start[1]=="bl"):
+                botend = len(self.bottomCircles[start[0]])-1
+                startLoc = self.sender.getCirclePosition(self.bottomCircles[start[0]][botend])
+            endLoc = None
+            if(end[1]=="tl"):
+                endLoc = self.sender.getCirclePosition(self.topCircles[end[0]][0])
+            elif(end[1]=="tr"):
+                topend = len(self.topCircles[end[0]])-1
+                endLoc = self.sender.getCirclePosition(self.topCircles[end[0]][topend])
+            elif(end[1]=="br"):
+                endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][0])
+            elif(end[1]=="bl"):
+                print str(self.bottomCircles[end[0]])
+                botend = len(self.bottomCircles[end[0]])-1
+                endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][botend])
+            ele = self.sender.newLine(1, startLoc[0], startLoc[1], endLoc[0], endLoc[1], (1,0,0,1), 3)
+            self.connections.append([start,end,ele])
+        else:
+            print "Already exists"
 
     def getInput(self,get_point):
         #mpb=pygame.mouse.get_pressed() # mouse pressed buttons
