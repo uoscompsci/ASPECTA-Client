@@ -127,15 +127,23 @@ class client:
         if(side=="top"):
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.topbz[surface],curve)
+            self.connectionUpdateCheck(surface, "tl")
+            self.connectionUpdateCheck(surface, "tr")
         elif(side=="bottom"):
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.bottombz[surface],curve)
+            self.connectionUpdateCheck(surface, "bl")
+            self.connectionUpdateCheck(surface, "br")
         elif(side=="left"):
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
             self.sender.setLineStripContent(self.leftbz[surface],curve)
+            self.connectionUpdateCheck(surface, "tl")
+            self.connectionUpdateCheck(surface, "bl")
         elif(side=="right"):
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.rightbz[surface],curve)
+            self.connectionUpdateCheck(surface, "tr")
+            self.connectionUpdateCheck(surface, "br")
             
     def isHit(self, point1, point2):
         a = abs(float(point1[0])-float(point2[0]))
@@ -165,14 +173,15 @@ class client:
     def createConnectionLine(self, start, end):
         found = False
         for x in range(0,len(self.connections)):
-            if (start[0]==self.connections[x][0][0] and start[1]==self.connections[x][0][1] and end[0]==self.connections[x][1][0] and end[1]==self.connections[x][1][1]):
-                found = True
-                self.sender.removeElement(self.connections[x][2], 1)
-                self.connections.pop(x)
-            elif (end[0]==self.connections[x][0][0] and end[1]==self.connections[x][0][1] and start[0]==self.connections[x][1][0] and start[1]==self.connections[x][1][1]):
-                found = True
-                self.sender.removeElement(self.connections[x][2], 1)
-                self.connections.pop(x)
+            if(found==False):
+                if (start[0]==self.connections[x][0][0] and start[1]==self.connections[x][0][1] and end[0]==self.connections[x][1][0] and end[1]==self.connections[x][1][1]):
+                    found = True
+                    self.sender.removeElement(self.connections[x][2], 1)
+                    self.connections.pop(x)
+                elif (end[0]==self.connections[x][0][0] and end[1]==self.connections[x][0][1] and start[0]==self.connections[x][1][0] and start[1]==self.connections[x][1][1]):
+                    found = True
+                    self.sender.removeElement(self.connections[x][2], 1)
+                    self.connections.pop(x)
         if(found==False):
             startLoc = None
             if(start[1]=="tl"):
@@ -194,13 +203,38 @@ class client:
             elif(end[1]=="br"):
                 endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][0])
             elif(end[1]=="bl"):
-                print str(self.bottomCircles[end[0]])
                 botend = len(self.bottomCircles[end[0]])-1
                 endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][botend])
             ele = self.sender.newLine(1, startLoc[0], startLoc[1], endLoc[0], endLoc[1], (1,0,0,1), 3)
-            self.connections.append([start,end,ele])
-        else:
-            print "Already exists"
+            self.connections.append([(start[0],start[1]),(end[0],end[1]),ele])
+            
+    def connectionUpdateCheck(self, surface, corner):
+        for x in range(len(self.connections)):
+            if(self.connections[x][0][0]==surface and self.connections[x][0][1]==corner or self.connections[x][1][0]==surface and self.connections[x][1][1]==corner):
+                startLoc = None
+                if(self.connections[x][0][1]=="tl"):
+                    startLoc = self.sender.getCirclePosition(self.topCircles[self.connections[x][0][0]][0])
+                elif(self.connections[x][0][1]=="tr"):
+                    topend = len(self.topCircles[self.connections[x][0][0]])-1
+                    startLoc = self.sender.getCirclePosition(self.topCircles[self.connections[x][0][0]][topend])
+                elif(self.connections[x][0][1]=="br"):
+                    startLoc = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][0][0]][0])
+                elif(self.connections[x][0][1]=="bl"):
+                    botend = len(self.bottomCircles[self.connections[x][0][0]])-1
+                    startLoc = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][0][0]][botend])
+                endLoc = None
+                if(self.connections[x][1][1]=="tl"):
+                    endLoc = self.sender.getCirclePosition(self.topCircles[self.connections[x][1][0]][0])
+                elif(self.connections[x][1][1]=="tr"):
+                    topend = len(self.topCircles[self.connections[x][1][0]])-1
+                    endLoc = self.sender.getCirclePosition(self.topCircles[self.connections[x][1][0]][topend])
+                elif(self.connections[x][1][1]=="br"):
+                    endLoc = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][1][0]][0])
+                elif(self.connections[x][1][1]=="bl"):
+                    botend = len(self.bottomCircles[self.connections[x][1][0]])-1
+                    endLoc = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][1][0]][botend])
+                self.sender.setLineStart(self.connections[x][2], startLoc[0], startLoc[1])
+                self.sender.setLineEnd(self.connections[x][2], endLoc[0], endLoc[1])
 
     def getInput(self,get_point):
         #mpb=pygame.mouse.get_pressed() # mouse pressed buttons
