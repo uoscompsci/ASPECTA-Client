@@ -231,6 +231,7 @@ class client:
                             loc = self.sender.getCursorPosition(1)
                             ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
                             self.hideable.append(ele)
+                            #self.dontFlip = True
                             return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -280,6 +281,58 @@ class client:
                                     if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                         self.splitSide(self.rightCircles[w], "right",w)
                                         self.updateMesh(w)
+                                '''if (get_point!=True and self.dontFlip==False):
+                                    flipped = False
+                                    point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
+                                    if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+                                        print "Clicked top right"
+                                        top = self.topCircles[w]
+                                        bottom = self.bottomCircles[w]
+                                        left = self.leftCircles[w]
+                                        right = self.rightCircles[w]
+                                        self.topCircles[w] = right
+                                        self.rightCircles[w] = bottom
+                                        self.bottomCircles[w] = left
+                                        self.leftCircles[w] = top
+                                        self.bezierUpdates[w][0] = True
+                                        self.bezierUpdates[w][1] = True
+                                        self.bezierUpdates[w][2] = True
+                                        self.bezierUpdates[w][3] = True
+                                        flipped = True
+                                    if (flipped == False):
+                                        point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+                                        if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+                                            print "Clicked bottom right"
+                                            top = self.topCircles[w]
+                                            bottom = self.bottomCircles[w]
+                                            left = self.leftCircles[w]
+                                            right = self.rightCircles[w]
+                                            self.topCircles[w] = bottom
+                                            self.rightCircles[w] = left
+                                            self.bottomCircles[w] = top
+                                            self.leftCircles[w] = right
+                                            self.bezierUpdates[w][0] = True
+                                            self.bezierUpdates[w][1] = True
+                                            self.bezierUpdates[w][2] = True
+                                            self.bezierUpdates[w][3] = True
+                                            flipped = True
+                                    if (flipped==False):
+                                        point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
+                                        if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+                                            print "Clicked bottom left"
+                                            top = self.topCircles[w]
+                                            bottom = self.bottomCircles[w]
+                                            left = self.leftCircles[w]
+                                            right = self.rightCircles[w]
+                                            self.topCircles[w] = left
+                                            self.rightCircles[w] = top
+                                            self.bottomCircles[w] = right
+                                            self.leftCircles[w] = bottom
+                                            self.bezierUpdates[w][0] = True
+                                            self.bezierUpdates[w][1] = True
+                                            self.bezierUpdates[w][2] = True
+                                            self.bezierUpdates[w][3] = True
+                                self.dontFlip=False'''
                         for w in range(0,len(self.topCircles)):
                             if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
                                 self.dragging=[]
@@ -601,6 +654,7 @@ class client:
                 self.getInput(False)
                 self.screen.blit(self.background, (0, 0))
                 pygame.display.flip()
+                time.sleep(1/30)
         time.sleep(0.2)
         pygame.quit()
 client()
