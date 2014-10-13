@@ -47,6 +47,7 @@ class client:
     setuplines = True
     refreshrate = 0
     connections = []
+    cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
     
     def bezierUpdateTracker(self):
         while(self.quit==False):
@@ -207,6 +208,31 @@ class client:
                 endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][botend])
             ele = self.sender.newLine(1, startLoc[0], startLoc[1], endLoc[0], endLoc[1], (1,0,0,1), 3)
             self.connections.append([(start[0],start[1]),(end[0],end[1]),ele])
+        if(found==False):
+            #look for created connections
+            for x in range(len(self.connections)):
+                if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][0][0]):
+                    if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
+                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                    if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
+                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][0][0]):
+                    if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
+                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                    if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
+                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][1][0]):
+                    if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
+                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                    if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
+                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][1][0]):
+                    if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
+                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                    if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
+                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+        #else:
+            #Look for removed connections
             
     def connectionUpdateCheck(self, surface, corner):
         for x in range(len(self.connections)):
@@ -527,6 +553,8 @@ class client:
                                 if(self.rightCircles[y].__contains__(self.dragging[x])):
                                     self.bezierUpdates[y][3] = True
                     if(len(self.rightDragging)!=0):
+                        print "Symbolic Drag = " + str(self.symbolicDrag)
+                        print "loc = " + str(loc)
                         self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
                         self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
     
