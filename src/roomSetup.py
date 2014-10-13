@@ -574,10 +574,12 @@ class client:
                                 if(self.rightCircles[y].__contains__(self.dragging[x])):
                                     self.bezierUpdates[y][3] = True
                     if(len(self.rightDragging)!=0):
-                        print "Symbolic Drag = " + str(self.symbolicDrag)
-                        print "loc = " + str(loc)
-                        self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
-                        self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
+                        try:
+                            self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
+                            self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
+                        except:
+                            print "Symbolic Drag = " + str(self.symbolicDrag)
+                            print "loc = " + str(loc)
     
     def defineSurface(self):
         tl = None
