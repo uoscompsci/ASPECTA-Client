@@ -49,6 +49,8 @@ class client:
     setuplines = True
     refreshrate = 0
     connections = []
+    dontFlip = {}
+    
     cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
     
     def bezierUpdateTracker(self):
@@ -357,8 +359,6 @@ class client:
                             loc = self.sender.getCursorPosition(1)
                             ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
                             self.hideable.append(ele)
-                            self.dontFlip = True
-                            print "Hello"
                             return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -409,11 +409,10 @@ class client:
                                         self.splitSide(self.rightCircles[w], "right",w)
                                         self.updateMesh(w)
                                 if (get_point!=True):
-                                    if(self.dontFlip==False):
+                                    if(self.dontFlip[w]==False):
                                         flipped = False
                                         point = self.sender.getCirclePosition(self.topCircles[w][0])
                                         if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                            print "Clicked top left"
                                             if(self.orientation[w]!=0):
                                                 if(self.mirrored[w]==False):
                                                     self.sender.rotateSurfaceTo0(w+1)
@@ -433,7 +432,6 @@ class client:
                                         if(flipped == False):
                                             point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
                                             if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                                print "Clicked top right"
                                                 if(self.orientation[w]!=1):
                                                     if(self.mirrored[w]==False):
                                                         self.sender.rotateSurfaceTo90(w+1)
@@ -453,7 +451,6 @@ class client:
                                         if (flipped == False):
                                             point = self.sender.getCirclePosition(self.bottomCircles[w][0])
                                             if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                                print "Clicked bottom right"
                                                 if(self.orientation[w]!=2):
                                                     if(self.mirrored[w]==False):
                                                         self.sender.rotateSurfaceTo180(w+1)
@@ -473,7 +470,6 @@ class client:
                                         if (flipped==False):
                                             point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
                                             if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                                print "Clicked bottom left"
                                                 if(self.orientation[w]!=3):
                                                     if(self.mirrored[w]==False):
                                                         self.sender.rotateSurfaceTo270(w+1)
@@ -490,8 +486,7 @@ class client:
                                                         self.sender.mirrorSurface(w+1)
                                                         self.mirrored[w]=False
                                     else:
-                                        print "set flip"
-                                        self.dontFlip=False
+                                        self.dontFlip[w]=False
                         for w in range(0,len(self.topCircles)):
                             if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
                                 self.dragging=[]
@@ -694,6 +689,7 @@ class client:
             self.leftCircles[self.surfaceCounter].append(tl[1])
             self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
             self.surfaceCounter += 1
+            self.dontFlip[self.surfaceCounter-1] = True
         
     def blueCircleAnimation(self):
         while(self.quit==False):
