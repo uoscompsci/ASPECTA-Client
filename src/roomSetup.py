@@ -42,6 +42,8 @@ class client:
     rightDragging = []
     dragging = []
     hideable = []
+    orientation = {}
+    mirrored = {}
     warpedSurf = {}
     bezierUpdates = {} #[top,bottom,left,right]
     setuplines = True
@@ -355,7 +357,8 @@ class client:
                             loc = self.sender.getCursorPosition(1)
                             ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
                             self.hideable.append(ele)
-                            #self.dontFlip = True
+                            self.dontFlip = True
+                            print "Hello"
                             return (loc, ele)
                         if(get_point!=True):
                             loc = self.sender.getCursorPosition(1)
@@ -405,58 +408,90 @@ class client:
                                     if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
                                         self.splitSide(self.rightCircles[w], "right",w)
                                         self.updateMesh(w)
-                                '''if (get_point!=True and self.dontFlip==False):
-                                    flipped = False
-                                    point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
-                                    if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                        print "Clicked top right"
-                                        top = self.topCircles[w]
-                                        bottom = self.bottomCircles[w]
-                                        left = self.leftCircles[w]
-                                        right = self.rightCircles[w]
-                                        self.topCircles[w] = right
-                                        self.rightCircles[w] = bottom
-                                        self.bottomCircles[w] = left
-                                        self.leftCircles[w] = top
-                                        self.bezierUpdates[w][0] = True
-                                        self.bezierUpdates[w][1] = True
-                                        self.bezierUpdates[w][2] = True
-                                        self.bezierUpdates[w][3] = True
-                                        flipped = True
-                                    if (flipped == False):
-                                        point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+                                if (get_point!=True):
+                                    if(self.dontFlip==False):
+                                        flipped = False
+                                        point = self.sender.getCirclePosition(self.topCircles[w][0])
                                         if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                            print "Clicked bottom right"
-                                            top = self.topCircles[w]
-                                            bottom = self.bottomCircles[w]
-                                            left = self.leftCircles[w]
-                                            right = self.rightCircles[w]
-                                            self.topCircles[w] = bottom
-                                            self.rightCircles[w] = left
-                                            self.bottomCircles[w] = top
-                                            self.leftCircles[w] = right
-                                            self.bezierUpdates[w][0] = True
-                                            self.bezierUpdates[w][1] = True
-                                            self.bezierUpdates[w][2] = True
-                                            self.bezierUpdates[w][3] = True
+                                            print "Clicked top left"
+                                            if(self.orientation[w]!=0):
+                                                if(self.mirrored[w]==False):
+                                                    self.sender.rotateSurfaceTo0(w+1)
+                                                else:
+                                                    self.sender.rotateSurfaceTo270(w+1)
+                                                self.orientation[w]=0
+                                            else:
+                                                if(self.mirrored[w]==False):
+                                                    self.sender.rotateSurfaceTo270(w+1)
+                                                    self.sender.mirrorSurface(w+1)
+                                                    self.mirrored[w]=True
+                                                else:
+                                                    self.sender.rotateSurfaceTo0(w+1)
+                                                    self.sender.mirrorSurface(w+1)
+                                                    self.mirrored[w]=False
                                             flipped = True
-                                    if (flipped==False):
-                                        point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
-                                        if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-                                            print "Clicked bottom left"
-                                            top = self.topCircles[w]
-                                            bottom = self.bottomCircles[w]
-                                            left = self.leftCircles[w]
-                                            right = self.rightCircles[w]
-                                            self.topCircles[w] = left
-                                            self.rightCircles[w] = top
-                                            self.bottomCircles[w] = right
-                                            self.leftCircles[w] = bottom
-                                            self.bezierUpdates[w][0] = True
-                                            self.bezierUpdates[w][1] = True
-                                            self.bezierUpdates[w][2] = True
-                                            self.bezierUpdates[w][3] = True
-                                self.dontFlip=False'''
+                                        if(flipped == False):
+                                            point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
+                                            if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+                                                print "Clicked top right"
+                                                if(self.orientation[w]!=1):
+                                                    if(self.mirrored[w]==False):
+                                                        self.sender.rotateSurfaceTo90(w+1)
+                                                    else:
+                                                        self.sender.rotateSurfaceTo0(w+1)
+                                                    self.orientation[w]=1
+                                                else:
+                                                    if(self.mirrored[w]==False):
+                                                        self.sender.rotateSurfaceTo0(w+1)
+                                                        self.sender.mirrorSurface(w+1)
+                                                        self.mirrored[w]=True
+                                                    else:
+                                                        self.sender.rotateSurfaceTo90(w+1)
+                                                        self.sender.mirrorSurface(w+1)
+                                                        self.mirrored[w]=False
+                                                flipped = True
+                                        if (flipped == False):
+                                            point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+                                            if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+                                                print "Clicked bottom right"
+                                                if(self.orientation[w]!=2):
+                                                    if(self.mirrored[w]==False):
+                                                        self.sender.rotateSurfaceTo180(w+1)
+                                                    else:
+                                                        self.sender.rotateSurfaceTo90(w+1)
+                                                    self.orientation[w]=2
+                                                else:
+                                                    if(self.mirrored[w]==False):
+                                                        self.sender.rotateSurfaceTo90(w+1)
+                                                        self.sender.mirrorSurface(w+1)
+                                                        self.mirrored[w]=True
+                                                    else:
+                                                        self.sender.rotateSurfaceTo180(w+1)
+                                                        self.sender.mirrorSurface(w+1)
+                                                        self.mirrored[w]=False
+                                                flipped = True
+                                        if (flipped==False):
+                                            point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
+                                            if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+                                                print "Clicked bottom left"
+                                                if(self.orientation[w]!=3):
+                                                    if(self.mirrored[w]==False):
+                                                        self.sender.rotateSurfaceTo270(w+1)
+                                                    else:
+                                                        self.sender.rotateSurfaceTo180(w+1)
+                                                    self.orientation[w]=3
+                                                else:
+                                                    if(self.mirrored[w]==False):
+                                                        self.sender.rotateSurfaceTo180(w+1)
+                                                        self.sender.mirrorSurface(w+1)
+                                                        self.mirrored[w]=True
+                                                    else:
+                                                        self.sender.rotateSurfaceTo270(w+1)
+                                                        self.sender.mirrorSurface(w+1)
+                                                        self.mirrored[w]=False
+                                    else:
+                                        print "set flip"
+                                        self.dontFlip=False
                         for w in range(0,len(self.topCircles)):
                             if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
                                 self.dragging=[]
@@ -582,6 +617,8 @@ class client:
                             print "loc = " + str(loc)
     
     def defineSurface(self):
+        self.orientation[self.surfaceCounter]=0
+        self.mirrored[self.surfaceCounter]=False
         tl = None
         bl = None
         tr = None

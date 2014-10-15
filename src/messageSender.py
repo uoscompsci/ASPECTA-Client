@@ -296,6 +296,21 @@ class messageSender:
     def undefineSurface(self, surfaceNo):
         self.sendMessage("undefine_surface")
         
+    def rotateSurfaceTo0(self, surfaceNo):
+        self.sendMessage("rotate_surface_to_0," + str(surfaceNo))
+    
+    def rotateSurfaceTo90(self, surfaceNo):
+        self.sendMessage("rotate_surface_to_90," + str(surfaceNo))
+    
+    def rotateSurfaceTo180(self, surfaceNo):
+        self.sendMessage("rotate_surface_to_180," + str(surfaceNo))
+    
+    def rotateSurfaceTo270(self, surfaceNo):
+        self.sendMessage("rotate_surface_to_270," + str(surfaceNo))
+    
+    def mirrorSurface(self, surfaceNo):
+        self.sendMessage("mirror_surface," + str(surfaceNo))
+        
     def subscribeToWindow(self, windowNo):
         self.sendMessage("subscribe_to_window," + str(windowNo))
         
