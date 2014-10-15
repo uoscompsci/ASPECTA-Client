@@ -217,47 +217,47 @@ class client:
             if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][0][0]):
                 if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
                 if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
             elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][0][0]):
                 if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
                 if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][0][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
             if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][1][0]):
                 if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
                 if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
             elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][1][0]):
                 if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][0][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
                 if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
                     if(found==False):
-                        print "connecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " to " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
                     else:
-                        print "disconnecting " + self.cornerAdj[start[1]][1][1] + " of " + str(start[0])  + " from " + self.cornerAdj[end[1]][1][1] + " of " + str(end[0])
+                        self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
             
     def connectionUpdateCheck(self, surface, corner):
         for x in range(len(self.connections)):

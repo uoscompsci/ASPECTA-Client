@@ -311,6 +311,12 @@ class messageSender:
     def mirrorSurface(self, surfaceNo):
         self.sendMessage("mirror_surface," + str(surfaceNo))
         
+    def connectSurfaces(self, surfaceNo1, side1, surfaceNo2, side2):
+        self.sendMessage("connect_surfaces," + str(surfaceNo1) + "," + side1 + "," + str(surfaceNo2) + "," + side2)
+    
+    def disconnectSurfaces(self, surfaceNo1, side1, surfaceNo2, side2):
+        self.sendMessage("disconnect_surfaces," + str(surfaceNo1) + "," + side1 + "," + str(surfaceNo2) + "," + side2)
+        
     def subscribeToWindow(self, windowNo):
         self.sendMessage("subscribe_to_window," + str(windowNo))
         
