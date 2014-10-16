@@ -580,17 +580,8 @@ class client:
                 if (not(xdist==0 and ydist==0)):
                     pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
                     
-                    loc = self.sender.testMoveCursor(1,-xdist,ydist)
-            
-                    if (loc[0]<0):
-                        loc[0]=0
-                    elif(loc[0]>1280):
-                        loc[0]=1280
-                    if(loc[1]<0):
-                        loc[1] = 0
-                    elif(loc[1]>1024):
-                        loc[1] = 1024
-                    self.sender.relocateCursor(1,float(loc[0]),float(loc[1]),0)
+                    self.sender.moveCursor(1, -xdist, ydist)
+                    loc = self.sender.getCursorPosition(1)
                     if(len(self.dragging)!=0):
                         for x in range (0,len(self.dragging)):
                             self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
