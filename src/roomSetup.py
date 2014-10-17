@@ -581,6 +581,7 @@ class client:
                     pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
                     
                     self.sender.moveCursor(1, -xdist, ydist)
+                    self.sender.moveCursor(2, -xdist, ydist)
                     loc = self.sender.getCursorPosition(1)
                     if(len(self.dragging)!=0):
                         for x in range (0,len(self.dragging)):
@@ -759,7 +760,7 @@ class client:
         #self.sender.addPolygonPoint(ele, 200, 150)
         
         self.warpedSurf[1] = self.sender.newSurface()
-        self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
+        #self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "american_gothic.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
@@ -779,7 +780,7 @@ class client:
         #self.sender.addPolygonPoint(ele, 200, 150)
         
         self.warpedSurf[2] = self.sender.newSurface()
-        self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
+        #self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "van_gough.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
@@ -790,7 +791,7 @@ class client:
         self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
         
         self.warpedSurf[3] = self.sender.newSurface()
-        self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
+        #self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "the_scream.jpg")
         self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
