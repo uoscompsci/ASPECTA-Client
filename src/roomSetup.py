@@ -307,6 +307,8 @@ class client:
                     self.sender.quit()
                     time.sleep(0.1)
                     self.quit = True
+                elif event.key==pygame.K_SPACE:
+                    self.sender.saveDefinedSurfaces("spaceSave")
                 elif event.key==pygame.K_v:
                     if (self.setuplines == False):
                         for q in range(0,len(self.hideable)):

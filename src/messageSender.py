@@ -296,6 +296,12 @@ class messageSender:
     def undefineSurface(self, surfaceNo):
         self.sendMessage("undefine_surface")
         
+    def saveDefinedSurfaces(self, filename):
+        self.sendMessage("save_defined_surfaces," + str(filename))
+        
+    def loadDefinedSurfaces(self, filename):
+        self.sendMessage("load_defined_surfaces," + str(filename))
+        
     def rotateSurfaceTo0(self, surfaceNo):
         self.sendMessage("rotate_surface_to_0," + str(surfaceNo))
     
