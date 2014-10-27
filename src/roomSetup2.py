@@ -697,10 +697,29 @@ class client:
 		
 	def saveLayout(self):
 		self.sender.saveDefinedSurfaces(self.saveName.get())
+		self.layouts = self.sender.getSavedLayouts()
+		self.loadList.delete(0, END)
+		for x in range(0, len(self.layouts)):
+			self.loadList.insert(END, self.layouts[x])
 		
 	def loadLayout(self):
+		self.sender.loadDefinedSurfaces(self.loadList.selection_get())
+		self.reInitGUI()
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
+		
+	def refreshLayouts(self):
+		self.layouts = self.sender.getSavedLayouts()
+		self.loadList.delete(0, END)
+		for x in range(0, len(self.layouts)):
+			self.loadList.insert(END, self.layouts[x])
+			
+	def deleteLayout(self):
+		self.sender.deleteLayout(self.loadList.selection_get())
+		self.layouts = self.sender.getSavedLayouts()
+		self.loadList.delete(0, END)
+		for x in range(0, len(self.layouts)):
+			self.loadList.insert(END, self.layouts[x])
 	
 	def tkinthread(self):
 		self.master = Tk()
@@ -716,6 +735,8 @@ class client:
 		self.frame5.pack()
 		self.frame6 = Frame(self.master)
 		self.frame6.pack()
+		self.frame7 = Frame(self.master)
+		self.frame7.pack()
 		self.button = Button(self.frame, text="QUIT CLIENT AND SERVER", fg="red", command=self.quitAllButton, width=40)
 		self.button.pack(side=LEFT)
 		self.slogan = Button(self.frame2, text="Control Projected Mouse (Middle Click to Release)", command=self.LockMouse, width=40)
@@ -729,12 +750,62 @@ class client:
 		self.saveBut.pack(side=LEFT)
 		self.loadList = Listbox(self.frame5, width=40)
 		self.loadList.pack(side=LEFT)
-		self.loadList.insert(END, "Bacon")
-		self.loadList.insert(END, "Lettuce")
-		self.loadList.insert(END, "Cheese")
-		self.saveBut = Button(self.frame6, text="Load Layout", command=self.loadLayout, width=40)
+		time.sleep(0.2)
+		for x in range(0, len(self.layouts)):
+			self.loadList.insert(END, self.layouts[x])
+		self.saveBut = Button(self.frame6, text="Load Layout", command=self.loadLayout, width=18)
+		self.saveBut.pack(side=LEFT)
+		self.saveBut = Button(self.frame6, text="Refresh List", command=self.refreshLayouts, width=18)
+		self.saveBut.pack(side=LEFT)
+		self.saveBut = Button(self.frame7, text="Delete Layout", command=self.deleteLayout, width=18)
+		self.saveBut.pack(side=LEFT)
+		self.saveBut = Button(self.frame7, text="NONE", command=self.refreshLayouts, width=18)
 		self.saveBut.pack(side=LEFT)
 		self.master.mainloop()
+		
+	def initGUI(self):
+		self.sender.showSetupSurface()
+		self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
+		self.sender.newCursor(0, 1280/2, 1024/2)
+		
+		self.warpedSurf[0] = self.sender.newSurface()
+		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
+		self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+
+		self.warpedSurf[1] = self.sender.newSurface()
+		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+
+		self.warpedSurf[2] = self.sender.newSurface()
+		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+
+		self.warpedSurf[3] = self.sender.newSurface()
+		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		
+		self.surfaceCounter = 0
+		
+	def reInitGUI(self):
+		self.sender.showSetupSurface()
+		self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
+		self.sender.newCursor(0, 1280/2, 1024/2)
+		
+		self.window = self.sender.newWindow(1, 200, 200, 100, 100, "Bob")
+		self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+
+		self.window = self.sender.newWindow(2, 200, 200, 100, 100, "Bob")
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+
+		self.window = self.sender.newWindow(3, 200, 200, 100, 100, "Bob")
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+
+		self.window = self.sender.newWindow(4, 200, 200, 100, 100, "Bob")
+		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		
+		self.surfaceCounter = 0
 	
 	def __init__(self):
 		tkinterThread = threading.Thread(target=self.tkinthread, args=()) #Creates the display thread
@@ -769,28 +840,8 @@ class client:
 		
 		self.sender.login("jp438")
 		self.sender.setapp("myapp")
-		self.sender.showSetupSurface()
-		self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
-		self.sender.newCursor(0, 1280/2, 1024/2)
-		
-		self.warpedSurf[0] = self.sender.newSurface()
-		window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
-		self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
-		self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
-
-		self.warpedSurf[1] = self.sender.newSurface()
-		window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
-		self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
-
-		self.warpedSurf[2] = self.sender.newSurface()
-		window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
-		self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
-
-		self.warpedSurf[3] = self.sender.newSurface()
-		window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
-		self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
-		
-		self.surfaceCounter = 0
+		self.layouts = self.sender.getSavedLayouts()
+		self.initGUI()
 		
 		self.mouseLock=False
 		pygame.mouse.set_visible(True)
@@ -802,7 +853,6 @@ class client:
 			thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
 			thread.start() #Starts the display thread
 			self.dirleft = True
-			self.window = window
 			while(self.quit==False):
 				self.background.fill((255, 255, 255))
 				text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))

@@ -302,6 +302,16 @@ class messageSender:
     def loadDefinedSurfaces(self, filename):
         self.sendMessage("load_defined_surfaces," + str(filename))
         
+    def getSavedLayouts(self):
+        layouts = self.sendMessage("get_saved_layouts")
+        layoutlist = []
+        for x in range(0,int(layouts["count"])):
+            layoutlist.append(layouts[x])
+        return layoutlist
+    
+    def deleteLayout(self, name):
+        self.sendMessage("delete_layout," + name)
+        
     def rotateSurfaceTo0(self, surfaceNo):
         self.sendMessage("rotate_surface_to_0," + str(surfaceNo))
     
