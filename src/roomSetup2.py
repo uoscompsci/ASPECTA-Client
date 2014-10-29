@@ -827,26 +827,6 @@ class client:
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		
 		self.surfaceCounter = 0
-		
-	def reInitGUI(self):
-		self.sender.showSetupSurface()
-		self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
-		self.sender.newCursor(0, 1280/2, 1024/2)
-		
-		self.window = self.sender.newWindow(1, 200, 200, 100, 100, "Bob")
-		self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
-
-		self.window = self.sender.newWindow(2, 200, 200, 100, 100, "Bob")
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
-
-		self.window = self.sender.newWindow(3, 200, 200, 100, 100, "Bob")
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
-
-		self.window = self.sender.newWindow(4, 200, 200, 100, 100, "Bob")
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
-		
-		self.surfaceCounter = 0
 	
 	def __init__(self):
 		tkinterThread = threading.Thread(target=self.tkinthread, args=()) #Creates the display thread
