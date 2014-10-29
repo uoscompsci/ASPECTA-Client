@@ -292,6 +292,10 @@ class client:
 					self.quit = True
 				elif event.key==pygame.K_SPACE:
 					self.sender.saveDefinedSurfaces("spaceSave")
+				elif event.key==pygame.K_HOME:
+					print self.sender.getCirclePosition(self.bottomCircles[0][0])
+					print self.sender.getCirclePosition(self.bottomCircles[0][1])
+					print self.sender.getCirclePosition(self.bottomCircles[0][2])
 				elif event.key==pygame.K_v:
 					if (self.setuplines == False):
 						for q in range(0,len(self.hideable)):
@@ -622,8 +626,8 @@ class client:
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
 				self.topCircles[self.surfaceCounter].append(ele)
 			y=1
-			for z in range(0,len(layout[x][y])):
-				if(z==0):
+			for z in list(reversed(range(0,len(layout[x][y])))):
+				if(z==len(layout[x][y])-1):
 					self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
 				else:
 					self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
