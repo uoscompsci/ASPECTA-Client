@@ -703,8 +703,9 @@ class client:
 			self.loadList.insert(END, self.layouts[x])
 		
 	def loadLayout(self):
-		self.sender.loadDefinedSurfaces(self.loadList.selection_get())
-		self.reInitGUI()
+		self.clearLayout()
+		count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
+		self.surfaceCounter = count
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
 		

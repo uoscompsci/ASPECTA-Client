@@ -300,7 +300,8 @@ class messageSender:
         self.sendMessage("save_defined_surfaces," + str(filename))
         
     def loadDefinedSurfaces(self, filename):
-        self.sendMessage("load_defined_surfaces," + str(filename))
+        count = self.sendMessage("load_defined_surfaces," + str(filename))
+        return int(count["count"])
         
     def getSavedLayouts(self):
         layouts = self.sendMessage("get_saved_layouts")
