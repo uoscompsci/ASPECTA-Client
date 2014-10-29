@@ -301,7 +301,20 @@ class messageSender:
         
     def loadDefinedSurfaces(self, filename):
         count = self.sendMessage("load_defined_surfaces," + str(filename))
-        return int(count["count"])
+        surfaces = count["layouts"].split("%")
+        surfaceslist = []
+        for x in range(0,len(surfaces)):
+            sides = surfaces[x].split("&")
+            sideslist = []
+            for y in range(0,4):
+                points = sides[y].split(";")
+                side = []
+                for z in range(0,len(points)):
+                    point = points[z].split(":")
+                    side.append((float(point[0]), float(point[1])))
+                sideslist.append(side)
+            surfaceslist.append(sideslist)
+        return (int(count["count"]),surfaceslist)
         
     def getSavedLayouts(self):
         layouts = self.sendMessage("get_saved_layouts")

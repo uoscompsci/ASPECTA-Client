@@ -394,6 +394,7 @@ class client:
 										self.splitSide(self.rightCircles[w], "right",w)
 										self.updateMesh(w)
 								if (get_point!=True):
+									print str(self.dontFlip)
 									if(self.dontFlip[w]==False):
 										flipped = False
 										point = self.sender.getCirclePosition(self.topCircles[w][0])
@@ -596,6 +597,68 @@ class client:
 						except:
 							print "Symbolic Drag = " + str(self.symbolicDrag)
 							print "loc = " + str(loc)
+							
+	def redefineSurface(self,layout):
+		for x in range(0,len(layout)):
+			self.orientation[self.surfaceCounter]=0
+			self.mirrored[self.surfaceCounter]=False
+			
+			self.topCircles[self.surfaceCounter] = []
+			self.bottomCircles[self.surfaceCounter] = []
+			self.leftCircles[self.surfaceCounter] = []
+			self.rightCircles[self.surfaceCounter] = []
+			self.bezierUpdates[self.surfaceCounter] = [False,False,False,False]
+			
+			y=0
+			for z in range(0,len(layout[x][y])):
+				if(z==0):
+					self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+				else:
+					self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+				ele = None
+				if ((z==0) or (z==(len(layout[x][y])-1))):
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
+				else:
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+				self.topCircles[self.surfaceCounter].append(ele)
+			y=1
+			for z in range(0,len(layout[x][y])):
+				if(z==0):
+					self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+				else:
+					self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+				ele = None
+				if ((z==0) or (z==(len(layout[x][y])-1))):
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
+				else:
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+				self.bottomCircles[self.surfaceCounter].append(ele)
+			y=2
+			for z in range(0,len(layout[x][y])):
+				if(z==0):
+					self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+				else:
+					self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+				ele = None
+				if ((z==0) or (z==(len(layout[x][y])-1))):
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
+				else:
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+				self.leftCircles[self.surfaceCounter].append(ele)
+			y=3
+			for z in list(reversed(range(0,len(layout[x][y])))):
+				if(z==len(layout[x][y])-1):
+					self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+				else:
+					self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+				ele = None
+				if ((z==0) or (z==(len(layout[x][y])-1))):
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
+				else:
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+				self.rightCircles[self.surfaceCounter].append(ele)
+			self.surfaceCounter+=1
+			self.dontFlip[self.surfaceCounter-1] = True
 	
 	def defineSurface(self):
 		self.orientation[self.surfaceCounter]=0
@@ -705,7 +768,7 @@ class client:
 	def loadLayout(self):
 		self.clearLayout()
 		count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
-		self.surfaceCounter = count
+		self.redefineSurface(count[1])
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
 		
