@@ -726,7 +726,6 @@ class client:
 		self.sender.undefineSurface(self.warpedSurf[1])
 		self.sender.undefineSurface(self.warpedSurf[2])
 		self.sender.undefineSurface(self.warpedSurf[3])
-		print str(self.rightCircles)
 		for z in self.topCircles:
 			for x in range(0,len(self.topCircles[z])):
 				self.sender.removeElement(self.topCircles[z][x], 1)

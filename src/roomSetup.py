@@ -8,25 +8,6 @@ from bezier import *
 from ConfigParser import SafeConfigParser
 import datetime
 
-class point:
-    __slots__ = ['x','y']
-    
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
-    
-    def setX(self,x):
-        self.x = x
-        
-    def setY(self,y):
-        self.y = y
-        
-    def getX(self):
-        return self.x
-    
-    def getY(self):
-        return self.y
-
 class client:
     __slots__ = ['ppe']
     quit = False
@@ -684,19 +665,6 @@ class client:
             self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
             self.surfaceCounter += 1
             self.dontFlip[self.surfaceCounter-1] = True
-        
-    def blueCircleAnimation(self):
-        while(self.quit==False):
-            time.sleep(1.0/30)
-            pos = self.sender.getCirclePosition(self.blueCirc)
-            if(pos[0]>=512):
-                self.dirleft = False
-            if(pos[0]<=0):
-                self.dirleft = True
-            if(self.dirleft):
-                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], self.window)
-            else:
-                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], self.window)
     
     def __init__(self):
         parser = SafeConfigParser()
@@ -729,100 +697,39 @@ class client:
         self.sender.login("jp438")
         self.sender.setapp("myapp")
         self.sender.showSetupSurface()
-        self.warpedSurf[0] = self.sender.newSurface()
         self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
         self.sender.newCursor(0, 1280/2, 1024/2)
         
+        self.warpedSurf[0] = self.sender.newSurface()
         window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
         self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
-        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
-        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
-        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 50)
-        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 50)
-        self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 50)
-        self.blueCirc = self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 50)
-        self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 50)
-        
-        #self.sender.newRectangle(window, 200, 200, 100, 200, (1,1,1,1), (0,0,1,1))
-        
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 400, 30, "Arial", (1,1,0,1))
-        
-        ele = self.sender.newPolygon(window, 100, 100, (1,1,1,1), (0.5,0.5,0.5,1))
-        self.sender.addPolygonPoint(ele, 200, 150)
-        self.sender.addPolygonPoint(ele, 200, 200)
-        self.sender.addPolygonPoint(ele, 150, 175)
-        self.sender.addPolygonPoint(ele, 75, 175)
-        self.sender.addPolygonPoint(ele, 50, 150)
-        #self.sender.addPolygonPoint(ele, 200, 150)
-        #self.sender.addPolygonPoint(ele, 200, 150)
-        
+        self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
+
         self.warpedSurf[1] = self.sender.newSurface()
-        #self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "american_gothic.jpg")
-        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
-        
-        ele = self.sender.newPolygon(window, 100, 100, (1,1,1,1), (0.5,0.5,0.5,1))
-        self.sender.addPolygonPoint(ele, 200, 150)
-        self.sender.addPolygonPoint(ele, 200, 200)
-        self.sender.addPolygonPoint(ele, 150, 175)
-        self.sender.addPolygonPoint(ele, 75, 175)
-        self.sender.addPolygonPoint(ele, 50, 150)
-        #self.sender.addPolygonPoint(ele, 200, 150)
-        #self.sender.addPolygonPoint(ele, 200, 150)
-        
+        self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
+
         self.warpedSurf[2] = self.sender.newSurface()
-        #self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "van_gough.jpg")
-        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
-        
+        self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
+
         self.warpedSurf[3] = self.sender.newSurface()
-        #self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
         window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "the_scream.jpg")
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
+        self.sender.newTexRectangle(window, 0, 512, 512, 512, "checks.jpg")
         
         self.surfaceCounter = 0
         
-        self.mouseLock=True
-        pygame.mouse.set_visible(False)
+        self.mouseLock=False
+        pygame.mouse.set_visible(True)
         
         mouseThread = threading.Thread(target=self.mouseMovement, args=()) #Creates the display thread
         mouseThread.start() #Starts the display thread
         
-        self.defineSurface()
         if(self.quit==False):
-            self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
-            self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
-            self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
-            self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
-            
             thread = threading.Thread(target=self.bezierUpdateTracker, args=()) #Creates the display thread
             thread.start() #Starts the display thread
             self.dirleft = True
             self.window = window
-            circAnim = threading.Thread(target=self.blueCircleAnimation, args=()) #Creates the display thread
-            circAnim.start() #Starts the display thread
             while(self.quit==False):
                 self.background.fill((255, 255, 255))
                 text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))
