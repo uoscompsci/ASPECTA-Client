@@ -33,6 +33,7 @@ class client:
 	refreshrate = 0
 	connections = []
 	dontFlip = {}
+	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
 	
 	cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
 	
@@ -158,7 +159,7 @@ class client:
 			rightPoints.append(self.sender.getCirclePosition(self.rightCircles[surface][len(self.rightCircles[surface]) - 1 - x]))
 		self.sender.setSurfaceEdges(self.warpedSurf[surface], topPoints, bottomPoints, leftPoints, rightPoints)
 		
-	def createConnectionLine(self, start, end):
+	def createConnectionLine(self, start, end, visOnly):
 		found = False
 		for x in range(0,len(self.connections)):
 			if(found==False):
@@ -195,52 +196,53 @@ class client:
 				endLoc = self.sender.getCirclePosition(self.bottomCircles[end[0]][botend])
 			ele = self.sender.newLine(1, startLoc[0], startLoc[1], endLoc[0], endLoc[1], (1,0,0,1), 3)
 			self.connections.append([(start[0],start[1]),(end[0],end[1]),ele])
-		#look for created connections
-		for x in range(len(self.connections)):
-			if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][0][0]):
-				if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
-				if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
-			elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][0][0]):
-				if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
-				if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
-			if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][1][0]):
-				if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
-				if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
-			elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][1][0]):
-				if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
-				if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
-					if(found==False):
-						self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
-					else:
-						self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
+		if(not visOnly):
+			#look for created connections
+			for x in range(len(self.connections)):
+				if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][0][0]):
+					if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
+					if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
+				elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][0][0]):
+					if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][0][1])
+					if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0], self.cornerAdj[end[1]][1][1])
+				if(self.connections[x][0][0]==start[0] and self.connections[x][0][1]==self.cornerAdj[start[1]][1][0]):
+					if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][0][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
+					if(self.connections[x][1][0]==end[0] and self.connections[x][1][1]==self.cornerAdj[end[1]][1][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
+				elif(self.connections[x][1][0]==start[0] and self.connections[x][1][1]==self.cornerAdj[start[1]][1][0]):
+					if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][0][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][0][1])
+					if(self.connections[x][0][0]==end[0] and self.connections[x][0][1]==self.cornerAdj[end[1]][1][0]):
+						if(found==False):
+							self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
+						else:
+							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
 			
 	def connectionUpdateCheck(self, surface, corner):
 		for x in range(len(self.connections)):
@@ -292,10 +294,6 @@ class client:
 					self.quit = True
 				elif event.key==pygame.K_SPACE:
 					self.sender.saveDefinedSurfaces("spaceSave")
-				elif event.key==pygame.K_HOME:
-					print self.sender.getCirclePosition(self.bottomCircles[0][0])
-					print self.sender.getCirclePosition(self.bottomCircles[0][1])
-					print self.sender.getCirclePosition(self.bottomCircles[0][2])
 				elif event.key==pygame.K_v:
 					if (self.setuplines == False):
 						for q in range(0,len(self.hideable)):
@@ -398,7 +396,6 @@ class client:
 										self.splitSide(self.rightCircles[w], "right",w)
 										self.updateMesh(w)
 								if (get_point!=True):
-									print str(self.dontFlip)
 									if(self.dontFlip[w]==False):
 										flipped = False
 										point = self.sender.getCirclePosition(self.topCircles[w][0])
@@ -547,18 +544,18 @@ class client:
 								if (w != surface):
 									point = self.sender.getCirclePosition(self.topCircles[w][0])
 									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
-										self.createConnectionLine((surface,corner),(w,"tl"))
+										self.createConnectionLine((surface,corner),(w,"tl"), False)
 									end = len(self.topCircles[w])-1
 									point = self.sender.getCirclePosition(self.topCircles[w][end])
 									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
-										self.createConnectionLine((surface,corner),(w,"tr"))
+										self.createConnectionLine((surface,corner),(w,"tr"), False)
 									point = self.sender.getCirclePosition(self.bottomCircles[w][0])
 									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
-										self.createConnectionLine((surface,corner),(w,"br"))
+										self.createConnectionLine((surface,corner),(w,"br"), False)
 									end = len(self.bottomCircles[w])-1
 									point = self.sender.getCirclePosition(self.bottomCircles[w][end])
 									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]))):
-										self.createConnectionLine((surface,corner),(w,"bl"))
+										self.createConnectionLine((surface,corner),(w,"bl"), False)
 						self.rightDragging=[]
 						self.symbolicDrag = {}
 						if(elapsedSecs<0.15 and hitOnce==False):
@@ -743,6 +740,14 @@ class client:
 			self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
 			self.surfaceCounter += 1
 			self.dontFlip[self.surfaceCounter-1] = True
+			
+	def visualizeConnections(self, connections):
+		for x in range(0, len(connections)):
+			self.visualizeConnectionLines((connections[x][0][0],connections[x][0][1]), (connections[x][1][0],connections[x][1][1]))
+			
+	def visualizeConnectionLines(self, fromSide, toSide):
+		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][0]), (toSide[0],self.sideToCorners[toSide[1]][0]), True)
+		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][1]), (toSide[0],self.sideToCorners[toSide[1]][1]), True)
 	
 	def quitButton(self):
 		if(self.quit==False):
@@ -773,6 +778,7 @@ class client:
 		self.clearLayout()
 		count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
 		self.redefineSurface(count[1])
+		self.visualizeConnections(count[2])
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
 		
@@ -831,6 +837,7 @@ class client:
 	
 	def tkinthread(self):
 		self.master = Tk()
+		self.master.wm_title("Configuration GUI")
 		self.frame = Frame(self.master)
 		self.frame.pack()
 		self.frame2 = Frame(self.master)
