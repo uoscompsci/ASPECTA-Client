@@ -294,7 +294,7 @@ class messageSender:
         self.sendMessage("set_surface_edges," + str(surfaceNo) + "," + topString + "," + bottomString + "," + leftString + "," + rightString)
         
     def undefineSurface(self, surfaceNo):
-        self.sendMessage("undefine_surface")
+        self.sendMessage("undefine_surface," + str(surfaceNo))
         
     def saveDefinedSurfaces(self, filename):
         self.sendMessage("save_defined_surfaces," + str(filename))

@@ -720,6 +720,47 @@ class client:
 		self.loadList.delete(0, END)
 		for x in range(0, len(self.layouts)):
 			self.loadList.insert(END, self.layouts[x])
+			
+	def clearLayout(self):
+		self.sender.undefineSurface(self.warpedSurf[0])
+		self.sender.undefineSurface(self.warpedSurf[1])
+		self.sender.undefineSurface(self.warpedSurf[2])
+		self.sender.undefineSurface(self.warpedSurf[3])
+		print str(self.rightCircles)
+		for z in self.topCircles:
+			for x in range(0,len(self.topCircles[z])):
+				self.sender.removeElement(self.topCircles[z][x], 1)
+		self.topCircles = {}
+		for z in self.bottomCircles:
+			for x in range(0,len(self.bottomCircles[z])):
+				self.sender.removeElement(self.bottomCircles[z][x], 1)
+		self.bottomCircles = {}
+		for z in self.leftCircles:
+			for x in range(0,len(self.leftCircles[z])):
+				self.sender.removeElement(self.leftCircles[z][x], 1)
+		self.leftCircles = {}
+		for z in self.rightCircles:
+			for x in range(0,len(self.rightCircles[z])):
+				self.sender.removeElement(self.rightCircles[z][x], 1)
+		self.rightCircles = {}
+		for x in self.topbz:
+			self.sender.removeElement(self.topbz[x], 1)
+		self.topbz = {}
+		for x in self.bottombz:
+			self.sender.removeElement(self.bottombz[x], 1)
+		self.bottombz = {}
+		for x in self.leftbz:
+			self.sender.removeElement(self.leftbz[x], 1)
+		self.leftbz = {}
+		for x in self.rightbz:
+			self.sender.removeElement(self.rightbz[x], 1)
+		self.rightbz = {}
+		for x in self.mirrored:
+			self.mirrored[x] = False
+		for x in self.orientation:
+			self.orientation[x] = 0
+		
+		self.surfaceCounter = 0
 	
 	def tkinthread(self):
 		self.master = Tk()
@@ -750,7 +791,7 @@ class client:
 		self.saveBut.pack(side=LEFT)
 		self.loadList = Listbox(self.frame5, width=40)
 		self.loadList.pack(side=LEFT)
-		time.sleep(0.2)
+		time.sleep(0.5)
 		for x in range(0, len(self.layouts)):
 			self.loadList.insert(END, self.layouts[x])
 		self.saveBut = Button(self.frame6, text="Load Layout", command=self.loadLayout, width=18)
@@ -759,7 +800,7 @@ class client:
 		self.saveBut.pack(side=LEFT)
 		self.saveBut = Button(self.frame7, text="Delete Layout", command=self.deleteLayout, width=18)
 		self.saveBut.pack(side=LEFT)
-		self.saveBut = Button(self.frame7, text="NONE", command=self.refreshLayouts, width=18)
+		self.saveBut = Button(self.frame7, text="Clear Current Layout", command=self.clearLayout, width=18)
 		self.saveBut.pack(side=LEFT)
 		self.master.mainloop()
 		
