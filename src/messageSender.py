@@ -314,16 +314,19 @@ class messageSender:
                     side.append((float(point[0]), float(point[1])))
                 sideslist.append(side)
             surfaceslist.append(sideslist)
-        connections = count["connections"].split("%")
-        connectionslist = []
-        for x in range(0,len(connections)):
-            connection = connections[x].split(";")
-            conn1 = connection[0].split(":")
-            conn2 = connection[1].split(":")
-            conn1list = [int(conn1[0]),conn1[1]]
-            conn2list = [int(conn2[0]),conn2[1]]
-            connectionslist.append([conn1list,conn2list])
-        return (int(count["count"]),surfaceslist,connectionslist)
+        if(count["connections"]!=""):
+            connections = count["connections"].split("%")
+            connectionslist = []
+            for x in range(0,len(connections)):
+                connection = connections[x].split(";")
+                conn1 = connection[0].split(":")
+                conn2 = connection[1].split(":")
+                conn1list = [int(conn1[0]),conn1[1]]
+                conn2list = [int(conn2[0]),conn2[1]]
+                connectionslist.append([conn1list,conn2list])
+            return (int(count["count"]),surfaceslist,connectionslist)
+        else:
+            return (int(count["count"]),surfaceslist,[])
         
     def getSavedLayouts(self):
         layouts = self.sendMessage("get_saved_layouts")

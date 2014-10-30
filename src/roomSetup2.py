@@ -288,10 +288,6 @@ class client:
 					elif(self.mouseLock == False):
 						self.mouseLock = True
 						pygame.mouse.set_visible(False)
-				elif event.key==pygame.K_ESCAPE:
-					self.sender.quit()
-					time.sleep(0.1)
-					self.quit = True
 				elif event.key==pygame.K_SPACE:
 					self.sender.saveDefinedSurfaces("spaceSave")
 				elif event.key==pygame.K_v:
