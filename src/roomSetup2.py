@@ -9,6 +9,7 @@ from bezier import *
 from ConfigParser import SafeConfigParser
 import datetime
 from pgu import gui
+import tkMessageBox
 
 class client:
 	__slots__ = ['ppe']
@@ -554,7 +555,7 @@ class client:
 										self.createConnectionLine((surface,corner),(w,"bl"), False)
 						self.rightDragging=[]
 						self.symbolicDrag = {}
-						if(elapsedSecs<0.15 and hitOnce==False):
+						if(elapsedSecs<0.15 and hitOnce==False and self.surfaceCounter<4):
 							self.defineSurface()
 							self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
 							self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
@@ -654,6 +655,7 @@ class client:
 				else:
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
 				self.rightCircles[self.surfaceCounter].append(ele)
+			self.bezierUpdates[self.surfaceCounter] = [True,True,True,True]
 			self.surfaceCounter+=1
 			self.dontFlip[self.surfaceCounter-1] = True
 	
@@ -764,11 +766,21 @@ class client:
 		pygame.mouse.set_visible(False)
 		
 	def saveLayout(self):
-		self.sender.saveDefinedSurfaces(self.saveName.get())
-		self.layouts = self.sender.getSavedLayouts()
-		self.loadList.delete(0, END)
-		for x in range(0, len(self.layouts)):
-			self.loadList.insert(END, self.layouts[x])
+		if(self.saveName.get()!=""):
+			hit=False
+			for x in range(0,self.loadList.size()):
+				if(self.loadList.get(x)==self.saveName.get()):
+					hit=True
+			if hit==True:
+				hit = tkMessageBox.askyesno("Overwrite", "Overwrite existing layout?")
+			if hit==True:
+				self.sender.saveDefinedSurfaces(self.saveName.get())
+				self.layouts = self.sender.getSavedLayouts()
+				self.loadList.delete(0, END)
+				for x in range(0, len(self.layouts)):
+					self.loadList.insert(END, self.layouts[x])
+		else:
+			tkMessageBox.showinfo("Error", "Please enter save name first")
 		
 	def loadLayout(self):
 		self.clearLayout()
@@ -778,6 +790,13 @@ class client:
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
 		
+	def selectEntry(self, event):
+		w = event.widget
+		index = int(w.curselection()[0])
+		value = w.get(index)
+		self.saveName.delete(0, END)
+		self.saveName.insert(0, value)
+		
 	def refreshLayouts(self):
 		self.layouts = self.sender.getSavedLayouts()
 		self.loadList.delete(0, END)
@@ -785,11 +804,14 @@ class client:
 			self.loadList.insert(END, self.layouts[x])
 			
 	def deleteLayout(self):
-		self.sender.deleteLayout(self.loadList.selection_get())
-		self.layouts = self.sender.getSavedLayouts()
-		self.loadList.delete(0, END)
-		for x in range(0, len(self.layouts)):
-			self.loadList.insert(END, self.layouts[x])
+		if(self.loadList.selection_get()!="DEFAULT"):
+			self.sender.deleteLayout(self.loadList.selection_get())
+			self.layouts = self.sender.getSavedLayouts()
+			self.loadList.delete(0, END)
+			for x in range(0, len(self.layouts)):
+				self.loadList.insert(END, self.layouts[x])
+		else:
+			tkMessageBox.showinfo("Error", "Cannot delete default layout")
 			
 	def clearLayout(self):
 		self.sender.undefineSurface(self.warpedSurf[0])
@@ -830,6 +852,9 @@ class client:
 			self.orientation[x] = 0
 		
 		self.surfaceCounter = 0
+		
+		self.saveName.delete(0, END)
+		self.saveName.insert(0, "")
 	
 	def tkinthread(self):
 		self.master = Tk()
@@ -854,16 +879,19 @@ class client:
 		self.slogan.pack(side=LEFT)
 		self.label = Label(self.frame3, text="Save name", width=10)
 		self.label.pack(side=LEFT)
-		self.saveName = Entry(self.frame3, width=30)
+		self.saveName = Entry(self.frame3, width=32)
 		self.saveName.pack(side=LEFT)
-		self.saveName.insert(0, "DEFAULT")
 		self.saveBut = Button(self.frame4, text="Save Layout", command=self.saveLayout, width=40)
 		self.saveBut.pack(side=LEFT)
-		self.loadList = Listbox(self.frame5, width=40)
+		self.loadList = Listbox(self.frame5, width=42)
 		self.loadList.pack(side=LEFT)
 		time.sleep(0.5)
+		index = 0
 		for x in range(0, len(self.layouts)):
+			if self.layouts[x]=="DEFAULT":
+				index = x
 			self.loadList.insert(END, self.layouts[x])
+		self.loadList.bind('<<ListboxSelect>>', self.selectEntry)
 		self.saveBut = Button(self.frame6, text="Load Layout", command=self.loadLayout, width=18)
 		self.saveBut.pack(side=LEFT)
 		self.saveBut = Button(self.frame6, text="Refresh List", command=self.refreshLayouts, width=18)
@@ -872,6 +900,8 @@ class client:
 		self.saveBut.pack(side=LEFT)
 		self.saveBut = Button(self.frame7, text="Clear Current Layout", command=self.clearLayout, width=18)
 		self.saveBut.pack(side=LEFT)
+		self.loadList.select_set(index)
+		self.loadLayout()
 		self.master.mainloop()
 		
 	def initGUI(self):
@@ -946,7 +976,7 @@ class client:
 			self.dirleft = True
 			while(self.quit==False):
 				self.background.fill((255, 255, 255))
-				text = self.font.render("Press 'L' to release mouse", 1, (10, 10, 10))
+				text = self.font.render("", 1, (10, 10, 10))
 				textpos = text.get_rect()
 				textpos.centerx = self.background.get_rect().centerx
 				self.background.blit(text, textpos)
