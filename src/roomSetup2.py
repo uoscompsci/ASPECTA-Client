@@ -768,12 +768,13 @@ class client:
 	def saveLayout(self):
 		if(self.saveName.get()!=""):
 			hit=False
+			confirm = False
 			for x in range(0,self.loadList.size()):
 				if(self.loadList.get(x)==self.saveName.get()):
 					hit=True
 			if hit==True:
-				hit = tkMessageBox.askyesno("Overwrite", "Overwrite existing layout?")
-			if hit==True:
+				confirm = tkMessageBox.askyesno("Overwrite", "Overwrite existing layout?")
+			if hit==False or confirm==True:
 				self.sender.saveDefinedSurfaces(self.saveName.get())
 				self.layouts = self.sender.getSavedLayouts()
 				self.loadList.delete(0, END)
