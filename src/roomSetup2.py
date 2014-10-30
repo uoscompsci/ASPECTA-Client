@@ -616,7 +616,7 @@ class client:
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
 				self.topCircles[self.surfaceCounter].append(ele)
 			y=1
 			for z in list(reversed(range(0,len(layout[x][y])))):
@@ -628,7 +628,7 @@ class client:
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
 				self.bottomCircles[self.surfaceCounter].append(ele)
 			y=2
 			for z in range(0,len(layout[x][y])):
@@ -640,7 +640,7 @@ class client:
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
 				self.leftCircles[self.surfaceCounter].append(ele)
 			y=3
 			for z in list(reversed(range(0,len(layout[x][y])))):
@@ -652,7 +652,7 @@ class client:
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, (1, 0, 0, 1), (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, (1, 0, 0, 1), (0, 1, 0, 1), 20)
 				self.rightCircles[self.surfaceCounter].append(ele)
 			self.surfaceCounter+=1
 			self.dontFlip[self.surfaceCounter-1] = True
