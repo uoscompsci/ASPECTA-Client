@@ -350,132 +350,134 @@ class client:
 							self.hideable.append(ele)
 							return (loc, ele)
 						if(get_point!=True):
-							loc = self.sender.getCursorPosition(1)
-							self.dragging = []
-							for z in range(0,len(self.topCircles)):
-								for x in range(0,len(self.topCircles[z])):
-									point = self.sender.getCirclePosition(self.topCircles[z][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.dragging.append(self.topCircles[z][x])
-								for x in range(0,len(self.bottomCircles[z])):
-									point = self.sender.getCirclePosition(self.bottomCircles[z][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.dragging.append(self.bottomCircles[z][x])
-								for x in range(0,len(self.leftCircles[z])):
-									point = self.sender.getCirclePosition(self.leftCircles[z][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.dragging.append(self.leftCircles[z][x])
-								for x in range(0,len(self.rightCircles[z])):
-									point = self.sender.getCirclePosition(self.rightCircles[z][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.dragging.append(self.rightCircles[z][x])
+							if(self.cursorMode=="default"):
+								loc = self.sender.getCursorPosition(1)
+								self.dragging = []
+								for z in range(0,len(self.topCircles)):
+									for x in range(0,len(self.topCircles[z])):
+										point = self.sender.getCirclePosition(self.topCircles[z][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.dragging.append(self.topCircles[z][x])
+									for x in range(0,len(self.bottomCircles[z])):
+										point = self.sender.getCirclePosition(self.bottomCircles[z][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.dragging.append(self.bottomCircles[z][x])
+									for x in range(0,len(self.leftCircles[z])):
+										point = self.sender.getCirclePosition(self.leftCircles[z][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.dragging.append(self.leftCircles[z][x])
+									for x in range(0,len(self.rightCircles[z])):
+										point = self.sender.getCirclePosition(self.rightCircles[z][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.dragging.append(self.rightCircles[z][x])
 				elif event.type == pygame.MOUSEBUTTONUP:
 					if(event.button==1):
 						lClickRelTime=datetime.datetime.now()
 						self.ldown=False
 						elapsedSecs = (lClickRelTime-self.lClickTime).total_seconds()
 						if(elapsedSecs<0.15):
-							loc = self.sender.getCursorPosition(1)
-							for w in range(0,len(self.topCircles)):
-								for x in range(1,len(self.topCircles[w])-1):
-									point = self.sender.getCirclePosition(self.topCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.splitSide(self.topCircles[w], "top",w)
-										self.updateMesh(w)
-								for x in range(1,len(self.bottomCircles[w])-1):
-									point = self.sender.getCirclePosition(self.bottomCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.splitSide(self.bottomCircles[w], "bottom",w)
-										self.updateMesh(w)
-								for x in range(1,len(self.leftCircles[w])-1):
-									point = self.sender.getCirclePosition(self.leftCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.splitSide(self.leftCircles[w], "left",w)
-										self.updateMesh(w)
-								for x in range(1,len(self.rightCircles[w])-1):
-									point = self.sender.getCirclePosition(self.rightCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										self.splitSide(self.rightCircles[w], "right",w)
-										self.updateMesh(w)
-								if (get_point!=True):
-									if(self.dontFlip[w]==False):
-										flipped = False
-										point = self.sender.getCirclePosition(self.topCircles[w][0])
-										if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-											if(self.orientation[w]!=0):
-												if(self.mirrored[w]==False):
-													self.sender.rotateSurfaceTo0(w+1)
-												else:
-													self.sender.rotateSurfaceTo270(w+1)
-												self.orientation[w]=0
-											else:
-												if(self.mirrored[w]==False):
-													self.sender.rotateSurfaceTo270(w+1)
-													self.sender.mirrorSurface(w+1)
-													self.mirrored[w]=True
-												else:
-													self.sender.rotateSurfaceTo0(w+1)
-													self.sender.mirrorSurface(w+1)
-													self.mirrored[w]=False
-											flipped = True
-										if(flipped == False):
-											point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
+							if(self.cursorMode=="default"):
+								loc = self.sender.getCursorPosition(1)
+								for w in range(0,len(self.topCircles)):
+									for x in range(1,len(self.topCircles[w])-1):
+										point = self.sender.getCirclePosition(self.topCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.splitSide(self.topCircles[w], "top",w)
+											self.updateMesh(w)
+									for x in range(1,len(self.bottomCircles[w])-1):
+										point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.splitSide(self.bottomCircles[w], "bottom",w)
+											self.updateMesh(w)
+									for x in range(1,len(self.leftCircles[w])-1):
+										point = self.sender.getCirclePosition(self.leftCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.splitSide(self.leftCircles[w], "left",w)
+											self.updateMesh(w)
+									for x in range(1,len(self.rightCircles[w])-1):
+										point = self.sender.getCirclePosition(self.rightCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											self.splitSide(self.rightCircles[w], "right",w)
+											self.updateMesh(w)
+									if (get_point!=True):
+										if(self.dontFlip[w]==False):
+											flipped = False
+											point = self.sender.getCirclePosition(self.topCircles[w][0])
 											if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-												if(self.orientation[w]!=1):
+												if(self.orientation[w]!=0):
 													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo90(w+1)
-													else:
 														self.sender.rotateSurfaceTo0(w+1)
-													self.orientation[w]=1
+													else:
+														self.sender.rotateSurfaceTo270(w+1)
+													self.orientation[w]=0
 												else:
 													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo0(w+1)
+														self.sender.rotateSurfaceTo270(w+1)
 														self.sender.mirrorSurface(w+1)
 														self.mirrored[w]=True
 													else:
-														self.sender.rotateSurfaceTo90(w+1)
+														self.sender.rotateSurfaceTo0(w+1)
 														self.sender.mirrorSurface(w+1)
 														self.mirrored[w]=False
 												flipped = True
-										if (flipped == False):
-											point = self.sender.getCirclePosition(self.bottomCircles[w][0])
-											if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-												if(self.orientation[w]!=2):
-													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo180(w+1)
+											if(flipped == False):
+												point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
+												if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+													if(self.orientation[w]!=1):
+														if(self.mirrored[w]==False):
+															self.sender.rotateSurfaceTo90(w+1)
+														else:
+															self.sender.rotateSurfaceTo0(w+1)
+														self.orientation[w]=1
 													else:
-														self.sender.rotateSurfaceTo90(w+1)
-													self.orientation[w]=2
-												else:
-													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo90(w+1)
-														self.sender.mirrorSurface(w+1)
-														self.mirrored[w]=True
+														if(self.mirrored[w]==False):
+															self.sender.rotateSurfaceTo0(w+1)
+															self.sender.mirrorSurface(w+1)
+															self.mirrored[w]=True
+														else:
+															self.sender.rotateSurfaceTo90(w+1)
+															self.sender.mirrorSurface(w+1)
+															self.mirrored[w]=False
+													flipped = True
+											if (flipped == False):
+												point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+												if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+													if(self.orientation[w]!=2):
+														if(self.mirrored[w]==False):
+															self.sender.rotateSurfaceTo180(w+1)
+														else:
+															self.sender.rotateSurfaceTo90(w+1)
+														self.orientation[w]=2
 													else:
-														self.sender.rotateSurfaceTo180(w+1)
-														self.sender.mirrorSurface(w+1)
-														self.mirrored[w]=False
-												flipped = True
-										if (flipped==False):
-											point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
-											if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
-												if(self.orientation[w]!=3):
-													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo270(w+1)
+														if(self.mirrored[w]==False):
+															self.sender.rotateSurfaceTo90(w+1)
+															self.sender.mirrorSurface(w+1)
+															self.mirrored[w]=True
+														else:
+															self.sender.rotateSurfaceTo180(w+1)
+															self.sender.mirrorSurface(w+1)
+															self.mirrored[w]=False
+													flipped = True
+											if (flipped==False):
+												point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
+												if(self.isHit((point[0],point[1]), (loc[0],loc[1]))):
+													if(self.orientation[w]!=3):
+														if(self.mirrored[w]==False):
+															self.sender.rotateSurfaceTo270(w+1)
+														else:
+															self.sender.rotateSurfaceTo180(w+1)
+														self.orientation[w]=3
 													else:
-														self.sender.rotateSurfaceTo180(w+1)
-													self.orientation[w]=3
-												else:
-													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo180(w+1)
-														self.sender.mirrorSurface(w+1)
-														self.mirrored[w]=True
-													else:
-														self.sender.rotateSurfaceTo270(w+1)
-														self.sender.mirrorSurface(w+1)
-														self.mirrored[w]=False
-									else:
-										self.dontFlip[w]=False
+														if(self.mirrored[w]==False):
+															self.sender.rotateSurfaceTo180(w+1)
+															self.sender.mirrorSurface(w+1)
+															self.mirrored[w]=True
+														else:
+															self.sender.rotateSurfaceTo270(w+1)
+															self.sender.mirrorSurface(w+1)
+															self.mirrored[w]=False
+										else:
+											self.dontFlip[w]=False
 						for w in range(0,len(self.topCircles)):
 							if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
 								self.dragging=[]
@@ -494,44 +496,45 @@ class client:
 						hit = False
 						hitOnce = False
 						if(elapsedSecs<0.15):
-							loc = self.sender.getCursorPosition(1)
-							for w in range(0,len(self.topCircles)):
-								for x in range(1,len(self.topCircles[w])-1):
-									point = self.sender.getCirclePosition(self.topCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										hit = True
-										hitOnce = True
-								if (hit==True):
-									hit=False
-									self.reduceSide(self.topCircles[w], "top",w)
-									self.updateMesh(w)
-								for x in range(1,len(self.bottomCircles[w])-1):
-									point = self.sender.getCirclePosition(self.bottomCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										hit = True
-										hitOnce = True
-								if (hit==True):
-									hit=False
-									self.reduceSide(self.bottomCircles[w], "bottom",w)
-									self.updateMesh(w)
-								for x in range(1,len(self.leftCircles[w])-1):
-									point = self.sender.getCirclePosition(self.leftCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										hit = True
-										hitOnce = True
-								if (hit==True):
-									hit=False
-									self.reduceSide(self.leftCircles[w], "left",w)
-									self.updateMesh(w)
-								for x in range(1,len(self.rightCircles[w])-1):
-									point = self.sender.getCirclePosition(self.rightCircles[w][x])
-									if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-										hit = True
-										hitOnce = True
-								if (hit==True):
-									hit=False
-									self.reduceSide(self.rightCircles[w], "right",w)
-									self.updateMesh(w)
+							if(self.cursorMode=="default"):
+								loc = self.sender.getCursorPosition(1)
+								for w in range(0,len(self.topCircles)):
+									for x in range(1,len(self.topCircles[w])-1):
+										point = self.sender.getCirclePosition(self.topCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											hit = True
+											hitOnce = True
+									if (hit==True):
+										hit=False
+										self.reduceSide(self.topCircles[w], "top",w)
+										self.updateMesh(w)
+									for x in range(1,len(self.bottomCircles[w])-1):
+										point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											hit = True
+											hitOnce = True
+									if (hit==True):
+										hit=False
+										self.reduceSide(self.bottomCircles[w], "bottom",w)
+										self.updateMesh(w)
+									for x in range(1,len(self.leftCircles[w])-1):
+										point = self.sender.getCirclePosition(self.leftCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											hit = True
+											hitOnce = True
+									if (hit==True):
+										hit=False
+										self.reduceSide(self.leftCircles[w], "left",w)
+										self.updateMesh(w)
+									for x in range(1,len(self.rightCircles[w])-1):
+										point = self.sender.getCirclePosition(self.rightCircles[w][x])
+										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+											hit = True
+											hitOnce = True
+									if (hit==True):
+										hit=False
+										self.reduceSide(self.rightCircles[w], "right",w)
+										self.updateMesh(w)
 						dropPoint = None
 						if(len(self.symbolicDrag)>0):
 							dropPoint = self.sender.getCirclePosition(self.symbolicDrag[1])
@@ -604,14 +607,17 @@ class client:
 						for x in range (0,len(self.dragging)):
 							self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
 							for y in range(0,len(self.bezierUpdates)):
-								if(self.topCircles[y].__contains__(self.dragging[x])):
-									self.bezierUpdates[y][0] = True
-								if(self.bottomCircles[y].__contains__(self.dragging[x])):
-									self.bezierUpdates[y][1] = True
-								if(self.leftCircles[y].__contains__(self.dragging[x])):
-									self.bezierUpdates[y][2] = True
-								if(self.rightCircles[y].__contains__(self.dragging[x])):
-									self.bezierUpdates[y][3] = True
+								try:
+									if(self.topCircles[y].__contains__(self.dragging[x])):
+										self.bezierUpdates[y][0] = True
+									if(self.bottomCircles[y].__contains__(self.dragging[x])):
+										self.bezierUpdates[y][1] = True
+									if(self.leftCircles[y].__contains__(self.dragging[x])):
+										self.bezierUpdates[y][2] = True
+									if(self.rightCircles[y].__contains__(self.dragging[x])):
+										self.bezierUpdates[y][3] = True
+								except:
+									pass
 					if(len(self.rightDragging)!=0):
 						try:
 							self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
@@ -837,7 +843,7 @@ class client:
 				if(self.loadList.get(x)==self.saveName.get()):
 					hit=True
 			if hit==True:
-				confirm = tkMessageBox.askyesno("Overwrite", "Overwrite existing layout?")
+				confirm = tkMessageBox.askyesno("Overwrite", "Overwrite existing \"" + self.saveName.get() + "\" layout?")
 			if hit==False or confirm==True:
 				self.sender.saveDefinedSurfaces(self.saveName.get())
 				self.layouts = self.sender.getSavedLayouts()
@@ -876,7 +882,7 @@ class client:
 			for x in range(0, len(self.layouts)):
 				self.loadList.insert(END, self.layouts[x])
 		else:
-			tkMessageBox.showinfo("Error", "Cannot delete default layout")
+			tkMessageBox.showinfo("Error", "You are not allowed to delete the \"DEFAULT\" layout")
 			
 	def clearLayout(self):
 		self.sender.undefineSurface(self.warpedSurf[0])
