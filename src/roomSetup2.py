@@ -35,24 +35,28 @@ class client:
 	connections = []
 	dontFlip = {}
 	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
+	cursorMode = "default"
 	
 	cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
 	
 	def bezierUpdateTracker(self):
 		while(self.quit==False):
 			for x in range(0,len(self.bezierUpdates)):
-				if (self.bezierUpdates[x][0]==True):
-					self.updateBezier("top",x)
-					self.bezierUpdates[x][0] = False
-				if (self.bezierUpdates[x][1]==True):
-					self.updateBezier("bottom",x)
-					self.bezierUpdates[x][1] = False
-				if(self.bezierUpdates[x][2] == True):
-					self.updateBezier("left",x)
-					self.bezierUpdates[x][2] = False
-				if(self.bezierUpdates[x][3] == True):
-					self.updateBezier("right",x)
-					self.bezierUpdates[x][3] = False
+				try:
+					if (self.bezierUpdates[x][0]==True):
+						self.updateBezier("top",x)
+						self.bezierUpdates[x][0] = False
+					if (self.bezierUpdates[x][1]==True):
+						self.updateBezier("bottom",x)
+						self.bezierUpdates[x][1] = False
+					if(self.bezierUpdates[x][2] == True):
+						self.updateBezier("left",x)
+						self.bezierUpdates[x][2] = False
+					if(self.bezierUpdates[x][3] == True):
+						self.updateBezier("right",x)
+						self.bezierUpdates[x][3] = False
+				except:
+					pass
 			time.sleep(0.0/30)
 	
 	def getMidPoints(self, point1, point2):
@@ -310,32 +314,33 @@ class client:
 						self.mClickTime=datetime.datetime.now()
 					elif event.button==3:
 						self.rClickTime=datetime.datetime.now()
-						loc = self.sender.getCursorPosition(1)
-						self.rightDragging = []
-						for z in range(0,len(self.topCircles)):
-							hit = False
-							point = self.sender.getCirclePosition(self.topCircles[z][0])
-							if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-								self.rightDragging.append((self.topCircles[z][0],"tl",z))
-								hit = True
-							end = len(self.topCircles[z])-1
-							point = self.sender.getCirclePosition(self.topCircles[z][end])
-							if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-								self.rightDragging.append((self.topCircles[z][end],"tr",z))
-								hit = True
-							point = self.sender.getCirclePosition(self.bottomCircles[z][0])
-							if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-								self.rightDragging.append((self.bottomCircles[z][0],"br",z))
-								hit = True
-							end = len(self.bottomCircles[z])-1
-							point = self.sender.getCirclePosition(self.bottomCircles[z][end])
-							if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
-								self.rightDragging.append((self.bottomCircles[z][end],"bl",z))
-								hit = True
-							if(hit==True):
-								cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
-								self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
-								self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
+						if(self.cursorMode=="default"):
+							loc = self.sender.getCursorPosition(1)
+							self.rightDragging = []
+							for z in range(0,len(self.topCircles)):
+								hit = False
+								point = self.sender.getCirclePosition(self.topCircles[z][0])
+								if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+									self.rightDragging.append((self.topCircles[z][0],"tl",z))
+									hit = True
+								end = len(self.topCircles[z])-1
+								point = self.sender.getCirclePosition(self.topCircles[z][end])
+								if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+									self.rightDragging.append((self.topCircles[z][end],"tr",z))
+									hit = True
+								point = self.sender.getCirclePosition(self.bottomCircles[z][0])
+								if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+									self.rightDragging.append((self.bottomCircles[z][0],"br",z))
+									hit = True
+								end = len(self.bottomCircles[z])-1
+								point = self.sender.getCirclePosition(self.bottomCircles[z][end])
+								if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
+									self.rightDragging.append((self.bottomCircles[z][end],"bl",z))
+									hit = True
+								if(hit==True):
+									cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
+									self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
+									self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
 					elif event.button==1:
 						self.lClickTime=datetime.datetime.now()
 						self.ldown=True
@@ -555,12 +560,31 @@ class client:
 										self.createConnectionLine((surface,corner),(w,"bl"), False)
 						self.rightDragging=[]
 						self.symbolicDrag = {}
-						if(elapsedSecs<0.15 and hitOnce==False and self.surfaceCounter<4):
-							self.defineSurface()
-							self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
-							self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
-							self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
-							self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
+						if(elapsedSecs<0.25 and hitOnce==False):
+							if(self.cursorMode=="default"):
+								if(self.surfaceCounter<4):
+									self.sender.setCursorWallMode(1)
+									self.cursorMode="wall"
+									self.defineSurface()
+									if(self.sender.getCursorMode(1)=="wall"):
+										self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
+										self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
+										self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
+										self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
+										self.sender.setCursorDefaultMode(1)
+										self.cursorMode="default"
+								else:
+									self.sender.setCursorScreenMode(1)
+									self.cursorMode="screen"
+							elif(self.cursorMode=="wall"):
+								self.sender.setCursorScreenMode(1)
+								self.cursorMode="screen"
+							elif(self.cursorMode=="screen"):
+								self.sender.setCursorBlockMode(1)
+								self.cursorMode="block"
+							elif(self.cursorMode=="block"):
+								self.sender.setCursorDefaultMode(1)
+								self.cursorMode="default"
 		return None
 	
 	def mouseMovement(self):
@@ -673,7 +697,7 @@ class client:
 		self.rightCircles[self.surfaceCounter] = []
 		self.bezierUpdates[self.surfaceCounter] = [False,False,False,False]
 		
-		while(self.quit==False and tl==None):
+		while(self.quit==False and tl==None and self.cursorMode=="wall"):
 			self.background.fill((255, 255, 255))
 			text = self.font.render("Click the top left", 1, (10, 10, 10))
 			textpos = text.get_rect()
@@ -682,12 +706,12 @@ class client:
 			tl = self.getInput(True)
 			self.screen.blit(self.background, (0, 0))
 			pygame.display.flip()
-		if(self.quit==False):
+		if(self.quit==False and self.cursorMode=="wall"):
 			self.topCircles[self.surfaceCounter].append(tl[1])
 			self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
 			self.hideable.append(self.topbz[self.surfaceCounter])
 			
-		while(self.quit==False and tr==None):
+		while(self.quit==False and tr==None) and self.cursorMode=="wall":
 			self.background.fill((255, 255, 255))
 			text = self.font.render("Click the top right", 1, (10, 10, 10))
 			textpos = text.get_rect()
@@ -696,14 +720,14 @@ class client:
 			tr = self.getInput(True)
 			self.screen.blit(self.background, (0, 0))
 			pygame.display.flip()
-		if(self.quit==False):
+		if(self.quit==False and self.cursorMode=="wall"):
 			self.topCircles[self.surfaceCounter].append(tr[1])
 			self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
 			self.rightCircles[self.surfaceCounter].append(tr[1])
 			self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
 			self.hideable.append(self.rightbz[self.surfaceCounter])
 			
-		while(self.quit==False and br==None):
+		while(self.quit==False and br==None and self.cursorMode=="wall"):
 			self.background.fill((255, 255, 255))
 			text = self.font.render("Click the bottom right", 1, (10, 10, 10))
 			textpos = text.get_rect()
@@ -712,14 +736,14 @@ class client:
 			br = self.getInput(True)
 			self.screen.blit(self.background, (0, 0))
 			pygame.display.flip()
-		if(self.quit==False):
+		if(self.quit==False and self.cursorMode=="wall"):
 			self.rightCircles[self.surfaceCounter].append(br[1])
 			self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
 			self.bottomCircles[self.surfaceCounter].append(br[1])
 			self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
 			self.hideable.append(self.bottombz[self.surfaceCounter])
 			
-		while(self.quit==False and bl==None):
+		while(self.quit==False and bl==None and self.cursorMode=="wall"):
 			self.background.fill((255, 255, 255))
 			text = self.font.render("Click the bottom left", 1, (10, 10, 10))
 			textpos = text.get_rect()
@@ -728,7 +752,7 @@ class client:
 			bl = self.getInput(True)
 			self.screen.blit(self.background, (0, 0))
 			pygame.display.flip()
-		if(self.quit==False):
+		if(self.quit==False and self.cursorMode=="wall"):
 			self.bottomCircles[self.surfaceCounter].append(bl[1])
 			self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
 			self.leftCircles[self.surfaceCounter].append(bl[1])
@@ -738,6 +762,46 @@ class client:
 			self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
 			self.surfaceCounter += 1
 			self.dontFlip[self.surfaceCounter-1] = True
+		if(self.cursorMode!="wall"):
+			self.orientation.pop(self.surfaceCounter)
+			self.mirrored.pop(self.surfaceCounter)
+			tl = None
+			bl = None
+			tr = None
+			br = None
+			try:
+				self.sender.removeElement(self.topbz[self.surfaceCounter], 1)
+				self.topbz.pop(self.surfaceCounter)
+			except:
+				pass
+			try:
+				self.sender.removeElement(self.bottombz[self.surfaceCounter], 1)
+				self.bottombz.pop(self.surfaceCounter)
+			except:
+				pass
+			try:
+				self.sender.removeElement(self.leftbz[self.surfaceCounter], 1)
+				self.leftbz.pop(self.surfaceCounter)
+			except:
+				pass
+			try:
+				self.sender.removeElement(self.rightbz[self.surfaceCounter], 1)
+				self.rightbz.pop(self.surfaceCounter)
+			except:
+				pass
+			for x in range(0,len(self.topCircles[self.surfaceCounter])):
+				self.sender.removeElement(self.topCircles[self.surfaceCounter][x], 1)
+			self.topCircles.pop(self.surfaceCounter)
+			for x in range(0,len(self.bottomCircles[self.surfaceCounter])):
+				self.sender.removeElement(self.bottomCircles[self.surfaceCounter][x], 1)
+			self.bottomCircles.pop(self.surfaceCounter)
+			for x in range(0,len(self.leftCircles[self.surfaceCounter])):
+				self.sender.removeElement(self.leftCircles[self.surfaceCounter][x], 1)
+			self.leftCircles.pop(self.surfaceCounter)
+			for x in range(0,len(self.rightCircles[self.surfaceCounter])):
+				self.sender.removeElement(self.rightCircles[self.surfaceCounter][x], 1)
+			self.rightCircles.pop(self.surfaceCounter)
+			self.bezierUpdates.pop(self.surfaceCounter)
 			
 	def visualizeConnections(self, connections):
 		for x in range(0, len(connections)):

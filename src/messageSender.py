@@ -518,6 +518,22 @@ class messageSender:
         rotation = self.sendMessage("get_cursor_rotation," + str(cursorNo))
         return rotation["rotation"]
     
+    def getCursorMode(self, cursorNo):
+        mode = self.sendMessage("get_cursor_mode," + str(cursorNo))
+        return mode["mode"]
+    
+    def setCursorDefaultMode(self, cursorNo):
+        self.sendMessage("set_cursor_default_mode," + str(cursorNo))
+        
+    def setCursorWallMode(self, cursorNo):
+        self.sendMessage("set_cursor_wall_mode," + str(cursorNo))
+        
+    def setCursorBlockMode(self, cursorNo):
+        self.sendMessage("set_cursor_block_mode," + str(cursorNo))
+        
+    def setCursorScreenMode(self, cursorNo):
+        self.sendMessage("set_cursor_screen_mode," + str(cursorNo))
+    
     def moveWindow(self, windowNo, xDistance, yDistance):
         self.sendMessage("move_window," + str(windowNo) + "," + str(xDistance) + "," + str(yDistance))
         
