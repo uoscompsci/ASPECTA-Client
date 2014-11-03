@@ -634,7 +634,7 @@ class client:
 			y=0
 			for z in range(0,len(layout[x][y])):
 				if(z==0):
-					self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+					self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (0,0.75,0,1), 5)
 				else:
 					self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
 				ele = None
@@ -646,7 +646,7 @@ class client:
 			y=1
 			for z in list(reversed(range(0,len(layout[x][y])))):
 				if(z==len(layout[x][y])-1):
-					self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+					self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (0,0.75,0,1), 5)
 				else:
 					self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
 				ele = None
@@ -658,7 +658,7 @@ class client:
 			y=2
 			for z in range(0,len(layout[x][y])):
 				if(z==0):
-					self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+					self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (0,0.75,0,1), 5)
 				else:
 					self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
 				ele = None
@@ -670,7 +670,7 @@ class client:
 			y=3
 			for z in list(reversed(range(0,len(layout[x][y])))):
 				if(z==len(layout[x][y])-1):
-					self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (1,1,1,1), 5)
+					self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], (0,0.75,0,1), 5)
 				else:
 					self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
 				ele = None
@@ -708,7 +708,7 @@ class client:
 			pygame.display.flip()
 		if(self.quit==False and self.cursorMode=="wall"):
 			self.topCircles[self.surfaceCounter].append(tl[1])
-			self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (1,1,1,1), 5)
+			self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], (0,0.75,0,1), 5)
 			self.hideable.append(self.topbz[self.surfaceCounter])
 			
 		while(self.quit==False and tr==None) and self.cursorMode=="wall":
@@ -724,7 +724,7 @@ class client:
 			self.topCircles[self.surfaceCounter].append(tr[1])
 			self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
 			self.rightCircles[self.surfaceCounter].append(tr[1])
-			self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (1,1,1,1), 5)
+			self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], (0,0.75,0,1), 5)
 			self.hideable.append(self.rightbz[self.surfaceCounter])
 			
 		while(self.quit==False and br==None and self.cursorMode=="wall"):
@@ -740,7 +740,7 @@ class client:
 			self.rightCircles[self.surfaceCounter].append(br[1])
 			self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
 			self.bottomCircles[self.surfaceCounter].append(br[1])
-			self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (1,1,1,1), 5)
+			self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], (0,0.75,0,1), 5)
 			self.hideable.append(self.bottombz[self.surfaceCounter])
 			
 		while(self.quit==False and bl==None and self.cursorMode=="wall"):
@@ -756,7 +756,7 @@ class client:
 			self.bottomCircles[self.surfaceCounter].append(bl[1])
 			self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
 			self.leftCircles[self.surfaceCounter].append(bl[1])
-			self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (1,1,1,1), 5)
+			self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], (0,0.75,0,1), 5)
 			self.hideable.append(self.leftbz[self.surfaceCounter])
 			self.leftCircles[self.surfaceCounter].append(tl[1])
 			self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
