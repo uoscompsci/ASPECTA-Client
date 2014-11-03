@@ -39,6 +39,7 @@ class client:
 	
 	cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
 	
+	#Scan for beziers that need to be updated and call them to be updated when appropriate
 	def bezierUpdateTracker(self):
 		while(self.quit==False):
 			for x in range(0,len(self.bezierUpdates)):
@@ -59,12 +60,15 @@ class client:
 					pass
 			time.sleep(0.0/30)
 	
+	#Get the midpoint between two points
 	def getMidPoints(self, point1, point2):
 		return ((float(point1[0])+float(point2[0]))/float(2), (float(point1[1])+float(point2[1]))/float(2))
 	
+	#Get the opposite curve control point by mirroring the point over the control point
 	def oppControl(self, point, control):
 		return (float(point[0])+(float(point[0])-float(control[0])),float(point[1])+(float(point[1])-float(control[1])))
 	
+	#Halves the number of waypoints on the curve
 	def reduceSide(self, circles, side, surface):
 		if(len(circles)>3):
 			count = (len(circles)-1)/2
@@ -81,6 +85,7 @@ class client:
 			elif(side == "right"):
 				self.bezierUpdates[surface][3] = True
 	
+	#Doubles the number of waypoints on the curve
 	def splitSide(self, circles, side, surface):
 		count = len(circles)
 		if(count<17): #Restrict to a maximum of 15 waypoints per side
@@ -103,6 +108,7 @@ class client:
 			elif(side == "right"):
 				self.bezierUpdates[surface][3] = True
 			
+	#Rebuilds the bezier curve for the requested surface side
 	def updateBezier(self, side, surface):
 		points = []
 		circles = []
@@ -138,7 +144,8 @@ class client:
 			self.sender.setLineStripContent(self.rightbz[surface],curve)
 			self.connectionUpdateCheck(surface, "tr")
 			self.connectionUpdateCheck(surface, "br")
-			
+	
+	#Tells you whether a click is within 10 pixels of a point		
 	def isHit(self, point1, point2):
 		a = abs(float(point1[0])-float(point2[0]))
 		b = abs(float(point1[1])-float(point2[1]))
@@ -149,6 +156,7 @@ class client:
 		else:
 			return False
 		
+	#Gathers the curve points for the requested surface and passes them to the server so that the mesh can be updated
 	def updateMesh(self, surface):
 		topPoints = []
 		for x in range(0,len(self.topCircles[surface])):
@@ -164,6 +172,7 @@ class client:
 			rightPoints.append(self.sender.getCirclePosition(self.rightCircles[surface][len(self.rightCircles[surface]) - 1 - x]))
 		self.sender.setSurfaceEdges(self.warpedSurf[surface], topPoints, bottomPoints, leftPoints, rightPoints)
 		
+	#Creates a visible line to indicate a connection between two corners of different surfaces or removes it if it exists. If appropriate sides are connected
 	def createConnectionLine(self, start, end, visOnly):
 		found = False
 		for x in range(0,len(self.connections)):
@@ -249,6 +258,7 @@ class client:
 						else:
 							self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0], self.cornerAdj[end[1]][1][1])
 			
+	#Checks whether a point movement should alter an existing visualised connection line
 	def connectionUpdateCheck(self, surface, corner):
 		for x in range(len(self.connections)):
 			if(self.connections[x][0][0]==surface and self.connections[x][0][1]==corner or self.connections[x][1][0]==surface and self.connections[x][1][1]==corner):
@@ -277,46 +287,35 @@ class client:
 				self.sender.setLineStart(self.connections[x][2], startLoc[0], startLoc[1])
 				self.sender.setLineEnd(self.connections[x][2], endLoc[0], endLoc[1])
 
+	#Checks for mouse button and keyboard
 	def getInput(self,get_point):
-		#mpb=pygame.mouse.get_pressed() # mouse pressed buttons
-		#kpb=pygame.key.get_pressed() # keyboard pressed buttons
 		pos=pygame.mouse.get_pos() # mouse shift
 		for event in pygame.event.get():
 			if event.type == QUIT:
 					self.quit = True
 					return None
 			elif event.type == pygame.KEYDOWN:
-				if event.key==pygame.K_l:
-					if (self.mouseLock == True):
-						self.mouseLock = False
-						pygame.mouse.set_visible(True)
-					elif(self.mouseLock == False):
-						self.mouseLock = True
-						pygame.mouse.set_visible(False)
-				elif event.key==pygame.K_SPACE:
-					self.sender.saveDefinedSurfaces("spaceSave")
-				elif event.key==pygame.K_v:
-					if (self.setuplines == False):
-						for q in range(0,len(self.hideable)):
-							self.sender.hideElement(self.hideable[q])
-						self.setuplines = True
-					else:
-						for q in range(0,len(self.hideable)):
-							self.sender.showElement(self.hideable[q])
-						self.setuplines = False
+				pass
 			if(self.mouseLock==True):
+				#Runs if a mouse button has been depressed
 				if event.type == pygame.MOUSEBUTTONDOWN:
+					#Runs if the mouse wheel is being rolled upwards
 					if event.button==4:
-						self.sender.rotateCursorClockwise(1,10)
+						self.sender.rotateCursorClockwise(1,10) #Tells the server to rotate the cursor clockwise
+					#Runs if the mouse wheel is being rolled downwards
 					elif event.button==5:
-						self.sender.rotateCursorAnticlockwise(1,10)
+						self.sender.rotateCursorAnticlockwise(1,10) #Tells the server to rotate the cursor anticlockwise
+					#Runs if the middle mouse button is pressed
 					elif event.button==2:
-						self.mClickTime=datetime.datetime.now()
+						self.mClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
+					#Runs if the right mouse button is pressed
 					elif event.button==3:
-						self.rClickTime=datetime.datetime.now()
+						self.rClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
+						#Runs if the default cursor mode is active
 						if(self.cursorMode=="default"):
 							loc = self.sender.getCursorPosition(1)
 							self.rightDragging = []
+							#Checks whether a corner point has been clicked and if so starts defining a connection
 							for z in range(0,len(self.topCircles)):
 								hit = False
 								point = self.sender.getCirclePosition(self.topCircles[z][0])
@@ -342,14 +341,16 @@ class client:
 									self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
 									self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
 					elif event.button==1:
-						self.lClickTime=datetime.datetime.now()
-						self.ldown=True
+						self.lClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
+						#If the user is trying to create a corner point it is defined then returned
 						if(get_point==True):
 							loc = self.sender.getCursorPosition(1)
 							ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
 							self.hideable.append(ele)
 							return (loc, ele)
-						if(get_point!=True):
+						#If the user isn't trying to create a corner point it is checked whether they have clicked on an existing point so it can be dragged
+						else:
+							#Runs if the default cursor mode is active
 							if(self.cursorMode=="default"):
 								loc = self.sender.getCursorPosition(1)
 								self.dragging = []
@@ -371,14 +372,17 @@ class client:
 										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
 											self.dragging.append(self.rightCircles[z][x])
 				elif event.type == pygame.MOUSEBUTTONUP:
+					#Runs if the left mouse button has been released
 					if(event.button==1):
 						lClickRelTime=datetime.datetime.now()
-						self.ldown=False
-						elapsedSecs = (lClickRelTime-self.lClickTime).total_seconds()
+						elapsedSecs = (lClickRelTime-self.lClickTime).total_seconds() #Checks how long the button was depressed
+						#Runs if the button was pressed for less than 0.15 seconds
 						if(elapsedSecs<0.15):
+							#Runs if the default cursor mode is active
 							if(self.cursorMode=="default"):
 								loc = self.sender.getCursorPosition(1)
 								for w in range(0,len(self.topCircles)):
+									#If a waypoint has been clicked, the side it was part of is split so that there are twice as many waypoints
 									for x in range(1,len(self.topCircles[w])-1):
 										point = self.sender.getCirclePosition(self.topCircles[w][x])
 										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
@@ -399,6 +403,7 @@ class client:
 										if(self.isHit((point[0],point[1]),(loc[0],loc[1]))):
 											self.splitSide(self.rightCircles[w], "right",w)
 											self.updateMesh(w)
+									#If a corner point has been clicked, the surface is mirrored or rotated as appropriate
 									if (get_point!=True):
 										if(self.dontFlip[w]==False):
 											flipped = False
@@ -478,26 +483,32 @@ class client:
 															self.mirrored[w]=False
 										else:
 											self.dontFlip[w]=False
+						#If appropriate the list of points currently being dragged is cleared
 						for w in range(0,len(self.topCircles)):
 							if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
 								self.dragging=[]
 								self.updateMesh(w)
+					#Runs if the middle mouse button has been released
 					if(event.button==2):
 						mClickRelTime=datetime.datetime.now()
-						self.mdown=False
-						elapsedSecs = (mClickRelTime-self.mClickTime).total_seconds()
+						elapsedSecs = (mClickRelTime-self.mClickTime).total_seconds() #Checks how long the button was depressed
+						#Runs if the button was pressed for less than 0.25 seconds and unlocks the mouse from the server
 						if(elapsedSecs<0.25):
 							self.mouseLock = False
 							pygame.mouse.set_visible(True)
 							self.master.focus_force()
+					#Runs if the right mouse button has been released
 					if(event.button==3):
 						rClickRelTime=datetime.datetime.now()
-						elapsedSecs = (rClickRelTime-self.rClickTime).total_seconds()
+						elapsedSecs = (rClickRelTime-self.rClickTime).total_seconds() #Checks how long the button was depressed
 						hit = False
 						hitOnce = False
+						#Runs if the button was pressed for less than 0.15 seconds
 						if(elapsedSecs<0.15):
+							#Runs if the default cursor mode is active
 							if(self.cursorMode=="default"):
 								loc = self.sender.getCursorPosition(1)
+								#If a waypoint has been clicked, the number of waypoints on the side is halved
 								for w in range(0,len(self.topCircles)):
 									for x in range(1,len(self.topCircles[w])-1):
 										point = self.sender.getCirclePosition(self.topCircles[w][x])
@@ -536,15 +547,18 @@ class client:
 										self.reduceSide(self.rightCircles[w], "right",w)
 										self.updateMesh(w)
 						dropPoint = None
+						#The temporary connection line is deleted after its current end point is recorded
 						if(len(self.symbolicDrag)>0):
 							dropPoint = self.sender.getCirclePosition(self.symbolicDrag[1])
 							self.sender.removeElement(self.symbolicDrag[0], 1)
 							self.sender.removeElement(self.symbolicDrag[1], 1)
+						#The list of items that were being dragged is scanned
 						for rDragInd in range(0,len(self.rightDragging)):
 							temp = self.rightDragging[rDragInd]
 							loc = self.sender.getCirclePosition(temp[0])
 							corner = temp[1]
 							surface = temp[2]
+							#If the dragged point was released over another point a connection line is created
 							for w in range(0,len(self.topCircles)):
 								if (w != surface):
 									point = self.sender.getCirclePosition(self.topCircles[w][0])
@@ -563,8 +577,11 @@ class client:
 										self.createConnectionLine((surface,corner),(w,"bl"), False)
 						self.rightDragging=[]
 						self.symbolicDrag = {}
+						#Runs if the button was pressed for less than 0.25 seconds and a point wasn't hit
 						if(elapsedSecs<0.25 and hitOnce==False):
+							#Runs if the default cursor mode is active
 							if(self.cursorMode=="default"):
+								#Switches to wall defining mode and begins definition if there are less than 4 walls, otherwise switches to screen defining mode
 								if(self.surfaceCounter<4):
 									self.sender.setCursorWallMode(1)
 									self.cursorMode="wall"
@@ -579,17 +596,21 @@ class client:
 								else:
 									self.sender.setCursorScreenMode(1)
 									self.cursorMode="screen"
+							#Runs if the wall defining cursor mode is active and switches to the screen defining mode
 							elif(self.cursorMode=="wall"):
 								self.sender.setCursorScreenMode(1)
 								self.cursorMode="screen"
+							#Runs if the screen defining cursor mode is active and switches to the blocked area defining mode
 							elif(self.cursorMode=="screen"):
 								self.sender.setCursorBlockMode(1)
 								self.cursorMode="block"
+							#Runs if the blocked area defining cursor mode is active and switches to the default defining mode
 							elif(self.cursorMode=="block"):
 								self.sender.setCursorDefaultMode(1)
 								self.cursorMode="default"
 		return None
 	
+	#Loops until the program is closed and monitors mouse movement
 	def mouseMovement(self):
 		while(self.quit==False):
 			time.sleep(1.0/60)
@@ -623,9 +644,9 @@ class client:
 							self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
 							self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
 						except:
-							print "Symbolic Drag = " + str(self.symbolicDrag)
-							print "loc = " + str(loc)
-							
+							pass
+			
+	#Defines all required surfaces according to a layout data structure				
 	def redefineSurface(self,layout):
 		for x in range(0,len(layout)):
 			self.orientation[self.surfaceCounter]=0
@@ -689,6 +710,7 @@ class client:
 			self.surfaceCounter+=1
 			self.dontFlip[self.surfaceCounter-1] = True
 	
+	#Allows the user to define the four corners of a surface
 	def defineSurface(self):
 		self.orientation[self.surfaceCounter]=0
 		self.mirrored[self.surfaceCounter]=False
@@ -809,20 +831,24 @@ class client:
 			self.rightCircles.pop(self.surfaceCounter)
 			self.bezierUpdates.pop(self.surfaceCounter)
 			
+	#looks through a data structure holding connections and draws connection lines as appropriate
 	def visualizeConnections(self, connections):
 		for x in range(0, len(connections)):
 			self.visualizeConnectionLines((connections[x][0][0],connections[x][0][1]), (connections[x][1][0],connections[x][1][1]))
-			
+	
+	#Creates both connection lines which indicate a connection between the two defined surface sides
 	def visualizeConnectionLines(self, fromSide, toSide):
 		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][0]), (toSide[0],self.sideToCorners[toSide[1]][0]), True)
 		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][1]), (toSide[0],self.sideToCorners[toSide[1]][1]), True)
 	
+	#Quits the client
 	def quitButton(self):
 		if(self.quit==False):
 			self.quit=True
 			time.sleep(0.2)
 			self.frame.quit()
-			
+	
+	#Quits the client and server
 	def quitAllButton(self):
 		if(self.quit==False):
 			self.sender.quit()
@@ -831,10 +857,12 @@ class client:
 			time.sleep(0.2)
 			self.frame.quit()
 	
+	#Locks the mouse so that the server can be controlled
 	def LockMouse(self):
 		self.mouseLock = True
 		pygame.mouse.set_visible(False)
-		
+	
+	#Requests for the existing layout to be saved to a file
 	def saveLayout(self):
 		if(self.saveName.get()!=""):
 			hit=False
@@ -852,7 +880,8 @@ class client:
 					self.loadList.insert(END, self.layouts[x])
 		else:
 			tkMessageBox.showinfo("Error", "Please enter save name first")
-		
+	
+	#Requests for the currently selected layout to be loaded
 	def loadLayout(self):
 		self.clearLayout()
 		count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
@@ -860,20 +889,23 @@ class client:
 		self.visualizeConnections(count[2])
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
-		
+	
+	#Makes it so that the save filename matches the current selection in the layout list
 	def selectEntry(self, event):
 		w = event.widget
 		index = int(w.curselection()[0])
 		value = w.get(index)
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, value)
-		
+	
+	#Refreshes the layout list by querying the server for an updated list
 	def refreshLayouts(self):
 		self.layouts = self.sender.getSavedLayouts()
 		self.loadList.delete(0, END)
 		for x in range(0, len(self.layouts)):
 			self.loadList.insert(END, self.layouts[x])
-			
+	
+	#Ask the server to delete the layout that is currently selected in the layout list
 	def deleteLayout(self):
 		if(self.loadList.selection_get()!="DEFAULT"):
 			self.sender.deleteLayout(self.loadList.selection_get())
@@ -883,7 +915,8 @@ class client:
 				self.loadList.insert(END, self.layouts[x])
 		else:
 			tkMessageBox.showinfo("Error", "You are not allowed to delete the \"DEFAULT\" layout")
-			
+	
+	#Clear the currently defined layout on both the client and server side
 	def clearLayout(self):
 		self.sender.undefineSurface(self.warpedSurf[0])
 		self.sender.undefineSurface(self.warpedSurf[1])
@@ -927,6 +960,7 @@ class client:
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, "")
 	
+	#Defines the GUI
 	def tkinthread(self):
 		self.master = Tk()
 		self.master.wm_title("Configuration GUI")
@@ -974,7 +1008,8 @@ class client:
 		self.loadList.select_set(index)
 		self.loadLayout()
 		self.master.mainloop()
-		
+	
+	#Sets up the surfaces which can be defined within the client
 	def initGUI(self):
 		self.sender.showSetupSurface()
 		self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
@@ -998,7 +1033,8 @@ class client:
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		
 		self.surfaceCounter = 0
-	
+
+	#The main loop
 	def __init__(self):
 		tkinterThread = threading.Thread(target=self.tkinthread, args=()) #Creates the display thread
 		tkinterThread.start() #Starts the display thread
