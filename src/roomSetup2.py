@@ -537,6 +537,19 @@ class client:
 																self.mirrored[w]=False
 											else:
 												self.dontFlip[w]=False
+											for x in range(0,len(self.centerPoints)):
+												point = self.sender.getCirclePosition(self.centerPoints[x])
+												radius = self.sender.getCircleRadius(self.centerPoints[x])
+												if(self.isHit((point[0],point[1]),(loc[0],loc[1]), radius)):
+													self.controlCur = self.surfCur[x]
+													self.sender.hideCursor(self.mainCur)
+													self.sender.hideElement(self.centerPoints[0])
+													self.sender.hideElement(self.centerPoints[1])
+													self.sender.hideElement(self.centerPoints[2])
+													self.sender.hideElement(self.centerPoints[3])
+													self.sender.relocateCursor(self.surfCur[x], 512/2, 512/2, self.warpedSurf[x])
+													self.sender.showCursor(self.surfCur[x])
+												
 						if(self.controlCur==self.mainCur):
 							#If appropriate the list of points currently being dragged is cleared
 							for w in range(0,len(self.topCircles)):
@@ -554,6 +567,20 @@ class client:
 								pygame.mouse.set_visible(True)
 								self.master.focus_force()
 								self.sender.hideCursor(self.mainCur)
+						else:
+							if(elapsedSecs<0.25):
+								current = None
+								for x in range(0,len(self.surfCur)):
+									if(self.controlCur==self.surfCur[x]):
+										current = x
+								self.controlCur = self.mainCur
+								self.sender.showCursor(self.mainCur)
+								self.sender.showElement(self.centerPoints[0])
+								self.sender.showElement(self.centerPoints[1])
+								self.sender.showElement(self.centerPoints[2])
+								self.sender.showElement(self.centerPoints[3])
+								self.sender.hideCursor(self.surfCur[current])
+								
 					#Runs if the right mouse button has been released
 					if(event.button==3):
 						rClickRelTime=datetime.datetime.now()
@@ -1129,21 +1156,25 @@ class client:
 		self.warpedSurf[0] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
 		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
+		self.sender.hideCursor(self.surfCur[0])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 
 		self.warpedSurf[1] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
 		self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
+		self.sender.hideCursor(self.surfCur[1])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 
 		self.warpedSurf[2] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
 		self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
+		self.sender.hideCursor(self.surfCur[2])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 
 		self.warpedSurf[3] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
 		self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
+		self.sender.hideCursor(self.surfCur[3])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		
 		self.surfaceCounter = 0
