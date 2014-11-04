@@ -36,6 +36,9 @@ class client:
 	refreshrate = 0
 	connections = []
 	dontFlip = {}
+	surfCur = {}
+	mainCur = None
+	controlCur = None
 	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
 	cursorMode = "default"
 	
@@ -322,10 +325,12 @@ class client:
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					#Runs if the mouse wheel is being rolled upwards
 					if event.button==4:
-						self.sender.rotateCursorClockwise(1,10) #Tells the server to rotate the cursor clockwise
+						if(self.controlCur==self.mainCur):
+							self.sender.rotateCursorClockwise(self.mainCur,10) #Tells the server to rotate the cursor clockwise
 					#Runs if the mouse wheel is being rolled downwards
 					elif event.button==5:
-						self.sender.rotateCursorAnticlockwise(1,10) #Tells the server to rotate the cursor anticlockwise
+						if(self.controlCur==self.mainCur):
+							self.sender.rotateCursorAnticlockwise(self.mainCur,10) #Tells the server to rotate the cursor anticlockwise
 					#Runs if the middle mouse button is pressed
 					elif event.button==2:
 						self.mClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
@@ -334,81 +339,83 @@ class client:
 						self.rClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
 						#Runs if the default cursor mode is active
 						if(self.cursorMode=="default"):
-							loc = self.sender.getCursorPosition(1)
-							self.rightDragging = []
-							#Checks whether a corner point has been clicked and if so starts defining a connection
-							for z in range(0,len(self.topCircles)):
-								hit = False
-								point = self.sender.getCirclePosition(self.topCircles[z][0])
-								radius = self.sender.getCircleRadius(self.topCircles[z][0])
-								if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-									self.rightDragging.append((self.topCircles[z][0],"tl",z))
-									hit = True
-								end = len(self.topCircles[z])-1
-								point = self.sender.getCirclePosition(self.topCircles[z][end])
-								radius = self.sender.getCircleRadius(self.topCircles[z][end])
-								if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-									self.rightDragging.append((self.topCircles[z][end],"tr",z))
-									hit = True
-								point = self.sender.getCirclePosition(self.bottomCircles[z][0])
-								radius = self.sender.getCircleRadius(self.bottomCircles[z][0])
-								if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-									self.rightDragging.append((self.bottomCircles[z][0],"br",z))
-									hit = True
-								end = len(self.bottomCircles[z])-1
-								point = self.sender.getCirclePosition(self.bottomCircles[z][end])
-								radius = self.sender.getCircleRadius(self.bottomCircles[z][end])
-								if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-									self.rightDragging.append((self.bottomCircles[z][end],"bl",z))
-									hit = True
-								if(hit==True):
-									cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
-									self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
-									self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
+							loc = self.sender.getCursorPosition(self.controlCur)
+							if(self.controlCur==self.mainCur):
+								self.rightDragging = []
+								#Checks whether a corner point has been clicked and if so starts defining a connection
+								for z in range(0,len(self.topCircles)):
+									hit = False
+									point = self.sender.getCirclePosition(self.topCircles[z][0])
+									radius = self.sender.getCircleRadius(self.topCircles[z][0])
+									if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+										self.rightDragging.append((self.topCircles[z][0],"tl",z))
+										hit = True
+									end = len(self.topCircles[z])-1
+									point = self.sender.getCirclePosition(self.topCircles[z][end])
+									radius = self.sender.getCircleRadius(self.topCircles[z][end])
+									if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+										self.rightDragging.append((self.topCircles[z][end],"tr",z))
+										hit = True
+									point = self.sender.getCirclePosition(self.bottomCircles[z][0])
+									radius = self.sender.getCircleRadius(self.bottomCircles[z][0])
+									if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+										self.rightDragging.append((self.bottomCircles[z][0],"br",z))
+										hit = True
+									end = len(self.bottomCircles[z])-1
+									point = self.sender.getCirclePosition(self.bottomCircles[z][end])
+									radius = self.sender.getCircleRadius(self.bottomCircles[z][end])
+									if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+										self.rightDragging.append((self.bottomCircles[z][end],"bl",z))
+										hit = True
+									if(hit==True):
+										cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
+										self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], (1, 0, 0, 1), 3)
+										self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 0, 0, 1), 20)
 					elif event.button==1:
 						self.lClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
-						#If the user is trying to create a corner point it is defined then returned
-						if(get_point==True):
-							loc = self.sender.getCursorPosition(1)
-							ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
-							self.hideable.append(ele)
-							return (loc, ele)
-						#If the user isn't trying to create a corner point it is checked whether they have clicked on an existing point so it can be dragged
-						else:
-							#Runs if the default cursor mode is active
-							if(self.cursorMode=="default"):
-								loc = self.sender.getCursorPosition(1)
-								self.dragging = []
-								self.cornerdrag = False
-								for z in range(0,len(self.topCircles)):
-									for x in range(0,len(self.topCircles[z])):
-										point = self.sender.getCirclePosition(self.topCircles[z][x])
-										radius = self.sender.getCircleRadius(self.topCircles[z][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.dragging.append(self.topCircles[z][x])
-											if (x == 0 or x == (len(self.topCircles[z])-1)):
-												self.cornerdrag = True
-									for x in range(0,len(self.bottomCircles[z])):
-										point = self.sender.getCirclePosition(self.bottomCircles[z][x])
-										radius = self.sender.getCircleRadius(self.bottomCircles[z][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.dragging.append(self.bottomCircles[z][x])
-											if (x == 0 or x == (len(self.bottomCircles[z])-1)):
-												self.cornerdrag = True
-									for x in range(0,len(self.leftCircles[z])):
-										point = self.sender.getCirclePosition(self.leftCircles[z][x])
-										radius = self.sender.getCircleRadius(self.leftCircles[z][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.dragging.append(self.leftCircles[z][x])
-											if (x == 0 or x == (len(self.leftCircles[z])-1)):
-												self.cornerdrag = True
-									for x in range(0,len(self.rightCircles[z])):
-										point = self.sender.getCirclePosition(self.rightCircles[z][x])
-										radius = self.sender.getCircleRadius(self.rightCircles[z][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.dragging.append(self.rightCircles[z][x])
-											if (x == 0 or x == (len(self.rightCircles[z])-1)):
-												self.cornerdrag = True
+						if(self.controlCur==self.mainCur):
+							#If the user is trying to create a corner point it is defined then returned
+							if(get_point==True):
+								loc = self.sender.getCursorPosition(self.controlCur)
+								ele = self.sender.newCircle(1, loc[0], loc[1], 10, (1, 0, 0, 1), (1, 1, 0, 1), 20)
+								self.hideable.append(ele)
+								return (loc, ele)
+							#If the user isn't trying to create a corner point it is checked whether they have clicked on an existing point so it can be dragged
+							else:
+								#Runs if the default cursor mode is active
+								if(self.cursorMode=="default"):
+									loc = self.sender.getCursorPosition(self.controlCur)
+									self.dragging = []
+									self.cornerdrag = False
+									for z in range(0,len(self.topCircles)):
+										for x in range(0,len(self.topCircles[z])):
+											point = self.sender.getCirclePosition(self.topCircles[z][x])
+											radius = self.sender.getCircleRadius(self.topCircles[z][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragging.append(self.topCircles[z][x])
+												if (x == 0 or x == (len(self.topCircles[z])-1)):
+													self.cornerdrag = True
+										for x in range(0,len(self.bottomCircles[z])):
+											point = self.sender.getCirclePosition(self.bottomCircles[z][x])
+											radius = self.sender.getCircleRadius(self.bottomCircles[z][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragging.append(self.bottomCircles[z][x])
+												if (x == 0 or x == (len(self.bottomCircles[z])-1)):
+													self.cornerdrag = True
+										for x in range(0,len(self.leftCircles[z])):
+											point = self.sender.getCirclePosition(self.leftCircles[z][x])
+											radius = self.sender.getCircleRadius(self.leftCircles[z][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragging.append(self.leftCircles[z][x])
+												if (x == 0 or x == (len(self.leftCircles[z])-1)):
+													self.cornerdrag = True
+										for x in range(0,len(self.rightCircles[z])):
+											point = self.sender.getCirclePosition(self.rightCircles[z][x])
+											radius = self.sender.getCircleRadius(self.rightCircles[z][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragging.append(self.rightCircles[z][x])
+												if (x == 0 or x == (len(self.rightCircles[z])-1)):
+													self.cornerdrag = True
 				elif event.type == pygame.MOUSEBUTTONUP:
 					#Runs if the left mouse button has been released
 					if(event.button==1):
@@ -416,252 +423,257 @@ class client:
 						elapsedSecs = (lClickRelTime-self.lClickTime).total_seconds() #Checks how long the button was depressed
 						#Runs if the button was pressed for less than 0.15 seconds
 						if(elapsedSecs<0.15):
-							#Runs if the default cursor mode is active
-							if(self.cursorMode=="default"):
-								loc = self.sender.getCursorPosition(1)
-								for w in range(0,len(self.topCircles)):
-									#If a waypoint has been clicked, the side it was part of is split so that there are twice as many waypoints
-									for x in range(1,len(self.topCircles[w])-1):
-										point = self.sender.getCirclePosition(self.topCircles[w][x])
-										radius = self.sender.getCircleRadius(self.topCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.splitSide(self.topCircles[w], "top",w)
-											self.updateMesh(w)
-									for x in range(1,len(self.bottomCircles[w])-1):
-										point = self.sender.getCirclePosition(self.bottomCircles[w][x])
-										radius = self.sender.getCircleRadius(self.bottomCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.splitSide(self.bottomCircles[w], "bottom",w)
-											self.updateMesh(w)
-									for x in range(1,len(self.leftCircles[w])-1):
-										point = self.sender.getCirclePosition(self.leftCircles[w][x])
-										radius = self.sender.getCircleRadius(self.leftCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.splitSide(self.leftCircles[w], "left",w)
-											self.updateMesh(w)
-									for x in range(1,len(self.rightCircles[w])-1):
-										point = self.sender.getCirclePosition(self.rightCircles[w][x])
-										radius = self.sender.getCircleRadius(self.rightCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											self.splitSide(self.rightCircles[w], "right",w)
-											self.updateMesh(w)
-									#If a corner point has been clicked, the surface is mirrored or rotated as appropriate
-									if (get_point!=True):
-										if(self.dontFlip[w]==False):
-											flipped = False
-											point = self.sender.getCirclePosition(self.topCircles[w][0])
-											radius = self.sender.getCircleRadius(self.topCircles[w][0])
+							if(self.controlCur==self.mainCur):
+								#Runs if the default cursor mode is active
+								if(self.cursorMode=="default"):
+									loc = self.sender.getCursorPosition(self.controlCur)
+									for w in range(0,len(self.topCircles)):
+										#If a waypoint has been clicked, the side it was part of is split so that there are twice as many waypoints
+										for x in range(1,len(self.topCircles[w])-1):
+											point = self.sender.getCirclePosition(self.topCircles[w][x])
+											radius = self.sender.getCircleRadius(self.topCircles[w][x])
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-												if(self.orientation[w]!=0):
-													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo0(w+1)
-													else:
-														self.sender.rotateSurfaceTo270(w+1)
-													self.orientation[w]=0
-												else:
-													if(self.mirrored[w]==False):
-														self.sender.rotateSurfaceTo270(w+1)
-														self.sender.mirrorSurface(w+1)
-														self.mirrored[w]=True
-													else:
-														self.sender.rotateSurfaceTo0(w+1)
-														self.sender.mirrorSurface(w+1)
-														self.mirrored[w]=False
-												flipped = True
-											if(flipped == False):
-												point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
-												radius = self.sender.getCircleRadius(self.topCircles[w][len(self.topCircles[w])-1])
+												self.splitSide(self.topCircles[w], "top",w)
+												self.updateMesh(w)
+										for x in range(1,len(self.bottomCircles[w])-1):
+											point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+											radius = self.sender.getCircleRadius(self.bottomCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.splitSide(self.bottomCircles[w], "bottom",w)
+												self.updateMesh(w)
+										for x in range(1,len(self.leftCircles[w])-1):
+											point = self.sender.getCirclePosition(self.leftCircles[w][x])
+											radius = self.sender.getCircleRadius(self.leftCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.splitSide(self.leftCircles[w], "left",w)
+												self.updateMesh(w)
+										for x in range(1,len(self.rightCircles[w])-1):
+											point = self.sender.getCirclePosition(self.rightCircles[w][x])
+											radius = self.sender.getCircleRadius(self.rightCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.splitSide(self.rightCircles[w], "right",w)
+												self.updateMesh(w)
+										#If a corner point has been clicked, the surface is mirrored or rotated as appropriate
+										if (get_point!=True):
+											if(self.dontFlip[w]==False):
+												flipped = False
+												point = self.sender.getCirclePosition(self.topCircles[w][0])
+												radius = self.sender.getCircleRadius(self.topCircles[w][0])
 												if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-													if(self.orientation[w]!=1):
+													if(self.orientation[w]!=0):
 														if(self.mirrored[w]==False):
-															self.sender.rotateSurfaceTo90(w+1)
-														else:
 															self.sender.rotateSurfaceTo0(w+1)
-														self.orientation[w]=1
+														else:
+															self.sender.rotateSurfaceTo270(w+1)
+														self.orientation[w]=0
 													else:
 														if(self.mirrored[w]==False):
-															self.sender.rotateSurfaceTo0(w+1)
+															self.sender.rotateSurfaceTo270(w+1)
 															self.sender.mirrorSurface(w+1)
 															self.mirrored[w]=True
 														else:
-															self.sender.rotateSurfaceTo90(w+1)
+															self.sender.rotateSurfaceTo0(w+1)
 															self.sender.mirrorSurface(w+1)
 															self.mirrored[w]=False
 													flipped = True
-											if (flipped == False):
-												point = self.sender.getCirclePosition(self.bottomCircles[w][0])
-												radius = self.sender.getCircleRadius(self.bottomCircles[w][0])
-												if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-													if(self.orientation[w]!=2):
-														if(self.mirrored[w]==False):
-															self.sender.rotateSurfaceTo180(w+1)
+												if(flipped == False):
+													point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
+													radius = self.sender.getCircleRadius(self.topCircles[w][len(self.topCircles[w])-1])
+													if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+														if(self.orientation[w]!=1):
+															if(self.mirrored[w]==False):
+																self.sender.rotateSurfaceTo90(w+1)
+															else:
+																self.sender.rotateSurfaceTo0(w+1)
+															self.orientation[w]=1
 														else:
-															self.sender.rotateSurfaceTo90(w+1)
-														self.orientation[w]=2
-													else:
-														if(self.mirrored[w]==False):
-															self.sender.rotateSurfaceTo90(w+1)
-															self.sender.mirrorSurface(w+1)
-															self.mirrored[w]=True
+															if(self.mirrored[w]==False):
+																self.sender.rotateSurfaceTo0(w+1)
+																self.sender.mirrorSurface(w+1)
+																self.mirrored[w]=True
+															else:
+																self.sender.rotateSurfaceTo90(w+1)
+																self.sender.mirrorSurface(w+1)
+																self.mirrored[w]=False
+														flipped = True
+												if (flipped == False):
+													point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+													radius = self.sender.getCircleRadius(self.bottomCircles[w][0])
+													if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+														if(self.orientation[w]!=2):
+															if(self.mirrored[w]==False):
+																self.sender.rotateSurfaceTo180(w+1)
+															else:
+																self.sender.rotateSurfaceTo90(w+1)
+															self.orientation[w]=2
 														else:
-															self.sender.rotateSurfaceTo180(w+1)
-															self.sender.mirrorSurface(w+1)
-															self.mirrored[w]=False
-													flipped = True
-											if (flipped==False):
-												point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
-												radius = self.sender.getCircleRadius(self.bottomCircles[w][len(self.bottomCircles[w])-1])
-												if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-													if(self.orientation[w]!=3):
-														if(self.mirrored[w]==False):
-															self.sender.rotateSurfaceTo270(w+1)
+															if(self.mirrored[w]==False):
+																self.sender.rotateSurfaceTo90(w+1)
+																self.sender.mirrorSurface(w+1)
+																self.mirrored[w]=True
+															else:
+																self.sender.rotateSurfaceTo180(w+1)
+																self.sender.mirrorSurface(w+1)
+																self.mirrored[w]=False
+														flipped = True
+												if (flipped==False):
+													point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
+													radius = self.sender.getCircleRadius(self.bottomCircles[w][len(self.bottomCircles[w])-1])
+													if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+														if(self.orientation[w]!=3):
+															if(self.mirrored[w]==False):
+																self.sender.rotateSurfaceTo270(w+1)
+															else:
+																self.sender.rotateSurfaceTo180(w+1)
+															self.orientation[w]=3
 														else:
-															self.sender.rotateSurfaceTo180(w+1)
-														self.orientation[w]=3
-													else:
-														if(self.mirrored[w]==False):
-															self.sender.rotateSurfaceTo180(w+1)
-															self.sender.mirrorSurface(w+1)
-															self.mirrored[w]=True
-														else:
-															self.sender.rotateSurfaceTo270(w+1)
-															self.sender.mirrorSurface(w+1)
-															self.mirrored[w]=False
-										else:
-											self.dontFlip[w]=False
-						#If appropriate the list of points currently being dragged is cleared
-						for w in range(0,len(self.topCircles)):
-							if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
-								self.dragging=[]
-								self.updateMesh(w)
+															if(self.mirrored[w]==False):
+																self.sender.rotateSurfaceTo180(w+1)
+																self.sender.mirrorSurface(w+1)
+																self.mirrored[w]=True
+															else:
+																self.sender.rotateSurfaceTo270(w+1)
+																self.sender.mirrorSurface(w+1)
+																self.mirrored[w]=False
+											else:
+												self.dontFlip[w]=False
+						if(self.controlCur==self.mainCur):
+							#If appropriate the list of points currently being dragged is cleared
+							for w in range(0,len(self.topCircles)):
+								if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
+									self.dragging=[]
+									self.updateMesh(w)
 					#Runs if the middle mouse button has been released
 					if(event.button==2):
 						mClickRelTime=datetime.datetime.now()
 						elapsedSecs = (mClickRelTime-self.mClickTime).total_seconds() #Checks how long the button was depressed
-						#Runs if the button was pressed for less than 0.25 seconds and unlocks the mouse from the server
-						if(elapsedSecs<0.25):
-							self.mouseLock = False
-							pygame.mouse.set_visible(True)
-							self.master.focus_force()
+						if(self.controlCur==self.mainCur):
+							#Runs if the button was pressed for less than 0.25 seconds and unlocks the mouse from the server
+							if(elapsedSecs<0.25):
+								self.mouseLock = False
+								pygame.mouse.set_visible(True)
+								self.master.focus_force()
+								self.sender.hideCursor(self.mainCur)
 					#Runs if the right mouse button has been released
 					if(event.button==3):
 						rClickRelTime=datetime.datetime.now()
 						elapsedSecs = (rClickRelTime-self.rClickTime).total_seconds() #Checks how long the button was depressed
-						hit = False
-						hitOnce = False
-						#Runs if the button was pressed for less than 0.15 seconds
-						if(elapsedSecs<0.15):
-							#Runs if the default cursor mode is active
-							if(self.cursorMode=="default"):
-								loc = self.sender.getCursorPosition(1)
-								#If a waypoint has been clicked, the number of waypoints on the side is halved
+						if(self.controlCur==self.mainCur):
+							hit = False
+							hitOnce = False
+							#Runs if the button was pressed for less than 0.15 seconds
+							if(elapsedSecs<0.15):
+								#Runs if the default cursor mode is active
+								if(self.cursorMode=="default"):
+									loc = self.sender.getCursorPosition(self.controlCur)
+									#If a waypoint has been clicked, the number of waypoints on the side is halved
+									for w in range(0,len(self.topCircles)):
+										for x in range(1,len(self.topCircles[w])-1):
+											point = self.sender.getCirclePosition(self.topCircles[w][x])
+											radius = self.sender.getCircleRadius(self.topCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												hit = True
+												hitOnce = True
+										if (hit==True):
+											hit=False
+											self.reduceSide(self.topCircles[w], "top",w)
+											self.updateMesh(w)
+										for x in range(1,len(self.bottomCircles[w])-1):
+											point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+											radius = self.sender.getCircleRadius(self.bottomCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												hit = True
+												hitOnce = True
+										if (hit==True):
+											hit=False
+											self.reduceSide(self.bottomCircles[w], "bottom",w)
+											self.updateMesh(w)
+										for x in range(1,len(self.leftCircles[w])-1):
+											point = self.sender.getCirclePosition(self.leftCircles[w][x])
+											radius = self.sender.getCircleRadius(self.leftCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												hit = True
+												hitOnce = True
+										if (hit==True):
+											hit=False
+											self.reduceSide(self.leftCircles[w], "left",w)
+											self.updateMesh(w)
+										for x in range(1,len(self.rightCircles[w])-1):
+											point = self.sender.getCirclePosition(self.rightCircles[w][x])
+											radius = self.sender.getCircleRadius(self.rightCircles[w][x])
+											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												hit = True
+												hitOnce = True
+										if (hit==True):
+											hit=False
+											self.reduceSide(self.rightCircles[w], "right",w)
+											self.updateMesh(w)
+							dropPoint = None
+							#The temporary connection line is deleted after its current end point is recorded
+							if(len(self.symbolicDrag)>0):
+								dropPoint = self.sender.getCirclePosition(self.symbolicDrag[1])
+								self.sender.removeElement(self.symbolicDrag[0], 1)
+								self.sender.removeElement(self.symbolicDrag[1], 1)
+							#The list of items that were being dragged is scanned
+							for rDragInd in range(0,len(self.rightDragging)):
+								temp = self.rightDragging[rDragInd]
+								loc = self.sender.getCirclePosition(temp[0])
+								corner = temp[1]
+								surface = temp[2]
+								#If the dragged point was released over another point a connection line is created
 								for w in range(0,len(self.topCircles)):
-									for x in range(1,len(self.topCircles[w])-1):
-										point = self.sender.getCirclePosition(self.topCircles[w][x])
-										radius = self.sender.getCircleRadius(self.topCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											hit = True
-											hitOnce = True
-									if (hit==True):
-										hit=False
-										self.reduceSide(self.topCircles[w], "top",w)
-										self.updateMesh(w)
-									for x in range(1,len(self.bottomCircles[w])-1):
-										point = self.sender.getCirclePosition(self.bottomCircles[w][x])
-										radius = self.sender.getCircleRadius(self.bottomCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											hit = True
-											hitOnce = True
-									if (hit==True):
-										hit=False
-										self.reduceSide(self.bottomCircles[w], "bottom",w)
-										self.updateMesh(w)
-									for x in range(1,len(self.leftCircles[w])-1):
-										point = self.sender.getCirclePosition(self.leftCircles[w][x])
-										radius = self.sender.getCircleRadius(self.leftCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											hit = True
-											hitOnce = True
-									if (hit==True):
-										hit=False
-										self.reduceSide(self.leftCircles[w], "left",w)
-										self.updateMesh(w)
-									for x in range(1,len(self.rightCircles[w])-1):
-										point = self.sender.getCirclePosition(self.rightCircles[w][x])
-										radius = self.sender.getCircleRadius(self.rightCircles[w][x])
-										if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
-											hit = True
-											hitOnce = True
-									if (hit==True):
-										hit=False
-										self.reduceSide(self.rightCircles[w], "right",w)
-										self.updateMesh(w)
-						dropPoint = None
-						#The temporary connection line is deleted after its current end point is recorded
-						if(len(self.symbolicDrag)>0):
-							dropPoint = self.sender.getCirclePosition(self.symbolicDrag[1])
-							self.sender.removeElement(self.symbolicDrag[0], 1)
-							self.sender.removeElement(self.symbolicDrag[1], 1)
-						#The list of items that were being dragged is scanned
-						for rDragInd in range(0,len(self.rightDragging)):
-							temp = self.rightDragging[rDragInd]
-							loc = self.sender.getCirclePosition(temp[0])
-							corner = temp[1]
-							surface = temp[2]
-							#If the dragged point was released over another point a connection line is created
-							for w in range(0,len(self.topCircles)):
-								if (w != surface):
-									point = self.sender.getCirclePosition(self.topCircles[w][0])
-									radius = self.sender.getCircleRadius(self.topCircles[w][0])
-									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
-										self.createConnectionLine((surface,corner),(w,"tl"), False)
-									end = len(self.topCircles[w])-1
-									point = self.sender.getCirclePosition(self.topCircles[w][end])
-									radius = self.sender.getCircleRadius(self.topCircles[w][end])
-									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
-										self.createConnectionLine((surface,corner),(w,"tr"), False)
-									point = self.sender.getCirclePosition(self.bottomCircles[w][0])
-									radius = self.sender.getCircleRadius(self.bottomCircles[w][0])
-									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
-										self.createConnectionLine((surface,corner),(w,"br"), False)
-									end = len(self.bottomCircles[w])-1
-									point = self.sender.getCirclePosition(self.bottomCircles[w][end])
-									radius = self.sender.getCircleRadius(self.bottomCircles[w][end])
-									if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
-										self.createConnectionLine((surface,corner),(w,"bl"), False)
-						self.rightDragging=[]
-						self.symbolicDrag = {}
-						#Runs if the button was pressed for less than 0.25 seconds and a point wasn't hit
-						if(elapsedSecs<0.25 and hitOnce==False):
-							#Runs if the default cursor mode is active
-							if(self.cursorMode=="default"):
-								#Switches to wall defining mode and begins definition if there are less than 4 walls, otherwise switches to screen defining mode
-								if(self.surfaceCounter<4):
-									self.sender.setCursorWallMode(1)
-									self.cursorMode="wall"
-									self.defineSurface()
-									if(self.sender.getCursorMode(1)=="wall"):
-										self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
-										self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
-										self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
-										self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
-										self.sender.setCursorDefaultMode(1)
-										self.cursorMode="default"
-								else:
-									self.sender.setCursorScreenMode(1)
+									if (w != surface):
+										point = self.sender.getCirclePosition(self.topCircles[w][0])
+										radius = self.sender.getCircleRadius(self.topCircles[w][0])
+										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
+											self.createConnectionLine((surface,corner),(w,"tl"), False)
+										end = len(self.topCircles[w])-1
+										point = self.sender.getCirclePosition(self.topCircles[w][end])
+										radius = self.sender.getCircleRadius(self.topCircles[w][end])
+										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
+											self.createConnectionLine((surface,corner),(w,"tr"), False)
+										point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+										radius = self.sender.getCircleRadius(self.bottomCircles[w][0])
+										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
+											self.createConnectionLine((surface,corner),(w,"br"), False)
+										end = len(self.bottomCircles[w])-1
+										point = self.sender.getCirclePosition(self.bottomCircles[w][end])
+										radius = self.sender.getCircleRadius(self.bottomCircles[w][end])
+										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
+											self.createConnectionLine((surface,corner),(w,"bl"), False)
+							self.rightDragging=[]
+							self.symbolicDrag = {}
+							#Runs if the button was pressed for less than 0.25 seconds and a point wasn't hit
+							if(elapsedSecs<0.25 and hitOnce==False):
+								#Runs if the default cursor mode is active
+								if(self.cursorMode=="default"):
+									#Switches to wall defining mode and begins definition if there are less than 4 walls, otherwise switches to screen defining mode
+									if(self.surfaceCounter<4):
+										self.sender.setCursorWallMode(self.mainCur)
+										self.cursorMode="wall"
+										self.defineSurface()
+										if(self.sender.getCursorMode(self.mainCur)=="wall"):
+											self.splitSide(self.topCircles[self.surfaceCounter-1], "top",self.surfaceCounter-1)
+											self.splitSide(self.bottomCircles[self.surfaceCounter-1], "bottom",self.surfaceCounter-1)
+											self.splitSide(self.leftCircles[self.surfaceCounter-1], "left",self.surfaceCounter-1)
+											self.splitSide(self.rightCircles[self.surfaceCounter-1], "right",self.surfaceCounter-1)
+											self.sender.setCursorDefaultMode(1)
+											self.cursorMode="default"
+									else:
+										self.sender.setCursorScreenMode(self.mainCur)
+										self.cursorMode="screen"
+								#Runs if the wall defining cursor mode is active and switches to the screen defining mode
+								elif(self.cursorMode=="wall"):
+									self.sender.setCursorScreenMode(self.mainCur)
 									self.cursorMode="screen"
-							#Runs if the wall defining cursor mode is active and switches to the screen defining mode
-							elif(self.cursorMode=="wall"):
-								self.sender.setCursorScreenMode(1)
-								self.cursorMode="screen"
-							#Runs if the screen defining cursor mode is active and switches to the blocked area defining mode
-							elif(self.cursorMode=="screen"):
-								self.sender.setCursorBlockMode(1)
-								self.cursorMode="block"
-							#Runs if the blocked area defining cursor mode is active and switches to the default defining mode
-							elif(self.cursorMode=="block"):
-								self.sender.setCursorDefaultMode(1)
-								self.cursorMode="default"
+								#Runs if the screen defining cursor mode is active and switches to the blocked area defining mode
+								elif(self.cursorMode=="screen"):
+									self.sender.setCursorBlockMode(self.mainCur)
+									self.cursorMode="block"
+								#Runs if the blocked area defining cursor mode is active and switches to the default defining mode
+								elif(self.cursorMode=="block"):
+									self.sender.setCursorDefaultMode(self.mainCur)
+									self.cursorMode="default"
 		return None
 	
 	#Loops until the program is closed and monitors mouse movement
@@ -675,9 +687,9 @@ class client:
 				if (not(xdist==0 and ydist==0)):
 					pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
 					
-					self.sender.moveCursor(1, -xdist, ydist)
-					self.sender.moveCursor(2, -xdist, ydist)
-					loc = self.sender.getCursorPosition(1)
+					self.sender.moveCursor(self.controlCur, -xdist, ydist)
+
+					loc = self.sender.getCursorPosition(self.controlCur)
 					if(len(self.dragging)!=0):
 						for x in range (0,len(self.dragging)):
 							self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
@@ -951,6 +963,7 @@ class client:
 	def LockMouse(self):
 		self.mouseLock = True
 		pygame.mouse.set_visible(False)
+		self.sender.showCursor(self.mainCur)
 	
 	#Requests for the existing layout to be saved to a file
 	def saveLayout(self):
@@ -1044,6 +1057,10 @@ class client:
 			self.mirrored[x] = False
 		for x in self.orientation:
 			self.orientation[x] = 0
+			
+		for x in range(0,len(self.centerPoints)):
+			self.sender.removeElement(self.centerPoints[x], 1)
+		self.centerPoints = {}
 		
 		self.surfaceCounter = 0
 		
@@ -1103,23 +1120,30 @@ class client:
 	def initGUI(self):
 		self.sender.showSetupSurface()
 		self.sender.newWindow(0, 0, 1024, 1280, 1024, "setupWindow")
-		self.sender.newCursor(0, 1280/2, 1024/2)
+		self.mainCur = self.sender.newCursor(0, 1280/2, 1024/2)
+		
+		self.controlCur = self.mainCur
+		
+		self.sender.hideCursor(self.mainCur)
 		
 		self.warpedSurf[0] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
-		self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
+		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 
 		self.warpedSurf[1] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
+		self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 
 		self.warpedSurf[2] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
+		self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 
 		self.warpedSurf[3] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
+		self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		
 		self.surfaceCounter = 0

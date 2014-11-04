@@ -533,6 +533,16 @@ class messageSender:
         
     def setCursorScreenMode(self, cursorNo):
         self.sendMessage("set_cursor_screen_mode," + str(cursorNo))
+        
+    def showCursor(self, cursorNo):
+        self.sendMessage("show_cursor," + str(cursorNo))
+    
+    def hideCursor(self, cursorNo):
+        self.sendMessage("hide_cursor," + str(cursorNo))
+    
+    def isCursorVisible(self, cursorNo):
+        visibility = self.sendMessage("isCursorVisible," + str(cursorNo))
+        return visibility["visibility"]
     
     def moveWindow(self, windowNo, xDistance, yDistance):
         self.sendMessage("move_window," + str(windowNo) + "," + str(xDistance) + "," + str(yDistance))
