@@ -39,6 +39,8 @@ class client:
 	surfCur = {}
 	mainCur = None
 	controlCur = None
+	stretchRects = {}
+	stretchCircs = {}
 	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
 	cursorMode = "default"
 	
@@ -416,6 +418,8 @@ class client:
 												self.dragging.append(self.rightCircles[z][x])
 												if (x == 0 or x == (len(self.rightCircles[z])-1)):
 													self.cornerdrag = True
+						else:
+							pass
 				elif event.type == pygame.MOUSEBUTTONUP:
 					#Runs if the left mouse button has been released
 					if(event.button==1):
@@ -543,10 +547,10 @@ class client:
 												if(self.isHit((point[0],point[1]),(loc[0],loc[1]), radius)):
 													self.controlCur = self.surfCur[x]
 													self.sender.hideCursor(self.mainCur)
-													self.sender.hideElement(self.centerPoints[0])
-													self.sender.hideElement(self.centerPoints[1])
-													self.sender.hideElement(self.centerPoints[2])
-													self.sender.hideElement(self.centerPoints[3])
+													for y in range(0,4):
+														self.sender.hideElement(self.centerPoints[y])
+														self.sender.showElement(self.stretchCircs[x][y])
+													self.sender.showElement(self.stretchRects[x])
 													self.sender.relocateCursor(self.surfCur[x], 512/2, 512/2, self.warpedSurf[x])
 													self.sender.showCursor(self.surfCur[x])
 												
@@ -575,11 +579,11 @@ class client:
 										current = x
 								self.controlCur = self.mainCur
 								self.sender.showCursor(self.mainCur)
-								self.sender.showElement(self.centerPoints[0])
-								self.sender.showElement(self.centerPoints[1])
-								self.sender.showElement(self.centerPoints[2])
-								self.sender.showElement(self.centerPoints[3])
+								for x in range(0,4):
+									self.sender.showElement(self.centerPoints[x])
+									self.sender.hideElement(self.stretchCircs[current][x])
 								self.sender.hideCursor(self.surfCur[current])
+								self.sender.hideElement(self.stretchRects[current])
 								
 					#Runs if the right mouse button has been released
 					if(event.button==3):
@@ -1158,24 +1162,72 @@ class client:
 		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[0])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.stretchRects[0] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
+		self.sender.hideElement(self.stretchRects[0])
+		circs = {}
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[0])
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[1])
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[2])
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[3])
+		self.stretchCircs[0] = circs
 
 		self.warpedSurf[1] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
 		self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[1])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.stretchRects[1] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
+		self.sender.hideElement(self.stretchRects[1])
+		circs = {}
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[0])
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[1])
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[2])
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[3])
+		self.stretchCircs[1] = circs
 
 		self.warpedSurf[2] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
 		self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[2])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.stretchRects[2] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
+		self.sender.hideElement(self.stretchRects[2])
+		circs = {}
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[0])
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[1])
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[2])
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[3])
+		self.stretchCircs[2] = circs
 
 		self.warpedSurf[3] = self.sender.newSurface()
 		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
 		self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[3])
 		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.stretchRects[3] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
+		self.sender.hideElement(self.stretchRects[3])
+		circs = {}
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[0])
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[1])
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[2])
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, (0,0,0,1), (0,1,0,1), 20)
+		self.sender.hideElement(circs[3])
+		self.stretchCircs[3] = circs
 		
 		self.surfaceCounter = 0
 
