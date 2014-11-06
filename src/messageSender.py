@@ -335,6 +335,20 @@ class messageSender:
             layoutlist.append(layouts[x])
         return layoutlist
     
+    def setSurfacePixelHeight(self,surfaceNo,height):
+        self.sendMessage("set_surface_pixel_height," + str(surfaceNo) + "," + str(height))
+        
+    def setSurfacePixelWidth(self,surfaceNo,width):
+        self.sendMessage("set_surface_pixel_width," + str(surfaceNo) + "," + str(width))
+        
+    def getSurfacePixelHeight(self,surfaceNo):
+        height = self.sendMessage("get_surface_pixel_height," + str(surfaceNo))
+        return height["height"]
+        
+    def getSurfacePixelWidth(self,surfaceNo):
+        width = self.sendMessage("get_surface_pixel_width," + str(surfaceNo))
+        return width["width"]
+    
     def deleteLayout(self, name):
         self.sendMessage("delete_layout," + name)
         

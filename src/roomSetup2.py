@@ -578,6 +578,29 @@ class client:
 									self.dragging=[]
 									self.updateMesh(w)
 						else:
+							if len(self.stretching)>0:
+								surfWidth = self.sender.getSurfacePixelWidth(self.stretching[0][0])
+								surfHeight = self.sender.getSurfacePixelHeight(self.stretching[0][0])
+								rectWidth = self.sender.getRectangleWidth(self.stretchRects[self.stretching[0][0]])
+								rectHeight = self.sender.getRectangleHeight(self.stretchRects[self.stretching[0][0]])
+								percentWidth = rectWidth/surfWidth*100
+								percentHeight = rectHeight/surfHeight*100
+								newWidth = 150/percentWidth*100
+								newHeight = 150/percentHeight*100
+								self.sender.setRectangleWidth(self.stretchRects[self.stretching[0][0]], 150)
+								self.sender.setRectangleHeight(self.stretchRects[self.stretching[0][0]], 150)
+								self.sender.setSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]], int(newWidth))
+								self.sender.setSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]], int(newHeight))
+								self.sender.setRectangleTopLeft(self.stretchRects[self.stretching[0][0]], newWidth/2-75, newHeight/2+75)
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][0], newWidth/2, newHeight/2+75, self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][3], newWidth/2+75, newHeight/2, self.surfWindows[self.stretching[0][0]])
+								#self.surfWindows[x[0]
+								print "Surf width - " + str(surfWidth)
+								print "Surf height - " + str(surfHeight)
+								print "Rect width - " + str(rectWidth)
+								print "Rect Height - " + str(rectHeight)
 							self.stretching = []
 					#Runs if the middle mouse button has been released
 					if(event.button==2):
@@ -792,8 +815,10 @@ class client:
 					if(len(self.stretching)!=0):
 						for x in self.stretching:
 							origpos = self.sender.getCirclePosition(self.stretchCircs[x[0]][x[1]])
+							wid = self.sender.getSurfacePixelWidth(self.warpedSurf[x[0]])
+							hei = self.sender.getSurfacePixelHeight(self.warpedSurf[x[0]])
 							if(x[1]<2):
-								if(x[1]==0 and loc[1]>512/2 or x[1]==1 and loc[1]<512/2):
+								if(x[1]==0 and loc[1]>hei/2 or x[1]==1 and loc[1]<hei/2):
 									self.sender.relocateCircle(self.stretchCircs[x[0]][x[1]], float(origpos[0]), float(loc[1]), self.surfWindows[x[0]])
 									hdifference = loc[1] - origpos[1]
 									if(x[1]==0):
@@ -803,7 +828,7 @@ class client:
 										origpos2 = self.sender.getCirclePosition(self.stretchCircs[x[0]][0])
 										self.sender.relocateCircle(self.stretchCircs[x[0]][0], float(origpos[0]), float(origpos2[1])-hdifference, self.surfWindows[x[0]])
 							else:
-								if(x[1]==2 and loc[0]<512/2 or x[1]==3 and loc[0]>512/2):
+								if(x[1]==2 and loc[0]<wid/2 or x[1]==3 and loc[0]>wid/2):
 									self.sender.relocateCircle(self.stretchCircs[x[0]][x[1]], float(loc[0]), float(origpos[1]), self.surfWindows[x[0]])
 									vdifference = loc[0] - origpos[0]
 									if(x[1]==2):
