@@ -579,10 +579,16 @@ class client:
 									self.updateMesh(w)
 						else:
 							if len(self.stretching)>0:
-								surfWidth = self.sender.getSurfacePixelWidth(self.stretching[0][0])
-								surfHeight = self.sender.getSurfacePixelHeight(self.stretching[0][0])
+								surfWidth = self.sender.getSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]])
+								surfHeight = self.sender.getSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]])
 								rectWidth = self.sender.getRectangleWidth(self.stretchRects[self.stretching[0][0]])
 								rectHeight = self.sender.getRectangleHeight(self.stretchRects[self.stretching[0][0]])
+								print "Original:"
+								print "Surf Width: " + str(surfWidth)
+								print "Surf Height: " + str(surfHeight)
+								print "Rect Width: " + str(rectWidth)
+								print "Rect Height: " + str(rectHeight)
+								
 								percentWidth = rectWidth/surfWidth*100
 								percentHeight = rectHeight/surfHeight*100
 								newWidth = 150/percentWidth*100
@@ -596,11 +602,13 @@ class client:
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][3], newWidth/2+75, newHeight/2, self.surfWindows[self.stretching[0][0]])
+								print "Afterwards:"
+								print "Surf Width: " + str(self.sender.getSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]]))
+								print "Surf Height: " + str(self.sender.getSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]]))
+								print "Rect Width: " + str(self.sender.getRectangleWidth(self.stretchRects[self.stretching[0][0]]))
+								print "Rect Height: " + str(self.sender.getRectangleHeight(self.stretchRects[self.stretching[0][0]]))
+								
 								#self.surfWindows[x[0]
-								print "Surf width - " + str(surfWidth)
-								print "Surf height - " + str(surfHeight)
-								print "Rect width - " + str(rectWidth)
-								print "Rect Height - " + str(rectHeight)
 							self.stretching = []
 					#Runs if the middle mouse button has been released
 					if(event.button==2):
