@@ -43,6 +43,7 @@ class client:
 	stretchRects = {}
 	stretchCircs = {}
 	stretching = []
+	texRects = {}
 	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
 	cursorMode = "default"
 	
@@ -565,8 +566,14 @@ class client:
 													self.controlCur = self.surfCur[x]
 													self.sender.hideCursor(self.mainCur)
 													for y in range(0,4):
-														self.sender.hideElement(self.centerPoints[y])
-														self.sender.showElement(self.stretchCircs[x][y])
+														try:
+															self.sender.hideElement(self.centerPoints[y])
+														except KeyError, e:
+															pass
+														try:
+															self.sender.showElement(self.stretchCircs[x][y])
+														except KeyError, e:
+															pass
 													self.sender.showElement(self.stretchRects[x])
 													self.sender.relocateCursor(self.surfCur[x], 512/2, 512/2, self.warpedSurf[x])
 													self.sender.showCursor(self.surfCur[x])
@@ -583,16 +590,12 @@ class client:
 								surfHeight = self.sender.getSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]])
 								rectWidth = self.sender.getRectangleWidth(self.stretchRects[self.stretching[0][0]])
 								rectHeight = self.sender.getRectangleHeight(self.stretchRects[self.stretching[0][0]])
-								print "Original:"
-								print "Surf Width: " + str(surfWidth)
-								print "Surf Height: " + str(surfHeight)
-								print "Rect Width: " + str(rectWidth)
-								print "Rect Height: " + str(rectHeight)
 								
 								percentWidth = rectWidth/surfWidth*100
 								percentHeight = rectHeight/surfHeight*100
 								newWidth = 150/percentWidth*100
 								newHeight = 150/percentHeight*100
+								
 								self.sender.setRectangleWidth(self.stretchRects[self.stretching[0][0]], 150)
 								self.sender.setRectangleHeight(self.stretchRects[self.stretching[0][0]], 150)
 								self.sender.setSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]], int(newWidth))
@@ -602,11 +605,10 @@ class client:
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][3], newWidth/2+75, newHeight/2, self.surfWindows[self.stretching[0][0]])
-								print "Afterwards:"
-								print "Surf Width: " + str(self.sender.getSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]]))
-								print "Surf Height: " + str(self.sender.getSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]]))
-								print "Rect Width: " + str(self.sender.getRectangleWidth(self.stretchRects[self.stretching[0][0]]))
-								print "Rect Height: " + str(self.sender.getRectangleHeight(self.stretchRects[self.stretching[0][0]]))
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][0], newHeight*20/512)
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][1], newHeight*20/512)
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][2], newHeight*20/512)
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][3], newHeight*20/512)
 								
 								#self.surfWindows[x[0]
 							self.stretching = []
@@ -630,8 +632,14 @@ class client:
 								self.controlCur = self.mainCur
 								self.sender.showCursor(self.mainCur)
 								for x in range(0,4):
-									self.sender.showElement(self.centerPoints[x])
-									self.sender.hideElement(self.stretchCircs[current][x])
+									try:
+										self.sender.showElement(self.centerPoints[x])
+									except KeyError, e:
+										pass
+									try:
+										self.sender.hideElement(self.stretchCircs[current][x])
+									except KeyError, e:
+										pass
 								self.sender.hideCursor(self.surfCur[current])
 								self.sender.hideElement(self.stretchRects[current])
 								
@@ -1064,6 +1072,33 @@ class client:
 	#Quits the client
 	def quitButton(self):
 		if(self.quit==False):
+			for z in self.topCircles:
+				for x in range(0,len(self.topCircles[z])):
+					self.sender.removeElement(self.topCircles[z][x],1)
+			for z in self.bottomCircles:
+				for x in range(0,len(self.bottomCircles[z])):
+					self.sender.removeElement(self.bottomCircles[z][x],1)
+			for z in self.leftCircles:
+				for x in range(0,len(self.leftCircles[z])):
+					self.sender.removeElement(self.leftCircles[z][x],1)
+			for z in self.rightCircles:
+				for x in range(0,len(self.rightCircles[z])):
+					self.sender.removeElement(self.rightCircles[z][x],1)
+			for x in self.topbz:
+				self.sender.removeElement(self.topbz[x],1)
+			for x in self.bottombz:
+				self.sender.removeElement(self.bottombz[x],1)
+			for x in self.leftbz:
+				self.sender.removeElement(self.leftbz[x],1)
+			for x in self.rightbz:
+				self.sender.removeElement(self.rightbz[x],1)
+			for x in range(0,len(self.centerPoints)):
+				self.sender.removeElement(self.centerPoints[x],1)
+			for x in range(0,len(self.warpedSurf)):
+				self.sender.clearSurface(self.warpedSurf[x])
+			
+			self.sender.quitClientOnly()
+			time.sleep(0.1)
 			self.quit=True
 			time.sleep(0.2)
 			self.frame.quit()
@@ -1108,6 +1143,10 @@ class client:
 		count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
 		self.redefineSurface(count[1])
 		self.visualizeConnections(count[2])
+		self.updateRectangle(0)
+		self.updateRectangle(1)
+		self.updateRectangle(2)
+		self.updateRectangle(3)
 		self.saveName.delete(0, END)
 		self.saveName.insert(0, self.loadList.selection_get())
 	
@@ -1203,7 +1242,9 @@ class client:
 		self.frame6.pack()
 		self.frame7 = Frame(self.master)
 		self.frame7.pack()
-		self.button = Button(self.frame, text="QUIT CLIENT AND SERVER", fg="red", command=self.quitAllButton, width=40)
+		self.button = Button(self.frame, text="QUIT CLIENT AND SERVER", fg="red", command=self.quitAllButton, width=18)
+		self.button.pack(side=LEFT)
+		self.button = Button(self.frame, text="QUIT CLIENT", fg="red", command=self.quitButton, width=18)
 		self.button.pack(side=LEFT)
 		self.slogan = Button(self.frame2, text="Control Projected Mouse (Middle Click to Release)", command=self.LockMouse, width=40)
 		self.slogan.pack(side=LEFT)
@@ -1248,7 +1289,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
 		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[0])
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[0] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		self.stretchRects[0] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[0])
 		circs = {}
@@ -1267,7 +1308,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
 		self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[1])
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[1] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		self.stretchRects[1] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[1])
 		circs = {}
@@ -1286,7 +1327,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
 		self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[2])
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[2] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		self.stretchRects[2] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[2])
 		circs = {}
@@ -1305,7 +1346,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
 		self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[3])
-		self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[3] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
 		self.stretchRects[3] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[3])
 		circs = {}

@@ -94,6 +94,9 @@ class messageSender:
         self.sendMessage("quit")
         self.loop=False
         
+    def quitClientOnly(self):
+        self.loop=False
+        
     def login(self, username):
         self.sendMessage("login," + str(username))
         
@@ -348,6 +351,9 @@ class messageSender:
     def getSurfacePixelWidth(self,surfaceNo):
         width = self.sendMessage("get_surface_pixel_width," + str(surfaceNo))
         return width["width"]
+    
+    def clearSurface(self,surfaceNo):
+        self.sendMessage("clear_surface," + str(surfaceNo))
     
     def deleteLayout(self, name):
         self.sendMessage("delete_layout," + name)
