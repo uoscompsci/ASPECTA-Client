@@ -22,19 +22,19 @@ class messageSender:
         while self.loop:
             #print str(self.eletrack)
             strips = 0
-            for x in range(1,len(self.elelocs)+1):
-                if(self.eletrack[x][0] == True):
-                    if(self.eletrack[x][1] == "lineStrip"):
+            for x in range(0,len(self.elelocs)):
+                if(self.eletrack[self.elelocs.keys()[x]][0] == True):
+                    if(self.eletrack[self.elelocs.keys()[x]][1] == "lineStrip"):
                         strips += 1
                         self.stripLock.acquire()
-                        converted = str(self.elelocs[x][0][0]) + ":" + str(self.elelocs[x][0][1])
-                        for y in range(0,len(self.elelocs[x])):
-                            converted += ";" + str(self.elelocs[x][y][0]) + ":" + str(self.elelocs[x][y][1])
-                        self.sendMessage("set_line_strip_content," + str(x) + "," + converted)
+                        converted = str(self.elelocs[self.elelocs.keys()[x]][0][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][0][1])
+                        for y in range(0,len(self.elelocs[self.elelocs.keys()[x]])):
+                            converted += ";" + str(self.elelocs[self.elelocs.keys()[x]][y][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][y][1])
+                        self.sendMessage("set_line_strip_content," + str(self.elelocs.keys()[x]) + "," + converted)
                         self.stripLock.release()
-                    elif(self.eletrack[x][1] == "circle"):
-                        self.sendMessage("relocate_circle," + str(x) + "," + str(self.elelocs[x][0]) + "," + str(self.elelocs[x][1]))
-                    self.eletrack[x][0]=False
+                    elif(self.eletrack[self.elelocs.keys()[x]][1] == "circle"):
+                        self.sendMessage("relocate_circle," + str(self.elelocs.keys()[x]) + "," + str(self.elelocs[self.elelocs.keys()[x]][0]) + "," + str(self.elelocs[self.elelocs.keys()[x]][1]))
+                    self.eletrack[self.elelocs.keys()[x]][0]=False
             time.sleep(self.refreshrate)
     
     def __init__(self):
@@ -96,6 +96,8 @@ class messageSender:
         
     def quitClientOnly(self):
         self.loop=False
+        self.eletrack = {}
+        self.elelocs = {}
         
     def login(self, username):
         self.sendMessage("login," + str(username))

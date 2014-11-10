@@ -44,13 +44,13 @@ class client:
                 if (not(xdist==0 and ydist==0)):
                     pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
                     
-                    self.sender.moveCursor(1, -xdist, ydist)
+                    self.sender.moveCursor(self.currentCur, -xdist, ydist)
         
     def blueCircleAnimation(self):
         while(self.quit==False):
             time.sleep(1.0/30)
             pos = self.sender.getCirclePosition(self.blueCirc)
-            if(pos[0]>=512):
+            if(pos[0]>=self.sender.getSurfacePixelWidth(1)):
                 self.dirleft = False
             if(pos[0]<=0):
                 self.dirleft = True
@@ -82,11 +82,11 @@ class client:
         pygame.display.flip()
         
         self.sender.login("jp438")
-        self.sender.setapp("myapp")
-        self.sender.loadDefinedSurfaces("spaceSave")
+        self.sender.setapp("indapp")
+        #self.sender.loadDefinedSurfaces("spaceSave")
         
         window = self.sender.newWindow(1, 200, 200, 100, 100, "Bob")
-        self.sender.newCursor(1, 512/2, 512/2)
+        self.currentCur = self.sender.newCursor(1, 512/2, 512/2)
         self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
