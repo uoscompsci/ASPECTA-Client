@@ -23,19 +23,23 @@ class messageSender:
             #print str(self.eletrack)
             strips = 0
             for x in range(0,len(self.elelocs)):
-                if(self.eletrack[self.elelocs.keys()[x]][0] == True):
-                    if(self.eletrack[self.elelocs.keys()[x]][1] == "lineStrip"):
-                        strips += 1
-                        self.stripLock.acquire()
-                        converted = str(self.elelocs[self.elelocs.keys()[x]][0][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][0][1])
-                        for y in range(0,len(self.elelocs[self.elelocs.keys()[x]])):
-                            converted += ";" + str(self.elelocs[self.elelocs.keys()[x]][y][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][y][1])
-                        self.sendMessage("set_line_strip_content," + str(self.elelocs.keys()[x]) + "," + converted)
-                        self.stripLock.release()
-                    elif(self.eletrack[self.elelocs.keys()[x]][1] == "circle"):
-                        self.sendMessage("relocate_circle," + str(self.elelocs.keys()[x]) + "," + str(self.elelocs[self.elelocs.keys()[x]][0]) + "," + str(self.elelocs[self.elelocs.keys()[x]][1]))
-                    self.eletrack[self.elelocs.keys()[x]][0]=False
+                try:
+                    if(self.eletrack[self.elelocs.keys()[x]][0] == True):
+                        if(self.eletrack[self.elelocs.keys()[x]][1] == "lineStrip"):
+                            strips += 1
+                            self.stripLock.acquire()
+                            converted = str(self.elelocs[self.elelocs.keys()[x]][0][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][0][1])
+                            for y in range(0,len(self.elelocs[self.elelocs.keys()[x]])):
+                                converted += ";" + str(self.elelocs[self.elelocs.keys()[x]][y][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][y][1])
+                            self.sendMessage("set_line_strip_content," + str(self.elelocs.keys()[x]) + "," + converted)
+                            self.stripLock.release()
+                        elif(self.eletrack[self.elelocs.keys()[x]][1] == "circle"):
+                            self.sendMessage("relocate_circle," + str(self.elelocs.keys()[x]) + "," + str(self.elelocs[self.elelocs.keys()[x]][0]) + "," + str(self.elelocs[self.elelocs.keys()[x]][1]))
+                        self.eletrack[self.elelocs.keys()[x]][0]=False
+                except IndexError, e:
+                    pass
             time.sleep(self.refreshrate)
+        print "Closing"
     
     def __init__(self):
         parser = SafeConfigParser()
