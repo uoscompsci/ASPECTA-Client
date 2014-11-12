@@ -17,6 +17,21 @@ class messageSender:
     stripLock = threading.Lock()
     sendlock = threading.Lock()
     loop = True
+
+    def uploadImage(self, file):
+        filename = file.split("/")
+        filename = filename[-1]
+        print filename
+        self.sendMessage("set_upload_name," + filename)
+        time.sleep(0.5)
+        s = socket.socket()
+        s.connect((self.host,self.port+1))
+        f=open(file, "rb") 
+        l = f.read(1024)
+        while (l):
+            s.send(l)
+            l = f.read(1024)
+        s.close()
     
     def eleUpdater(self):
         while self.loop:
@@ -370,6 +385,9 @@ class messageSender:
     
     def deleteLayout(self, name):
         self.sendMessage("delete_layout," + name)
+        
+    def deleteImage(self, filename):
+        self.sendMessage("delete_image," + filename)
         
     def rotateSurfaceTo0(self, surfaceNo):
         self.sendMessage("rotate_surface_to_0," + str(surfaceNo))

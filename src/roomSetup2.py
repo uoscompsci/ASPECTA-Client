@@ -10,6 +10,7 @@ from ConfigParser import SafeConfigParser
 import datetime
 from pgu import gui
 import tkMessageBox
+from tkFileDialog   import askopenfilename
 
 class client:
 	__slots__ = ['ppe']
@@ -1175,6 +1176,30 @@ class client:
 				self.loadList.insert(END, self.layouts[x])
 		else:
 			tkMessageBox.showinfo("Error", "You are not allowed to delete the \"DEFAULT\" layout")
+			
+	def uploadImage(self):
+		filename = askopenfilename() 
+		self.sender.uploadImage(filename)
+		time.sleep(0.5)
+		self.refreshImages()
+			
+	#Ask the server to delete the layout that is currently selected in the layout list
+	def deleteImage(self):
+		if(self.imageList.selection_get()!="checks.jpg"):
+			self.sender.deleteImage(self.imageList.selection_get())
+			self.images = self.sender.getSavedImages()
+			self.imageList.delete(0, END)
+			for x in range(0, len(self.images)):
+				self.imageList.insert(END, self.images[x])
+		else:
+			tkMessageBox.showinfo("Error", "You are not allowed to delete the \"checks.jpg\" image")
+			
+	#Refreshes the layout list by querying the server for an updated list
+	def refreshImages(self):
+		self.images = self.sender.getSavedImages()
+		self.imageList.delete(0, END)
+		for x in range(0, len(self.images)):
+			self.imageList.insert(END, self.images[x])
 	
 	#Clear the currently defined layout on both the client and server side
 	def clearLayout(self):
@@ -1248,6 +1273,10 @@ class client:
 		self.frame9.pack()
 		self.frame10 = Frame(self.master)
 		self.frame10.pack()
+		self.frame11 = Frame(self.master)
+		self.frame11.pack()
+		self.frame12 = Frame(self.master)
+		self.frame12.pack()
 		self.button = Button(self.frame, text="QUIT CLIENT AND SERVER", fg="red", command=self.quitAllButton, width=18)
 		self.button.pack(side=LEFT)
 		self.button = Button(self.frame, text="QUIT CLIENT", fg="red", command=self.quitButton, width=18)
@@ -1295,6 +1324,12 @@ class client:
 		images = self.sender.getSavedImages()
 		for x in range(0,len(images)):
 			self.imageList.insert(END, images[x])
+		self.saveBut = Button(self.frame11, text="Upload Image", command=self.uploadImage, width=18)
+		self.saveBut.pack(side=LEFT)
+		self.saveBut = Button(self.frame11, text="Delete Image", command=self.deleteImage, width=18)
+		self.saveBut.pack(side=LEFT)
+		self.saveBut = Button(self.frame12, text="Refresh List", command=self.refreshImages, width=40)
+		self.saveBut.pack(side=LEFT)
 		self.master.mainloop()
 	
 	#Sets up the surfaces which can be defined within the client
