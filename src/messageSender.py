@@ -344,6 +344,13 @@ class messageSender:
             layoutlist.append(layouts[x])
         return layoutlist
     
+    def getSavedImages(self):
+        images = self.sendMessage("get_saved_images")
+        imagelist = []
+        for x in range(0,int(images["count"])):
+            imagelist.append(images[x])
+        return imagelist
+    
     def setSurfacePixelHeight(self,surfaceNo,height):
         self.sendMessage("set_surface_pixel_height," + str(surfaceNo) + "," + str(height))
         
