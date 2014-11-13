@@ -1184,9 +1184,25 @@ class client:
 			tkMessageBox.showerror("Error", "Please make a selection first")
 			
 	def uploadImage(self):
-		filename = askopenfilename() 
+		filename = askopenfilename(filetypes=[("Image Files", ("*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.pcx", "*.tga", "*.tif", "*.tiff", "*.lbm", "*.pbm", "*.pgm", "*.ppm", "*.xpm")), 
+											("Portable Network Graphics","*.png"), 
+											("Joint Photographic Experts Group", ("*.jpg", "*.jpeg")), 
+											("Graphics Interchange Format", "*.gif"), 
+											("Bitmap", "*.bmp"),
+											("Personal Computer Exchange", "*.pcx"),
+											("Truevision TGA", "*.tga"),
+											("Tagged Image File Format", ("*.tif","*.tiff")),
+											("Interleaved Bitmap", "*.lbm"),
+											("Portable Bitmap", "*.pbm"),
+											("Portable Greymap", "*.pgm"),
+											("Portable Pixmap", "*.ppm"),
+											("X PixMap", "*.xpm"),
+											("All Files", "*")],
+								title="Upload Image")
 		if(len(filename)!=0):
-			self.sender.uploadImage(filename)
+			uploadThread = threading.Thread(target=self.sender.uploadImage, args=[filename])
+			uploadThread.start()
+			#self.sender.uploadImage(filename)
 			time.sleep(0.5)
 			self.refreshImages()
 			
@@ -1287,9 +1303,7 @@ class client:
 		self.frame11.pack()
 		self.frame12 = Frame(self.master)
 		self.frame12.pack()
-		self.button = Button(self.frame, text="QUIT CLIENT AND SERVER", fg="red", command=self.quitAllButton, width=18)
-		self.button.pack(side=LEFT)
-		self.button = Button(self.frame, text="QUIT CLIENT", fg="red", command=self.quitButton, width=18)
+		self.button = Button(self.frame, text="QUIT CLIENT", fg="red", command=self.quitButton, width=40)
 		self.button.pack(side=LEFT)
 		self.slogan = Button(self.frame2, text="Control Projected Mouse (Middle Click to Release)", command=self.LockMouse, width=40)
 		self.slogan.pack(side=LEFT)
