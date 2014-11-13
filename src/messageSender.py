@@ -21,7 +21,6 @@ class messageSender:
     def uploadImage(self, file):
         filename = file.split("/")
         filename = filename[-1]
-        print filename
         self.sendMessage("set_upload_name," + filename)
         time.sleep(0.5)
         s = socket.socket()
