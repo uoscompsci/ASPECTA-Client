@@ -1136,20 +1136,23 @@ class client:
 				for x in range(0, len(self.layouts)):
 					self.loadList.insert(END, self.layouts[x])
 		else:
-			tkMessageBox.showinfo("Error", "Please enter save name first")
+			tkMessageBox.showerror("Error", "Please enter save name first")
 	
 	#Requests for the currently selected layout to be loaded
 	def loadLayout(self):
-		self.clearLayout()
-		count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
-		self.redefineSurface(count[1])
-		self.visualizeConnections(count[2])
-		self.updateRectangle(0)
-		self.updateRectangle(1)
-		self.updateRectangle(2)
-		self.updateRectangle(3)
-		self.saveName.delete(0, END)
-		self.saveName.insert(0, self.loadList.selection_get())
+		if(len(self.loadList.curselection())>0):
+			self.clearLayout()
+			count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
+			self.redefineSurface(count[1])
+			self.visualizeConnections(count[2])
+			self.updateRectangle(0)
+			self.updateRectangle(1)
+			self.updateRectangle(2)
+			self.updateRectangle(3)
+			self.saveName.delete(0, END)
+			self.saveName.insert(0, self.loadList.selection_get())
+		else:
+			tkMessageBox.showerror("Error", "Please make a selection first")
 	
 	#Makes it so that the save filename matches the current selection in the layout list
 	def selectEntry(self, event):
@@ -1168,31 +1171,38 @@ class client:
 	
 	#Ask the server to delete the layout that is currently selected in the layout list
 	def deleteLayout(self):
-		if(self.loadList.selection_get()!="DEFAULT"):
-			self.sender.deleteLayout(self.loadList.selection_get())
-			self.layouts = self.sender.getSavedLayouts()
-			self.loadList.delete(0, END)
-			for x in range(0, len(self.layouts)):
-				self.loadList.insert(END, self.layouts[x])
+		if(len(self.loadList.curselection())>0):
+			if(self.loadList.selection_get()!="DEFAULT"):
+				self.sender.deleteLayout(self.loadList.selection_get())
+				self.layouts = self.sender.getSavedLayouts()
+				self.loadList.delete(0, END)
+				for x in range(0, len(self.layouts)):
+					self.loadList.insert(END, self.layouts[x])
+			else:
+				tkMessageBox.showinfo("Error", "You are not allowed to delete the \"DEFAULT\" layout")
 		else:
-			tkMessageBox.showinfo("Error", "You are not allowed to delete the \"DEFAULT\" layout")
+			tkMessageBox.showerror("Error", "Please make a selection first")
 			
 	def uploadImage(self):
 		filename = askopenfilename() 
-		self.sender.uploadImage(filename)
-		time.sleep(0.5)
-		self.refreshImages()
+		if(len(filename)!=0):
+			self.sender.uploadImage(filename)
+			time.sleep(0.5)
+			self.refreshImages()
 			
 	#Ask the server to delete the layout that is currently selected in the layout list
 	def deleteImage(self):
-		if(self.imageList.selection_get()!="checks.jpg"):
-			self.sender.deleteImage(self.imageList.selection_get())
-			self.images = self.sender.getSavedImages()
-			self.imageList.delete(0, END)
-			for x in range(0, len(self.images)):
-				self.imageList.insert(END, self.images[x])
+		if(len(self.imageList.curselection())>0):
+			if(self.imageList.selection_get()!="checks.jpg"):
+				self.sender.deleteImage(self.imageList.selection_get())
+				self.images = self.sender.getSavedImages()
+				self.imageList.delete(0, END)
+				for x in range(0, len(self.images)):
+					self.imageList.insert(END, self.images[x])
+			else:
+				tkMessageBox.showinfo("Error", "You are not allowed to delete the \"checks.jpg\" image")
 		else:
-			tkMessageBox.showinfo("Error", "You are not allowed to delete the \"checks.jpg\" image")
+			tkMessageBox.showerror("Error", "Please make a selection first")
 			
 	#Refreshes the layout list by querying the server for an updated list
 	def refreshImages(self):
