@@ -1271,8 +1271,7 @@ class client:
 		self.centerPoints = {}
 		
 		for x in list(reversed(range(0,len(self.connections)))):
-			self.sender.removeElement(self.connections[x][2], 1)
-			self.connections.pop(x)
+			self.createConnectionLine(self.connections[x][0], self.connections[x][1], False)
 		
 		self.surfaceCounter = 0
 		
