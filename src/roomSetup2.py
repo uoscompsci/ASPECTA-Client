@@ -1270,6 +1270,10 @@ class client:
 			self.sender.removeElement(self.centerPoints[x], 1)
 		self.centerPoints = {}
 		
+		for x in list(reversed(range(0,len(self.connections)))):
+			self.sender.removeElement(self.connections[x][2], 1)
+			self.connections.pop(x)
+		
 		self.surfaceCounter = 0
 		
 		self.saveName.delete(0, END)
