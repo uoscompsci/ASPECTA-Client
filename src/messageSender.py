@@ -75,6 +75,12 @@ class messageSender:
         
     def colorString(self, red, green, blue, alpha):
         return str(red) + ":" + str(green) + ":" + str(blue) + ":" + str(alpha)
+    
+    def colorTuple(self, string):
+        colortuple = string.split(":")
+        for x in range(0,4):
+            colortuple[x] = float(colortuple[x])
+        return colortuple
         
     def sendMessage(self, message):
         self.sendlock.acquire()
@@ -111,6 +117,8 @@ class messageSender:
     def quit(self):
         self.sendMessage("quit")
         self.loop=False
+        self.eletrack = {}
+        self.elelocs = {}
         
     def quitClientOnly(self):
         self.loop=False
@@ -507,8 +515,8 @@ class messageSender:
             elementlist.append(int(elements[x]))
         return elementlist
     
-    def getElementsOnWindow(self, surfaceNo):
-        elements = self.sendMessage("get_elements_on_window," + str(surfaceNo))
+    def getElementsOnWindow(self, windowNo):
+        elements = self.sendMessage("get_elements_on_window," + str(windowNo))
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
@@ -659,10 +667,10 @@ class messageSender:
         self.sendMessage("set_circle_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
 
     def getCircleLineColor(self, elementNo):
-        return self.sendMessage("get_circle_line_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_circle_line_color," + str(elementNo)))
         
     def getCircleFillColor(self, elementNo):
-        return self.sendMessage("get_circle_fill_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_circle_fill_color," + str(elementNo)))
     
     def setCircleRadius(self, elementNo, radius):
         self.sendMessage("set_circle_radius," + str(elementNo) + "," + str(radius))
@@ -696,7 +704,7 @@ class messageSender:
         self.sendMessage("set_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getLineColor(self, elementNo):
-        return self.sendMessage("get_line_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_line_color," + str(elementNo)))
     
     def setLineWidth(self, elementNo, width):
         self.sendMessage("set_line_width," + str(elementNo) + "," + str(width))
@@ -731,7 +739,7 @@ class messageSender:
         self.stripLock.release()
         
     def getLineStripColor(self, elementNo):
-        return self.sendMessage("get_line_strip_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_line_strip_color," + str(elementNo)))
         
     def setLineStripColor(self, elementNo, color):
         self.sendMessage("set_line_strip_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
@@ -767,13 +775,13 @@ class messageSender:
         self.sendMessage("relocate_polygon_point," + str(elementNo) + "," + str(pointNo) + "," + str(x) + "," + str(y))
         
     def getPolygonFillColor(self, elementNo):
-        return self.sendMessage("get_polygon_fill_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_polygon_fill_color," + str(elementNo)))
     
     def setPolygonFillColor(self, elementNo, color):
         self.sendMessage("set_polygon_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getPolygonLineColor(self, elementNo):
-        return self.sendMessage("get_polygon_line_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_polygon_line_color," + str(elementNo)))
     
     def setPolygonLineColor(self, elementNo, color):
         self.sendMessage("set_polygon_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
@@ -819,13 +827,13 @@ class messageSender:
         self.sendMessage("set_rectangle_fill_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getRectangleFillColor(self, elementNo):
-        return self.sendMessage("get_rectangle_fill_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_rectangle_fill_color," + str(elementNo)))
     
     def setRectangleLineColor(self, elementNo, color):
         self.sendMessage("set_rectangle_line_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
     def getRectangleLineColor(self, elementNo):
-        return self.sendMessage("get_rectangle_line_color," + str(elementNo))
+        return self.colorTuple(self.sendMessage("get_rectangle_line_color," + str(elementNo)))
     
     def setTexRectangleTopLeft(self, elementNo, x, y):
         self.sendMessage("set_texrectangle_top_left," + str(elementNo) + "," + str(x) + "," + str(y))
@@ -898,6 +906,9 @@ class messageSender:
     def setTextColor(self, elementNo, color):
         self.sendMessage("set_text_color," + str(elementNo) + "," + self.colorString(color[0], color[1], color[2], color[3]))
         
+    def getTextColor(self, elementNo):
+        return self.colorTuple(self.sendMessage("get_text_color," + str(elementNo)))
+           
     def showElement(self, elementNo):
         self.sendMessage("show_element," + str(elementNo))
         

@@ -1203,7 +1203,7 @@ class client:
 			uploadThread = threading.Thread(target=self.sender.uploadImage, args=[filename])
 			uploadThread.start()
 			#self.sender.uploadImage(filename)
-			time.sleep(0.5)
+			time.sleep(0.75)
 			self.refreshImages()
 			
 	#Ask the server to delete the layout that is currently selected in the layout list
