@@ -528,30 +528,6 @@ class messageSender:
     def stopBeingElementAdmin(self, elementNo):
         self.sendMessage("stop_being_element_admin," + str(elementNo))
     
-    def mouseLeftDown(self, cursorNo):
-        pt = self.sendMessage("mouse_l," + str(cursorNo))
-        return (pt["x"],pt["y"])
-    
-    def mouseLeftUp(self, cursorNo):
-        pt = self.sendMessage("mouse_lu," + str(cursorNo))
-        return (pt["x"],pt["y"],pt["duration"])
-    
-    def mouseMiddleDown(self, cursorNo):
-        pt = self.sendMessage("mouse_m," + str(cursorNo))
-        return (pt["x"],pt["y"])
-    
-    def mouseMiddleUp(self, cursorNo):
-        pt = self.sendMessage("mouse_mu," + str(cursorNo))
-        return (pt["x"],pt["y"],pt["duration"])
-    
-    def mouseRightDown(self, cursorNo):
-        pt = self.sendMessage("mouse_r," + str(cursorNo))
-        return (pt["x"],pt["y"])
-    
-    def mouseRightUp(self, cursorNo):
-        pt = self.sendMessage("mouse_ru," + str(cursorNo))
-        return (pt["x"],pt["y"],pt["duration"])
-    
     def moveCursor(self, cursorNo, xDistance, yDistance):
         self.sendMessage("move_cursor," + str(cursorNo) + "," + str(xDistance) + "," + str(yDistance))
         
