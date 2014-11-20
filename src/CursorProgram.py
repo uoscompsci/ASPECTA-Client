@@ -10,22 +10,14 @@ import tkSimpleDialog
 
 class MyDialog(tkSimpleDialog.Dialog):
 	def body(self, master):
-
 		Label(master, text="User Name:").grid(row=0)
-		Label(master, text="Program Name:").grid(row=1)
-
 		self.e1 = Entry(master)
-		self.e2 = Entry(master)
-
 		self.e1.grid(row=0, column=1)
-		self.e2.grid(row=1, column=1)
 		return self.e1 # initial focus
 
 	def apply(self):
-		first = self.e1.get()
-		second = self.e2.get()
-		self.result = (first, second)
-		print first, second # or something
+		user = self.e1.get()
+		self.result = (user)
 		
 	def getResult(self):
 		return self.result
@@ -36,7 +28,7 @@ class client:
 	refreshrate = 0
 	mainCur = None
 	controlCur = None
-	loginresult = None
+	username = None
 			
 	#Checks for mouse button and keyboard
 	def getInput(self,get_point):
@@ -120,7 +112,7 @@ class client:
 	def tkinthread(self):
 		self.master = Tk()
 		d = MyDialog(self.master)
-		self.loginresult = d.getResult()
+		self.username = d.getResult()
 		self.master.wm_title("Cursor Program GUI")
 		self.frame = Frame(self.master)
 		self.frame.pack()
@@ -161,11 +153,11 @@ class client:
 		self.screen.blit(self.background, (0, 0))
 		pygame.display.flip()
 		
-		while(self.loginresult==None):
+		while(self.username==None):
 			pass
 		
-		self.sender.login(self.loginresult[0])
-		self.sender.setapp(self.loginresult[1])
+		self.sender.login(self.username)
+		self.sender.setapp("CursorApp")
 		self.initGUI()
 		
 		self.mouseLock=False
