@@ -25,12 +25,18 @@ class messageSender:
         time.sleep(0.5)
         s = socket.socket()
         s.connect((self.host,self.port+1))
+        imageNo = s.recv(1024)
         f=open(file, "rb") 
         l = f.read(1024)
         while (l):
             s.send(l)
             l = f.read(1024)
+        f.close()
         s.close()
+        print str(imageNo)
+        print "Sent All"
+        time.sleep(0.5)
+        return int(imageNo)
     
     def eleUpdater(self):
         while self.loop:

@@ -1323,7 +1323,7 @@ class client:
 		layoutScroll.config(command=self.loadList.yview)
 		layoutScroll.pack(side=RIGHT, fill=Y)
 		self.loadList.pack(side=LEFT, fill=BOTH, expand=1)
-		time.sleep(0.5)
+		time.sleep(5)
 		layouts = self.sender.getSavedLayouts()
 		index = 0
 		for x in range(0, len(layouts)):
@@ -1373,7 +1373,8 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
 		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[0])
-		self.texRects[0] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.checksImage = self.sender.uploadImage("checks.jpg")
+		self.texRects[0] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, self.checksImage)
 		self.stretchRects[0] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[0])
 		circs = {}
@@ -1392,7 +1393,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "Bob")
 		self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[1])
-		self.texRects[1] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[1] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, self.checksImage)
 		self.stretchRects[1] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[1])
 		circs = {}
@@ -1411,7 +1412,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "Bob")
 		self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[2])
-		self.texRects[2] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[2] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, self.checksImage)
 		self.stretchRects[2] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[2])
 		circs = {}
@@ -1430,7 +1431,7 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "Bob")
 		self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[3])
-		self.texRects[3] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "checks.jpg")
+		self.texRects[3] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, self.checksImage)
 		self.stretchRects[3] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[3])
 		circs = {}
