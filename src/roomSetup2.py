@@ -1228,6 +1228,7 @@ class client:
 	
 	#Clear the currently defined layout on both the client and server side
 	def clearLayout(self):
+		time.sleep(3)
 		self.sender.undefineSurface(self.warpedSurf[0])
 		self.sender.undefineSurface(self.warpedSurf[1])
 		self.sender.undefineSurface(self.warpedSurf[2])
