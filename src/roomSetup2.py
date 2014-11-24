@@ -1322,7 +1322,7 @@ class client:
 		layoutScroll.config(command=self.loadList.yview)
 		layoutScroll.pack(side=RIGHT, fill=Y)
 		self.loadList.pack(side=LEFT, fill=BOTH, expand=1)
-		time.sleep(5)
+		#time.sleep(2)
 		layouts = self.sender.getSavedLayouts()
 		index = 0
 		for x in range(0, len(layouts)):
@@ -1372,7 +1372,6 @@ class client:
 		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "Bob")
 		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2)
 		self.sender.hideCursor(self.surfCur[0])
-		self.checksImage = self.sender.uploadImage("checks.jpg")
 		self.texRects[0] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, self.checksImage)
 		self.stretchRects[0] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, (0,0,0,1), (0,0,1,1))
 		self.sender.hideElement(self.stretchRects[0])
@@ -1448,10 +1447,7 @@ class client:
 		self.surfaceCounter = 0
 
 	#The main loop
-	def __init__(self):
-		tkinterThread = threading.Thread(target=self.tkinthread, args=()) #Creates the display thread
-		tkinterThread.start() #Starts the display thread
-		
+	def __init__(self):		
 		parser = SafeConfigParser()
 		parser.read("config.ini")
 		self.ppe = parser.getint('RoomSetup','PointsPerEdge')
@@ -1481,6 +1477,11 @@ class client:
 		
 		self.sender.login("jp438")
 		self.sender.setapp("myapp")
+		self.checksImage = self.sender.uploadImage("checks.jpg")
+		
+		tkinterThread = threading.Thread(target=self.tkinthread, args=()) #Creates the display thread
+		tkinterThread.start() #Starts the display thread
+
 		self.layouts = self.sender.getSavedLayouts()
 		self.initGUI()
 		

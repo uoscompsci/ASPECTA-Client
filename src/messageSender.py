@@ -17,6 +17,12 @@ class messageSender:
     stripLock = threading.Lock()
     sendlock = threading.Lock()
     loop = True
+    
+    def encode_length(self, l):
+        l = str(l)
+        while len(l) < 8:
+            l = "0" + l
+        return l
 
     def uploadImage(self, file):
         filename = file.split("/")
@@ -26,16 +32,21 @@ class messageSender:
         s = socket.socket()
         s.connect((self.host,self.port+1))
         imageNo = s.recv(1024)
+        
         f=open(file, "rb") 
+        data=f.read()
+        
+        s.sendall(self.encode_length(len(data)))
+        s.sendall(data)
+        
         l = f.read(1024)
         while (l):
             s.send(l)
             l = f.read(1024)
         f.close()
+        
+        s.recv(1)
         s.close()
-        print str(imageNo)
-        print "Sent All"
-        time.sleep(0.5)
         return int(imageNo)
     
     def eleUpdater(self):
