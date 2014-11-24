@@ -8,7 +8,6 @@ from math import *
 from bezier import *
 from ConfigParser import SafeConfigParser
 import datetime
-from pgu import gui
 import tkMessageBox
 from tkFileDialog   import askopenfilename
 
