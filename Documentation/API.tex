@@ -12,9 +12,12 @@
 
 \usepackage{listings}
 \usepackage{color}
+\usepackage{enumitem}
 
 % Comment in when writing in German
 %\usepackage{ngerman}
+
+\setcounter{secnumdepth}{5}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -47,7 +50,7 @@ Julian Petford\\
 
 \section{API Calls}
 \subsection{Initializing a connection}
-After creating an instance of messageSender, you first need to log into the server so that it can give objects you create appropriate identifiers. You do this by making both of the following calls.
+After running server.py then creating an instance of messageSender, you need to log into the server so that it can give objects you create appropriate identifiers. You do this by making both of the following calls.
 \subsubsection{login(username)}
 Logs the user in with the given username.
 \subsubsection{setapp(appname)}
@@ -436,4 +439,40 @@ sender.newText(win, "Hello World",
 	height/2-150, width/2-25, 60, 
 	"Free Sans", (1,1,1,1))
 \end{lstlisting}
+\section{REST API}
+If the server is run using "restServer.py" instead of "server.py" it will take take http messages instead of standard API calls. These are formatted as "/api/<CALL NAME>". Ones which add or change information are "POST" requests while those which just request information are "GET" requests. Parameters should be passed into these REST calls as JSON structures. Returned information is returned as a JSON structure.\\
+Logging in takes place automatically when using the REST server, so there is no need to call login() or setApp()
+\section{Sending Images with REST API}
+To display images to the rest API, a different method is used than the usual one that exists outside REST. Images are sent in the same calls that ask for them to be displayed. So, instead of a reference to the texture being included in the JSON for a call to /api/newTexRectangle, /api/newTexRectangleWithID, or /api/setTexRectangleTexture, the calls take the image data itself (converted to base64) and the file extension. These JSON parameters should be called "textureData" and "extension" respectively. I have created a python library called "jsonImageSender.py" which contains the class jsonImageSender which allows for easy sending of images. Here are the calls that this class provides.\\\\
+\subsubsection{Constructor - jsonImageSender(host,port)}
+Creates an instance of the class and tells it the host name and port number for the rest server for use in the provided call functions.
+\subsubsection{newTexRectangle(windowNo, filename, x, y, width, height)}
+Creates a base64 representation of the image with the chosen filename and sends it to the rest server to be displayed with the stated parameters.
+\subsubsection{newTexRectangleWithID(ID,windowNo, filename, x, y, width, height)}
+Creates a base64 representation of the image with the chosen filename and sends it to the rest server to be displayed with the stated parameters.
+\subsubsection{setTexRectangleTexture(elementNo, filename)}
+Creates a base64 representation of the image with the chosen filename and sends it to the rest server to replace the texture being used for the existing texRectangle with the stated element number.
+
+
+\section{REST Hello World}
+This example would be run in a UNIX terminal using "curl" assuming that the server is running on the same computer.
+
+\begin{lstlisting}[frame=single]
+curl -i -H "Content-Type: application/json"
+	-X POST -d "{\"surfaceNo\":0,
+	\"x\":0,\"y\":512,\"width\":512,
+	\"height\":512,\"name\":\"HWwin\"}" 
+	http://localhost:5000/api/newWindow
+curl -i -H "Content-Type: application/json"
+	-X POST -d "{\"windowNo\":1,
+	\"text\":\"Hello World\",\"x\":300,
+	\"y\":300,\"pt\":60,
+	\"font\":\"Free Sans\",
+	\"color\":\"1:1:1:1\"}" 
+	http://localhost:5000/api/newText
+
+
+\end{lstlisting}
+
+
 \end{document}
