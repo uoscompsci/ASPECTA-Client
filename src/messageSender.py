@@ -110,6 +110,15 @@ class messageSender:
         self.sending+=1
         #print "Sending " + str(self.sending)
         jsonmessage = json.dumps(message)
+        lengthorig = str(len(jsonmessage))
+        toadd = 10-len(lengthorig)
+        genstring = ""
+        while (toadd>0):
+            genstring+="0"
+            toadd-=1
+        length = genstring + lengthorig
+        self.s.send(length)
+        #time.sleep(0.05)
         self.s.send(jsonmessage)
         if(message=="quit"):
             print '\033[1;31mShutting down client\033[1;m'
