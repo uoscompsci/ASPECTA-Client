@@ -1,4 +1,5 @@
-import socket, sys, select, time, threading, json
+import socket, sys, select, time, threading
+import ujson as json
 from ConfigParser import SafeConfigParser
 import base64
 
@@ -118,13 +119,15 @@ class messageSender:
             toadd-=1
         length = genstring + lengthorig
         self.s.send(length)
-        #time.sleep(0.05)
-        self.s.send(jsonmessage)
+        n = 1024
+        splitjson = [jsonmessage[i:i+n] for i in range(0, len(jsonmessage), n)]
+        for x in range(0, len(splitjson)):
+            self.s.send(splitjson[x])
         if(message=="quit"):
             print '\033[1;31mShutting down client\033[1;m'
             self.loop=False
         socket_list = [sys.stdin, self.s]
-        read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
+        read_sockets = select.select(socket_list , [], [])[0]
         
         for sock in read_sockets:
             data = json.loads(sock.recv(4096))
