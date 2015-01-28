@@ -318,7 +318,7 @@ class client:
 
 	#Checks for mouse button and keyboard
 	def getInput(self,get_point):
-		pos=pygame.mouse.get_pos() # mouse shift
+		#pos=pygame.mouse.get_pos() # mouse shift
 		for event in pygame.event.get():
 			if event.type == QUIT:
 					self.quit = True
@@ -1182,29 +1182,6 @@ class client:
 		else:
 			tkMessageBox.showerror("Error", "Please make a selection first")
 			
-	def uploadImage(self):
-		filename = askopenfilename(filetypes=[("Image Files", ("*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.pcx", "*.tga", "*.tif", "*.tiff", "*.lbm", "*.pbm", "*.pgm", "*.ppm", "*.xpm")), 
-											("Portable Network Graphics","*.png"), 
-											("Joint Photographic Experts Group", ("*.jpg", "*.jpeg")), 
-											("Graphics Interchange Format", "*.gif"), 
-											("Bitmap", "*.bmp"),
-											("Personal Computer Exchange", "*.pcx"),
-											("Truevision TGA", "*.tga"),
-											("Tagged Image File Format", ("*.tif","*.tiff")),
-											("Interleaved Bitmap", "*.lbm"),
-											("Portable Bitmap", "*.pbm"),
-											("Portable Greymap", "*.pgm"),
-											("Portable Pixmap", "*.ppm"),
-											("X PixMap", "*.xpm"),
-											("All Files", "*")],
-								title="Upload Image")
-		if(len(filename)!=0):
-			uploadThread = threading.Thread(target=self.sender.uploadImage, args=[filename])
-			uploadThread.start()
-			#self.sender.uploadImage(filename)
-			time.sleep(0.75)
-			self.refreshImages()
-			
 	#Ask the server to delete the layout that is currently selected in the layout list
 	def deleteImage(self):
 		if(len(self.imageList.curselection())>0):
@@ -1340,22 +1317,6 @@ class client:
 		self.saveBut.pack(side=LEFT)
 		self.saveBut = Button(self.frame8, text="Clear Current Layout", command=self.clearLayout, width=18)
 		self.saveBut.pack(side=LEFT)
-		self.label = Label(self.frame9, text="-- Saved Images --", width=40, height=2)
-		self.label.pack(side=LEFT)
-		imageScroll = Scrollbar(self.frame10, orient=VERTICAL)
-		self.imageList = Listbox(self.frame10, width=41, yscrollcommand=imageScroll.set)
-		imageScroll.config(command=self.imageList.yview)
-		imageScroll.pack(side=RIGHT, fill=Y)
-		self.imageList.pack(side=LEFT, fill=BOTH, expand=1)
-		images = self.sender.getSavedImages()
-		for x in range(0,len(images)):
-			self.imageList.insert(END, images[x])
-		self.saveBut = Button(self.frame11, text="Upload Image", command=self.uploadImage, width=18)
-		self.saveBut.pack(side=LEFT)
-		self.saveBut = Button(self.frame11, text="Delete Image", command=self.deleteImage, width=18)
-		self.saveBut.pack(side=LEFT)
-		self.saveBut = Button(self.frame12, text="Refresh List", command=self.refreshImages, width=40)
-		self.saveBut.pack(side=LEFT)
 		self.master.mainloop()
 	
 	#Sets up the surfaces which can be defined within the client
@@ -1477,7 +1438,6 @@ class client:
 		
 		self.sender.login("jp438")
 		self.sender.setapp("myapp")
-		#self.checksImage = self.sender.uploadImage("checks.jpg")
 		
 		tkinterThread = threading.Thread(target=self.tkinthread, args=()) #Creates the display thread
 		tkinterThread.start() #Starts the display thread

@@ -85,14 +85,9 @@ class client:
         self.sender.setapp("indapp")
         #self.sender.loadDefinedSurfaces("spaceSave")
         
-        self.mona = self.sender.uploadImage("Mona_Lisa.jpg")
-        self.goth = self.sender.uploadImage("american_gothic.jpg")
-        self.van = self.sender.uploadImage("van_gough.jpg")
-        self.scream = self.sender.uploadImage("the_scream.jpg")
-        
         window = self.sender.newWindow(1, 200, 200, 100, 100, "Bob")
         self.currentCur = self.sender.newCursor(1, 512/2, 512/2)
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, self.mona)
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
         self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 50)
@@ -115,7 +110,7 @@ class client:
         self.sender.addPolygonPoint(ele, 50, 150)
 
         window = self.sender.newWindow(2, 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, self.goth)
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "american_gothic.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
         self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
@@ -131,7 +126,7 @@ class client:
         self.sender.addPolygonPoint(ele, 50, 150)
 
         window = self.sender.newWindow(3, 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, self.van)
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "van_gough.jpg")
         self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
         self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
         self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
@@ -140,7 +135,7 @@ class client:
         self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
         
         window = self.sender.newWindow(4, 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, self.scream)
+        self.sender.newTexRectangle(window, 200, 400, 300, 400, "the_scream.jpg")
         self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
         self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
         self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
