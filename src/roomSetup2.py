@@ -1228,7 +1228,7 @@ class client:
 	
 	#Clear the currently defined layout on both the client and server side
 	def clearLayout(self):
-		time.sleep(3)
+		time.sleep(1)
 		self.sender.undefineSurface(self.warpedSurf[0])
 		self.sender.undefineSurface(self.warpedSurf[1])
 		self.sender.undefineSurface(self.warpedSurf[2])
@@ -1323,7 +1323,6 @@ class client:
 		layoutScroll.config(command=self.loadList.yview)
 		layoutScroll.pack(side=RIGHT, fill=Y)
 		self.loadList.pack(side=LEFT, fill=BOTH, expand=1)
-		#time.sleep(2)
 		layouts = self.sender.getSavedLayouts()
 		index = 0
 		for x in range(0, len(layouts)):
