@@ -86,6 +86,7 @@ class messageSender:
         self.host = parser.get('connection','host')
         self.port = parser.getint('connection','port')
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.s.settimeout(2)
         thread = threading.Thread(target=self.eleUpdater, args=()) #Creates the display thread
         thread.start() #Starts the display thread
