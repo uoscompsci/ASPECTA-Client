@@ -444,7 +444,7 @@ class client:
 						lClickRelTime=datetime.datetime.now()
 						elapsedSecs = (lClickRelTime-self.lClickTime).total_seconds() #Checks how long the button was depressed
 						#Runs if the button was pressed for less than 0.15 seconds
-						if(elapsedSecs<0.15):
+						if(elapsedSecs<0.25):
 							if(self.controlCur==self.mainCur):
 								#Runs if the default cursor mode is active
 								if(self.cursorMode=="default"):
@@ -651,7 +651,7 @@ class client:
 							hit = False
 							hitOnce = False
 							#Runs if the button was pressed for less than 0.15 seconds
-							if(elapsedSecs<0.15):
+							if(elapsedSecs<0.25):
 								#Runs if the default cursor mode is active
 								if(self.cursorMode=="default"):
 									loc = self.sender.getCursorPosition(self.controlCur)
