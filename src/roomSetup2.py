@@ -395,28 +395,40 @@ class client:
 									for z in range(0,len(self.topCircles)):
 										for x in range(0,len(self.topCircles[z])):
 											point = self.sender.getCirclePosition(self.topCircles[z][x])
-											radius = self.sender.getCircleRadius(self.topCircles[z][x])
+											if(x==0 or x==(len(self.topCircles[z])-1)):
+												radius = 10
+											else:
+												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.dragging.append(self.topCircles[z][x])
 												if (x == 0 or x == (len(self.topCircles[z])-1)):
 													self.cornerdrag = True
 										for x in range(0,len(self.bottomCircles[z])):
 											point = self.sender.getCirclePosition(self.bottomCircles[z][x])
-											radius = self.sender.getCircleRadius(self.bottomCircles[z][x])
+											if(x==0 or x==(len(self.bottomCircles[z])-1)):
+												radius = 10
+											else:
+												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.dragging.append(self.bottomCircles[z][x])
 												if (x == 0 or x == (len(self.bottomCircles[z])-1)):
 													self.cornerdrag = True
 										for x in range(0,len(self.leftCircles[z])):
 											point = self.sender.getCirclePosition(self.leftCircles[z][x])
-											radius = self.sender.getCircleRadius(self.leftCircles[z][x])
+											if(x==0 or x==(len(self.leftCircles[z])-1)):
+												radius = 10
+											else:
+												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.dragging.append(self.leftCircles[z][x])
 												if (x == 0 or x == (len(self.leftCircles[z])-1)):
 													self.cornerdrag = True
 										for x in range(0,len(self.rightCircles[z])):
 											point = self.sender.getCirclePosition(self.rightCircles[z][x])
-											radius = self.sender.getCircleRadius(self.rightCircles[z][x])
+											if(x==0 or x==(len(self.rightCircles[z])-1)):
+												radius = 10
+											else:
+												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.dragging.append(self.rightCircles[z][x])
 												if (x == 0 or x == (len(self.rightCircles[z])-1)):
@@ -453,25 +465,25 @@ class client:
 										#If a waypoint has been clicked, the side it was part of is split so that there are twice as many waypoints
 										for x in range(1,len(self.topCircles[w])-1):
 											point = self.sender.getCirclePosition(self.topCircles[w][x])
-											radius = self.sender.getCircleRadius(self.topCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.splitSide(self.topCircles[w], "top",w)
 												self.updateMesh(w)
 										for x in range(1,len(self.bottomCircles[w])-1):
 											point = self.sender.getCirclePosition(self.bottomCircles[w][x])
-											radius = self.sender.getCircleRadius(self.bottomCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.splitSide(self.bottomCircles[w], "bottom",w)
 												self.updateMesh(w)
 										for x in range(1,len(self.leftCircles[w])-1):
 											point = self.sender.getCirclePosition(self.leftCircles[w][x])
-											radius = self.sender.getCircleRadius(self.leftCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.splitSide(self.leftCircles[w], "left",w)
 												self.updateMesh(w)
 										for x in range(1,len(self.rightCircles[w])-1):
 											point = self.sender.getCirclePosition(self.rightCircles[w][x])
-											radius = self.sender.getCircleRadius(self.rightCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												self.splitSide(self.rightCircles[w], "right",w)
 												self.updateMesh(w)
@@ -480,7 +492,7 @@ class client:
 											if(self.dontFlip[w]==False):
 												flipped = False
 												point = self.sender.getCirclePosition(self.topCircles[w][0])
-												radius = self.sender.getCircleRadius(self.topCircles[w][0])
+												radius = 10
 												if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 													if(self.orientation[w]!=0):
 														if(self.mirrored[w]==False):
@@ -500,7 +512,7 @@ class client:
 													flipped = True
 												if(flipped == False):
 													point = self.sender.getCirclePosition(self.topCircles[w][len(self.topCircles[w])-1])
-													radius = self.sender.getCircleRadius(self.topCircles[w][len(self.topCircles[w])-1])
+													radius = 10
 													if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 														if(self.orientation[w]!=1):
 															if(self.mirrored[w]==False):
@@ -520,7 +532,7 @@ class client:
 														flipped = True
 												if (flipped == False):
 													point = self.sender.getCirclePosition(self.bottomCircles[w][0])
-													radius = self.sender.getCircleRadius(self.bottomCircles[w][0])
+													radius = 10
 													if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 														if(self.orientation[w]!=2):
 															if(self.mirrored[w]==False):
@@ -540,7 +552,7 @@ class client:
 														flipped = True
 												if (flipped==False):
 													point = self.sender.getCirclePosition(self.bottomCircles[w][len(self.bottomCircles[w])-1])
-													radius = self.sender.getCircleRadius(self.bottomCircles[w][len(self.bottomCircles[w])-1])
+													radius = 10
 													if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 														if(self.orientation[w]!=3):
 															if(self.mirrored[w]==False):
@@ -561,7 +573,7 @@ class client:
 												self.dontFlip[w]=False
 											for x in range(0,len(self.centerPoints)):
 												point = self.sender.getCirclePosition(self.centerPoints[x])
-												radius = self.sender.getCircleRadius(self.centerPoints[x])
+												radius = 10
 												if(self.isHit((point[0],point[1]),(loc[0],loc[1]), radius)):
 													self.controlCur = self.surfCur[x]
 													self.sender.hideCursor(self.mainCur)
@@ -582,8 +594,9 @@ class client:
 							#If appropriate the list of points currently being dragged is cleared
 							for w in range(0,len(self.topCircles)):
 								if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
-									self.dragging=[]
-									self.updateMesh(w)
+									if(len(self.dragging)!=0):
+										self.dragging=[]
+										self.updateMesh(w)
 						else:
 							if len(self.stretching)>0:
 								surfWidth = self.sender.getSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]])
@@ -659,7 +672,7 @@ class client:
 									for w in range(0,len(self.topCircles)):
 										for x in range(1,len(self.topCircles[w])-1):
 											point = self.sender.getCirclePosition(self.topCircles[w][x])
-											radius = self.sender.getCircleRadius(self.topCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												hit = True
 												hitOnce = True
@@ -669,7 +682,7 @@ class client:
 											self.updateMesh(w)
 										for x in range(1,len(self.bottomCircles[w])-1):
 											point = self.sender.getCirclePosition(self.bottomCircles[w][x])
-											radius = self.sender.getCircleRadius(self.bottomCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												hit = True
 												hitOnce = True
@@ -679,7 +692,7 @@ class client:
 											self.updateMesh(w)
 										for x in range(1,len(self.leftCircles[w])-1):
 											point = self.sender.getCirclePosition(self.leftCircles[w][x])
-											radius = self.sender.getCircleRadius(self.leftCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												hit = True
 												hitOnce = True
@@ -689,7 +702,7 @@ class client:
 											self.updateMesh(w)
 										for x in range(1,len(self.rightCircles[w])-1):
 											point = self.sender.getCirclePosition(self.rightCircles[w][x])
-											radius = self.sender.getCircleRadius(self.rightCircles[w][x])
+											radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
 												hit = True
 												hitOnce = True
@@ -1205,7 +1218,7 @@ class client:
 	
 	#Clear the currently defined layout on both the client and server side
 	def clearLayout(self):
-		time.sleep(1)
+		time.sleep(3)
 		self.sender.undefineSurface(self.warpedSurf[0])
 		self.sender.undefineSurface(self.warpedSurf[1])
 		self.sender.undefineSurface(self.warpedSurf[2])
