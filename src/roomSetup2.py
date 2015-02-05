@@ -46,6 +46,7 @@ class client:
 	texRects = {}
 	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
 	cursorMode = "default"
+	dragSurf = "none"
 	
 	cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
 	
@@ -400,6 +401,7 @@ class client:
 											else:
 												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragSurf = str(z)
 												self.dragging.append(self.topCircles[z][x])
 												if (x == 0 or x == (len(self.topCircles[z])-1)):
 													self.cornerdrag = True
@@ -410,6 +412,7 @@ class client:
 											else:
 												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragSurf = str(z)
 												self.dragging.append(self.bottomCircles[z][x])
 												if (x == 0 or x == (len(self.bottomCircles[z])-1)):
 													self.cornerdrag = True
@@ -420,6 +423,7 @@ class client:
 											else:
 												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragSurf = str(z)
 												self.dragging.append(self.leftCircles[z][x])
 												if (x == 0 or x == (len(self.leftCircles[z])-1)):
 													self.cornerdrag = True
@@ -430,6 +434,7 @@ class client:
 											else:
 												radius = 7
 											if(self.isHit((point[0],point[1]),(loc[0],loc[1]),radius)):
+												self.dragSurf = str(z)
 												self.dragging.append(self.rightCircles[z][x])
 												if (x == 0 or x == (len(self.rightCircles[z])-1)):
 													self.cornerdrag = True
@@ -595,8 +600,8 @@ class client:
 							for w in range(0,len(self.topCircles)):
 								if (len(self.topCircles[w])>1 and len(self.bottomCircles[w])>1 and len(self.leftCircles[w])>1 and len(self.rightCircles[w])>1):
 									if(len(self.dragging)!=0):
-										self.dragging=[]
-										self.updateMesh(w)
+										self.dragging = []
+										self.updateMesh(int(self.dragSurf))
 						else:
 							if len(self.stretching)>0:
 								surfWidth = self.sender.getSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]])
