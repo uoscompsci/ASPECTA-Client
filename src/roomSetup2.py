@@ -731,21 +731,21 @@ class client:
 								for w in range(0,len(self.topCircles)):
 									if (w != surface):
 										point = self.sender.getCirclePosition(self.topCircles[w][0])
-										radius = self.sender.getCircleRadius(self.topCircles[w][0])
+										radius = 10
 										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
 											self.createConnectionLine((surface,corner),(w,"tl"), False)
 										end = len(self.topCircles[w])-1
 										point = self.sender.getCirclePosition(self.topCircles[w][end])
-										radius = self.sender.getCircleRadius(self.topCircles[w][end])
+										radius = 10
 										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
 											self.createConnectionLine((surface,corner),(w,"tr"), False)
 										point = self.sender.getCirclePosition(self.bottomCircles[w][0])
-										radius = self.sender.getCircleRadius(self.bottomCircles[w][0])
+										radius = 10
 										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
 											self.createConnectionLine((surface,corner),(w,"br"), False)
 										end = len(self.bottomCircles[w])-1
 										point = self.sender.getCirclePosition(self.bottomCircles[w][end])
-										radius = self.sender.getCircleRadius(self.bottomCircles[w][end])
+										radius = 10
 										if(self.isHit((point[0],point[1]),(dropPoint[0],dropPoint[1]),radius)):
 											self.createConnectionLine((surface,corner),(w,"bl"), False)
 							self.rightDragging=[]
@@ -1260,7 +1260,7 @@ class client:
 			self.mirrored[x] = False
 		for x in self.orientation:
 			self.orientation[x] = 0
-			
+            
 		for x in range(0,len(self.centerPoints)):
 			self.sender.removeElement(self.centerPoints[x], 1)
 		self.centerPoints = {}
