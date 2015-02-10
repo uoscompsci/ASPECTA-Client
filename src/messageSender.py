@@ -214,13 +214,14 @@ class messageSender:
         winNo = int(win["windowNo"])
         return winNo
     
-    def newCircle(self, windowNo, x, y, radius, lineCol, fillCol, sides):
+    def newCircle(self, windowNo, x, y, radius, lineCol, lineWidth, fillCol, sides):
         ele = self.sendMessage({'call' : 'new_circle', 
                                 'windowNo' :  str(windowNo), 
                                 'x' : str(x), 
                                 'y' : str(y), 
                                 'radius' : str(radius), 
-                                'lineColor' : self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]), 
+                                'lineColor' : self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]),
+                                'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]), 
                                 'sides' : str(sides)})
         eleNo = int(ele["elementNo"])
@@ -228,7 +229,7 @@ class messageSender:
         self.eletrack[eleNo] = [True,"circle"]
         return eleNo
     
-    def newCircleWithID(self, ID, windowNo, x, y, radius, lineCol, fillCol, sides):
+    def newCircleWithID(self, ID, windowNo, x, y, radius, lineCol, lineWidth, fillCol, sides):
         ele = self.sendMessage({'call' : 'new_circle_with_ID',
                                 'ID' : str(ID),
                                 'windowNo' : str(windowNo),
@@ -236,6 +237,7 @@ class messageSender:
                                 'y' : str(y),
                                 'radius' : str(radius), 
                                 'lineColor' : self.colorString(lineCol[0], lineCol[1], lineCol[2], lineCol[3]),
+                                'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]),
                                 'sides' : str(sides)})
         eleNo = int(ele["elementNo"])
@@ -297,25 +299,27 @@ class messageSender:
         self.eletrack[eleNo] = [True,"lineStrip"]
         return eleNo
     
-    def newPolygon(self, windowNo, x, y, lineColor, fillColor):
+    def newPolygon(self, windowNo, x, y, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_polygon',
                                 'windowNo' : str(windowNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'lineColor' : self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]),
+                                'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
         self.elelocs[eleNo] = [[x,y]]
         self.eletrack[eleNo] = [True,"polygon"]
         return eleNo
     
-    def newPolygonWithID(self, ID, windowNo, x, y, lineColor, fillColor):
+    def newPolygonWithID(self, ID, windowNo, x, y, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_polygon_with_ID',
                                 'ID' : str(ID),
                                 'windowNo' : str(windowNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'lineColor' : self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]),
+                                'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
         self.elelocs[eleNo] = [[x,y]]
@@ -357,7 +361,7 @@ class messageSender:
             self.eletrack[eleNo] = [True,"texrectangle"]
             return eleNo
     
-    def newRectangle(self, windowNo, x, y, width, height, lineColor, fillColor):
+    def newRectangle(self, windowNo, x, y, width, height, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_rectangle',
                                 'windowNo' : str(windowNo), 
                                 'x' : str(x),
@@ -365,13 +369,14 @@ class messageSender:
                                 'width' : str(width),
                                 'height' : str(height),
                                 'lineColor' : self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]),
+                                'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
         self.elelocs[eleNo] = (x,y)
         self.eletrack[eleNo] = [True,"rectangle"]
         return eleNo
     
-    def newRectangleWithID(self, ID, windowNo, x, y, width, height, lineColor, fillColor):
+    def newRectangleWithID(self, ID, windowNo, x, y, width, height, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_rectangle_with_ID',
                                 'ID' : str(ID),
                                 'windowNo' : str(windowNo), 
@@ -380,6 +385,7 @@ class messageSender:
                                 'width' : str(width),
                                 'height' : str(height),
                                 'lineColor' : self.colorString(lineColor[0], lineColor[1], lineColor[2], lineColor[3]),
+                                'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
         self.elelocs[eleNo] = (x,y)
