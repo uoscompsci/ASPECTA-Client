@@ -926,6 +926,11 @@ class messageSender:
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
+    def setCircleLineWidth(self, elementNo, width):
+        self.sendMessage({'call' : 'set_circle_line_width',
+                          'elementNo' : str(elementNo),
+                          'width' : str(width)})
+        
     def setCircleFillColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_circle_fill_color',
                           'elementNo' : str(elementNo),
@@ -934,6 +939,11 @@ class messageSender:
     def getCircleLineColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_circle_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
+        
+    def getCircleLineWidth(self, elementNo):
+        width = self.sendMessage({'call' : 'get_circle_line_width',
+                                 'elementNo' : str(elementNo)})
+        return width["width"]
         
     def getCircleFillColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_circle_fill_color',
@@ -1091,11 +1101,21 @@ class messageSender:
     def getPolygonLineColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_polygon_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
+        
+    def getPolygonLineWidth(self, elementNo):
+        width = self.sendMessage({'call' : 'get_polygon_line_width',
+                                 'elementNo' : str(elementNo)})
+        return width["width"]
     
     def setPolygonLineColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_polygon_line_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
+        
+    def setPolygonLineWidth(self, elementNo, width):
+        self.sendMessage({'call' : 'set_polygon_line_width',
+                          'elementNo' : str(elementNo),
+                          'width' : str(width)})
         
     def getPolygonPointCount(self, elementNo):
         count = self.sendMessage({'call' : 'get_polygon_point_count',
@@ -1162,9 +1182,19 @@ class messageSender:
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
+    def setRectangleLineWidth(self, elementNo, width):
+        self.sendMessage({'call' : 'set_rectangle_line_width',
+                          'elementNo' : str(elementNo),
+                          'width' : str(width)})
+        
     def getRectangleLineColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_rectangle_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
+        
+    def getRectangleLineWidth(self, elementNo):
+        width = self.sendMessage({'call' : 'get_rectangle_line_width',
+                                 'elementNo' : str(elementNo)})
+        return width["width"]
     
     def setTexRectangleTopLeft(self, elementNo, x, y):
         self.sendMessage({'call' : 'set_texrectangle_top_left',
