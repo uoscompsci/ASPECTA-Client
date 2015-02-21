@@ -248,7 +248,7 @@ class messageSender:
                                 'fillColor' : self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]),
                                 'sides' : str(sides)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y)
+        self.elelocs[eleNo] = (x,y,coorSys)
         self.eletrack[eleNo] = [True,"circle"]
         return eleNo
     
@@ -292,7 +292,7 @@ class messageSender:
                                 'color' : self.colorString(color[0], color[1], color[2], color[3]),
                                 'width' : str(width)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y]]
+        self.elelocs[eleNo] = [[x,y,coorSys]]
         self.eletrack[eleNo] = [True,"lineStrip"]
         return eleNo
     
@@ -306,7 +306,7 @@ class messageSender:
                                 'color' : self.colorString(color[0], color[1], color[2], color[3]),
                                 'width' : str(width)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y]]
+        self.elelocs[eleNo] = [[x,y,coorSys]]
         self.eletrack[eleNo] = [True,"lineStrip"]
         return eleNo
     
@@ -855,28 +855,32 @@ class messageSender:
                                        'cursorNo' : str(cursorNo)})
         return visibility["visibility"]
     
-    def moveWindow(self, windowNo, xDistance, yDistance):
+    def moveWindow(self, windowNo, xDistance, yDistance, coorSys):
         self.sendMessage({'call' : 'move_window',
                           'windowNo' : str(windowNo),
                           'xDist' : str(xDistance),
-                          'yDist' : str(yDistance)})
+                          'yDist' : str(yDistance),
+                          'coorSys' : str(coorSys)})
         
-    def relocateWindow(self, windowNo, x, y, surfaceNo):
+    def relocateWindow(self, windowNo, x, y, coorSys, surfaceNo):
         self.sendMessage({'call' : 'relocate_window',
                           'windowNo' : str(windowNo),
                           'x' : str(x),
                           'y' : str(y),
+                          'coorSys' : str(coorSys),
                           'surfaceNo' : str(surfaceNo)})
         
-    def setWindowWidth(self, windowNo, width):
+    def setWindowWidth(self, windowNo, width, coorSys):
         self.sendMessage({'call' : 'set_window_width',
                           'windowNo' : str(windowNo),
-                          'width' : str(width)})
+                          'width' : str(width),
+                          'coorSys' : str(coorSys)})
         
-    def setWindowHeight(self, windowNo, height):
+    def setWindowHeight(self, windowNo, height, coorSys):
         self.sendMessage({'call' : 'set_window_height',
                           'windowNo' : str(windowNo),
-                          'height' : str(height)})
+                          'height' : str(height),
+                          'coorSys' : str(coorSys)})
         
     def getWindowPosition(self, windowNo):
         loc = self.sendMessage({'call' : 'get_window_pos',
@@ -893,25 +897,29 @@ class messageSender:
                                    'windowNo' : str(windowNo)})
         return height["height"]
         
-    def stretchWindowDown(self, windowNo, distance):
+    def stretchWindowDown(self, windowNo, distance, coorSys):
         self.sendMessage({'call' : 'stretch_window_down',
                           'windowNo' : str(windowNo),
-                          'distance' : str(distance)})
+                          'distance' : str(distance),
+                          'coorSys' : str(coorSys)})
         
-    def stretchWindowUp(self, windowNo, distance):
+    def stretchWindowUp(self, windowNo, distance, coorSys):
         self.sendMessage({'call' : 'stretch_window_up',
                           'windowNo' : str(windowNo),
-                          'distance' : str(distance)})
+                          'distance' : str(distance),
+                          'coorSys' : str(coorSys)})
         
-    def stretchWindowLeft(self, windowNo, distance):
+    def stretchWindowLeft(self, windowNo, distance, coorSys):
         self.sendMessage({'call' : 'stretch_window_left',
                           'windowNo' : str(windowNo),
-                          'distance' : str(distance)})
+                          'distance' : str(distance),
+                          'coorSys' : str(coorSys)})
         
-    def stretchWindowRight(self, windowNo, distance):
+    def stretchWindowRight(self, windowNo, distance, coorSys):
         self.sendMessage({'call' : 'stretch_window_right',
                           'windowNo' : str(windowNo),
-                          'distance' : str(distance)})
+                          'distance' : str(distance),
+                          'coorSys' : str(coorSys)})
         
     def setWindowName(self, windowNo, name):
         self.sendMessage({'call' : 'set_window_name',
@@ -968,10 +976,11 @@ class messageSender:
         return self.colorTuple(self.sendMessage({'call' : 'get_circle_fill_color',
                                                  'elementNo' : str(elementNo)})["color"])
     
-    def setCircleRadius(self, elementNo, radius):
+    def setCircleRadius(self, elementNo, radius, coorSys):
         self.sendMessage({'call' : 'set_circle_radius',
                           'elementNo' : str(elementNo),
-                          'radius' : str(radius)})
+                          'radius' : str(radius),
+                          'coorSys' : str(coorSys)})
         
     def getCircleRadius(self, elementNo):
         radius = self.sendMessage({'call' : 'get_circle_radius',
@@ -998,17 +1007,19 @@ class messageSender:
                                 'elementNo' : str(elementNo)})
         return [loc["x"],loc["y"]]
     
-    def setLineStart(self, elementNo, x, y):
+    def setLineStart(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_line_start',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
-                          'y' : str(y)})
+                          'y' : str(y),
+                          'coorSys' : str(coorSys)})
     
-    def setLineEnd(self, elementNo, x, y):
+    def setLineEnd(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_line_end',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
-                          'y' : str(y)})
+                          'y' : str(y),
+                          'coorSys' : str(coorSys)})
     
     def setLineColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_line_color',
@@ -1029,30 +1040,30 @@ class messageSender:
                                   'elementNo' : str(elementNo)})
         return width["width"]
     
-    def addLineStripPoint(self, elementNo, x, y):
+    def addLineStripPoint(self, elementNo, x, y, coorSys):
         self.stripLock.acquire()
-        self.elelocs[elementNo].append([x,y])
+        self.elelocs[elementNo].append([x,y,coorSys])
         self.eletrack[elementNo][0] = True
         self.stripLock.release()
         
-    def addLineStripPointAt(self, elementNo, x, y, index):
+    def addLineStripPointAt(self, elementNo, x, y, coorSys, index):
         self.stripLock.acquire()
-        self.elelocs[elementNo].insert(index,[x,y])
+        self.elelocs[elementNo].insert(index,[x,y,coorSys])
         self.eletrack[elementNo][0] = True
         self.stripLock.release()
         
     def getLineStripPoint(self, elementNo, pointNo):
         if(self.elelocs.has_key(elementNo)):
-            return [self.elelocs[elementNo][pointNo][0],self.elelocs[elementNo][pointNo][0]]
+            return [self.elelocs[elementNo][pointNo][0],self.elelocs[elementNo][pointNo][1]]
         else:
             loc = self.sendMessage({'call' : 'get_line_strip_point',
                                     'elementNo' : str(elementNo),
                                     'index' : str(pointNo)})
             return [loc["x"],loc["y"]]
     
-    def moveLineStripPoint(self, elementNo, pointNo, x, y):
+    def moveLineStripPoint(self, elementNo, pointNo, x, y, coorSys):
         self.stripLock.acquire()
-        self.elelocs[elementNo][pointNo] = [x,y]
+        self.elelocs[elementNo][pointNo] = [x,y,coorSys]
         self.eletrack[elementNo][0] = True
         self.stripLock.release()
         
@@ -1083,17 +1094,18 @@ class messageSender:
     def setLineStripContent(self, elementNo, content):
         self.stripLock.acquire()
         self.elelock = True
-        self.elelocs[elementNo] = [[content[0][0],content[0][1]]]
+        self.elelocs[elementNo] = [[content[0][0],content[0][1],"pix"]]
         for x in range(1,len(content)):
-            self.elelocs[elementNo].append([content[x][0],content[x][1]])
+            self.elelocs[elementNo].append([content[x][0],content[x][1],"pix"])
         self.eletrack[elementNo][0] = True
         self.stripLock.release()
     
-    def addPolygonPoint(self, elementNo, x, y):
+    def addPolygonPoint(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'add_polygon_point',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
-                          'y' : str(y)})
+                          'y' : str(y),
+                          'coorSys' : str(coorSys)})
         
     def getPolygonPoint(self, elementNo, pointNo):
         loc = self.sendMessage({'call' : 'get_polygon_point',
@@ -1101,12 +1113,13 @@ class messageSender:
                                 'index' : str(pointNo)})
         return (loc["x"],loc["y"])
     
-    def movePolygonPoint(self, elementNo, pointNo, x, y):
+    def movePolygonPoint(self, elementNo, pointNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_polygon_point',
                           'elementNo' : str(elementNo),
                           'index' : str(pointNo),
                           'x' : str(x),
-                          'y' : str(y)})
+                          'y' : str(y),
+                          'coorSys' : str(coorSys)})
         
     def getPolygonFillColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_polygon_fill_color',
@@ -1141,11 +1154,12 @@ class messageSender:
                                   'elementNo' : str(elementNo)})
         return count["count"]
     
-    def setRectangleTopLeft(self, elementNo, x, y):
+    def setRectangleTopLeft(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'set_rectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
-                          'y' : str(y)})
+                          'y' : str(y),
+                          'coorSys' : str(coorSys)})
         
     def getRectangleTopLeft(self, elementNo):
         pos = self.sendMessage({'call' : 'get_rectangle_top_left',
@@ -1167,20 +1181,22 @@ class messageSender:
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def setRectangleWidth(self, elementNo, width):
+    def setRectangleWidth(self, elementNo, width, coorSys):
         self.sendMessage({'call' : 'set_rectangle_width',
                          'elementNo' : str(elementNo),
-                         'width' : str(width)})
+                         'width' : str(width),
+                         'coorSys' : str(coorSys)})
         
     def getRectangleWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_rectangle_width',
                                   'elementNo' : str(elementNo)})
         return float(width["width"])
         
-    def setRectangleHeight(self, elementNo, height):
+    def setRectangleHeight(self, elementNo, height, coorSys):
         self.sendMessage({'call' : 'set_rectangle_height',
                           'elementNo' : str(elementNo),
-                          'height' : str(height)})
+                          'height' : str(height),
+                          'coorSys' : str(coorSys)})
         
     def getRectangleHeight(self, elementNo):
         height = self.sendMessage({'call' : 'get_rectangle_height',
@@ -1215,11 +1231,12 @@ class messageSender:
                                  'elementNo' : str(elementNo)})
         return width["width"]
     
-    def setTexRectangleTopLeft(self, elementNo, x, y):
+    def setTexRectangleTopLeft(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'set_texrectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
-                          'y' : str(y)})
+                          'y' : str(y),
+                          'coorSys' : str(coorSys)})
         
     def getTexRectangleTopLeft(self, elementNo):
         pos = self.sendMessage({'call' : 'get_texrectangle_top_left',
@@ -1255,20 +1272,22 @@ class messageSender:
                               'textureData' : encoded_string,
                               'extension' : extension})
     
-    def setTexRectangleWidth(self, elementNo, width):
+    def setTexRectangleWidth(self, elementNo, width, coorSys):
         self.sendMessage({'call' : 'set_texrectangle_width',
                           'elementNo' : str(elementNo),
-                          'width' : str(width)})
+                          'width' : str(width),
+                          'coorSys' : str(coorSys)})
         
     def getTexRectangleWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_texrectangle_width',
                                   'elementNo' : str(elementNo)})
         return float(width["width"])
         
-    def setTexRectangleHeight(self, elementNo, height):
+    def setTexRectangleHeight(self, elementNo, height, coorSys):
         self.sendMessage({'call' : 'set_texrectangle_height',
                           'elementNo' : str(elementNo),
-                          'height' : str(height)})
+                          'height' : str(height),
+                          'coorSys' : str(coorSys)})
         
     def getTexRectangleHeight(self, elementNo):
         height = self.sendMessage({'call' : 'get_texrectangle_height',
@@ -1285,11 +1304,12 @@ class messageSender:
                                  'elementNo' : str(elementNo)})
         return text["text"]
     
-    def setTextPosition(self, elementNo, x, y, windowNo):
+    def setTextPosition(self, elementNo, x, y, coorSys, windowNo):
         self.sendMessage({'call' : 'relocate_text',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
+                          'coorSys' : str(coorSys),
                           'windowNo' : str(windowNo)})
         
     def getTextPosition(self, elementNo):

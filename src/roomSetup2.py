@@ -614,19 +614,19 @@ class client:
 								newWidth = 150/percentWidth*100
 								newHeight = 150/percentHeight*100
 								
-								self.sender.setRectangleWidth(self.stretchRects[self.stretching[0][0]], 150)
-								self.sender.setRectangleHeight(self.stretchRects[self.stretching[0][0]], 150)
+								self.sender.setRectangleWidth(self.stretchRects[self.stretching[0][0]], 150, "pix")
+								self.sender.setRectangleHeight(self.stretchRects[self.stretching[0][0]], 150, "pix")
 								self.sender.setSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]], int(newWidth))
 								self.sender.setSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]], int(newHeight))
-								self.sender.setRectangleTopLeft(self.stretchRects[self.stretching[0][0]], newWidth/2-75, newHeight/2+75)
+								self.sender.setRectangleTopLeft(self.stretchRects[self.stretching[0][0]], newWidth/2-75, newHeight/2+75, "pix")
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][0], newWidth/2, newHeight/2+75, "pix", self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, "pix", self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, "pix", self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][3], newWidth/2+75, newHeight/2, "pix", self.surfWindows[self.stretching[0][0]])
-								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][0], newHeight*20/512)
-								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][1], newHeight*20/512)
-								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][2], newHeight*20/512)
-								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][3], newHeight*20/512)
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][0], newHeight*20/512, "pix")
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][1], newHeight*20/512, "pix")
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][2], newHeight*20/512, "pix")
+								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][3], newHeight*20/512, "pix")
 								
 								#self.surfWindows[x[0]
 							self.stretching = []
@@ -880,9 +880,9 @@ class client:
 		right = self.sender.getCirclePosition(self.stretchCircs[surfaceRectNo][3])[0]
 		height = abs(top-bottom)
 		width = abs(left-right)
-		self.sender.setRectangleHeight(self.stretchRects[surfaceRectNo], height)
-		self.sender.setRectangleWidth(self.stretchRects[surfaceRectNo], width)
-		self.sender.setRectangleTopLeft(self.stretchRects[surfaceRectNo], left, top)
+		self.sender.setRectangleHeight(self.stretchRects[surfaceRectNo], height, "pix")
+		self.sender.setRectangleWidth(self.stretchRects[surfaceRectNo], width, "pix")
+		self.sender.setRectangleTopLeft(self.stretchRects[surfaceRectNo], left, top, "pix")
 			
 	#Defines all required surfaces according to a layout data structure				
 	def redefineSurface(self,layout):
@@ -901,7 +901,7 @@ class client:
 				if(z==0):
 					self.topbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], "pix", (0,0.75,0,1), 5)
 				else:
-					self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+					self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
@@ -913,7 +913,7 @@ class client:
 				if(z==len(layout[x][y])-1):
 					self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], "pix", (0,0.75,0,1), 5)
 				else:
-					self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+					self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
@@ -925,7 +925,7 @@ class client:
 				if(z==0):
 					self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], "pix", (0,0.75,0,1), 5)
 				else:
-					self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+					self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
@@ -937,7 +937,7 @@ class client:
 				if(z==len(layout[x][y])-1):
 					self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, layout[x][y][z][0], layout[x][y][z][1], "pix", (0,0.75,0,1), 5)
 				else:
-					self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1])
+					self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
 					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
@@ -994,7 +994,7 @@ class client:
 			pygame.display.flip()
 		if(self.quit==False and self.cursorMode=="wall"):
 			self.topCircles[self.surfaceCounter].append(tr[1])
-			self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1])
+			self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], tr[0][0], tr[0][1], "pix")
 			self.rightCircles[self.surfaceCounter].append(tr[1])
 			self.rightbz[self.surfaceCounter] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], "pix", (0,0.75,0,1), 5)
 			self.hideable.append(self.rightbz[self.surfaceCounter])
@@ -1010,7 +1010,7 @@ class client:
 			pygame.display.flip()
 		if(self.quit==False and self.cursorMode=="wall"):
 			self.rightCircles[self.surfaceCounter].append(br[1])
-			self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1])
+			self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], br[0][0], br[0][1], "pix")
 			self.bottomCircles[self.surfaceCounter].append(br[1])
 			self.bottombz[self.surfaceCounter] = self.sender.newLineStrip(1, br[0][0], br[0][1], "pix", (0,0.75,0,1), 5)
 			self.hideable.append(self.bottombz[self.surfaceCounter])
@@ -1026,12 +1026,12 @@ class client:
 			pygame.display.flip()
 		if(self.quit==False and self.cursorMode=="wall"):
 			self.bottomCircles[self.surfaceCounter].append(bl[1])
-			self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1])
+			self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], bl[0][0], bl[0][1], "pix")
 			self.leftCircles[self.surfaceCounter].append(bl[1])
 			self.leftbz[self.surfaceCounter] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], "pix", (0,0.75,0,1), 5)
 			self.hideable.append(self.leftbz[self.surfaceCounter])
 			self.leftCircles[self.surfaceCounter].append(tl[1])
-			self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1])
+			self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1], "pix")
 			center = self.lineIntersection(tl[0][0], tl[0][1], br[0][0], br[0][1], tr[0][0], tr[0][1], bl[0][0], bl[0][1])
 			self.centerPoints[self.surfaceCounter] = self.sender.newCircle(1, center[0], center[1], 10, "pix", (0,0,0,0), 1, (1,0,1,1), 20)
 			self.surfaceCounter += 1
