@@ -619,10 +619,10 @@ class client:
 								self.sender.setSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]], int(newWidth))
 								self.sender.setSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]], int(newHeight))
 								self.sender.setRectangleTopLeft(self.stretchRects[self.stretching[0][0]], newWidth/2-75, newHeight/2+75)
-								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][0], newWidth/2, newHeight/2+75, self.surfWindows[self.stretching[0][0]])
-								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, self.surfWindows[self.stretching[0][0]])
-								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, self.surfWindows[self.stretching[0][0]])
-								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][3], newWidth/2+75, newHeight/2, self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][0], newWidth/2, newHeight/2+75, "pix", self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, "pix", self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, "pix", self.surfWindows[self.stretching[0][0]])
+								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][3], newWidth/2+75, newHeight/2, "pix", self.surfWindows[self.stretching[0][0]])
 								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][0], newHeight*20/512)
 								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][1], newHeight*20/512)
 								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][2], newHeight*20/512)
@@ -799,7 +799,7 @@ class client:
 					loc = self.sender.getCursorPosition(self.controlCur)
 					if(len(self.dragging)!=0):
 						for x in range (0,len(self.dragging)):
-							self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), 1)
+							self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), "pix", 1)
 							for y in range(0,len(self.bezierUpdates)):
 								try:
 									if(self.topCircles[y].__contains__(self.dragging[x])):
@@ -810,7 +810,7 @@ class client:
 											brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
 											blcoor = self.sender.getCirclePosition(self.bottomCircles[y][len(self.bottomCircles[y])-1])
 											center = self.lineIntersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1], trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], 1)
+											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], "pix", 1)
 									if(self.bottomCircles[y].__contains__(self.dragging[x])):
 										self.bezierUpdates[y][1] = True
 										if(self.cornerdrag == True):
@@ -819,7 +819,7 @@ class client:
 											brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
 											blcoor = self.sender.getCirclePosition(self.bottomCircles[y][len(self.bottomCircles[y])-1])
 											center = self.lineIntersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1], trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], 1)
+											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], "pix", 1)
 									if(self.leftCircles[y].__contains__(self.dragging[x])):
 										self.bezierUpdates[y][2] = True
 										if(self.cornerdrag == True):
@@ -828,7 +828,7 @@ class client:
 											brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
 											blcoor = self.sender.getCirclePosition(self.bottomCircles[y][len(self.bottomCircles[y])-1])
 											center = self.lineIntersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1], trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], 1)
+											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], "pix", 1)
 									if(self.rightCircles[y].__contains__(self.dragging[x])):
 										self.bezierUpdates[y][3] = True
 										if(self.cornerdrag == True):
@@ -837,12 +837,12 @@ class client:
 											brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
 											blcoor = self.sender.getCirclePosition(self.bottomCircles[y][len(self.bottomCircles[y])-1])
 											center = self.lineIntersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1], trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], 1)
+											self.sender.relocateCircle(self.centerPoints[y], center[0], center[1], "pix", 1)
 								except:
 									pass
 					if(len(self.rightDragging)!=0):
 						try:
-							self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), 1)
+							self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), "pix", 1)
 							self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
 						except:
 							pass
@@ -853,24 +853,24 @@ class client:
 							hei = self.sender.getSurfacePixelHeight(self.warpedSurf[x[0]])
 							if(x[1]<2):
 								if(x[1]==0 and loc[1]>hei/2 or x[1]==1 and loc[1]<hei/2):
-									self.sender.relocateCircle(self.stretchCircs[x[0]][x[1]], float(origpos[0]), float(loc[1]), self.surfWindows[x[0]])
+									self.sender.relocateCircle(self.stretchCircs[x[0]][x[1]], float(origpos[0]), float(loc[1]), "pix", self.surfWindows[x[0]])
 									hdifference = loc[1] - origpos[1]
 									if(x[1]==0):
 										origpos2 = self.sender.getCirclePosition(self.stretchCircs[x[0]][1])
-										self.sender.relocateCircle(self.stretchCircs[x[0]][1], float(origpos[0]), float(origpos2[1])-hdifference, self.surfWindows[x[0]])
+										self.sender.relocateCircle(self.stretchCircs[x[0]][1], float(origpos[0]), float(origpos2[1])-hdifference, "pix", self.surfWindows[x[0]])
 									else:
 										origpos2 = self.sender.getCirclePosition(self.stretchCircs[x[0]][0])
-										self.sender.relocateCircle(self.stretchCircs[x[0]][0], float(origpos[0]), float(origpos2[1])-hdifference, self.surfWindows[x[0]])
+										self.sender.relocateCircle(self.stretchCircs[x[0]][0], float(origpos[0]), float(origpos2[1])-hdifference, "pix", self.surfWindows[x[0]])
 							else:
 								if(x[1]==2 and loc[0]<wid/2 or x[1]==3 and loc[0]>wid/2):
-									self.sender.relocateCircle(self.stretchCircs[x[0]][x[1]], float(loc[0]), float(origpos[1]), self.surfWindows[x[0]])
+									self.sender.relocateCircle(self.stretchCircs[x[0]][x[1]], float(loc[0]), float(origpos[1]), "pix", self.surfWindows[x[0]])
 									vdifference = loc[0] - origpos[0]
 									if(x[1]==2):
 										origpos2 = self.sender.getCirclePosition(self.stretchCircs[x[0]][3])
-										self.sender.relocateCircle(self.stretchCircs[x[0]][3], float(origpos2[0])-vdifference, float(origpos[1]), self.surfWindows[x[0]])
+										self.sender.relocateCircle(self.stretchCircs[x[0]][3], float(origpos2[0])-vdifference, float(origpos[1]), "pix", self.surfWindows[x[0]])
 									else:
 										origpos2 = self.sender.getCirclePosition(self.stretchCircs[x[0]][2])
-										self.sender.relocateCircle(self.stretchCircs[x[0]][2], float(origpos2[0])-vdifference, float(origpos[1]), self.surfWindows[x[0]])
+										self.sender.relocateCircle(self.stretchCircs[x[0]][2], float(origpos2[0])-vdifference, float(origpos[1]), "pix", self.surfWindows[x[0]])
 							self.updateRectangle(x[0])
 							
 	def updateRectangle(self, surfaceRectNo):

@@ -72,7 +72,8 @@ class messageSender:
                             self.sendMessage({'call' : 'relocate_circle', 
                                               'elementNo' : str(self.elelocs.keys()[x]), 
                                               'x' : str(self.elelocs[self.elelocs.keys()[x]][0]), 
-                                              'y' : str(self.elelocs[self.elelocs.keys()[x]][1])})
+                                              'y' : str(self.elelocs[self.elelocs.keys()[x]][1]), 
+                                              'coorSys' : str(self.elelocs[self.elelocs.keys()[x]][2])})
                         self.eletrack[self.elelocs.keys()[x]][0]=False
                 except IndexError, e:
                     pass
@@ -230,7 +231,7 @@ class messageSender:
                                 'fillColor' : self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]), 
                                 'sides' : str(sides)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y)
+        self.elelocs[eleNo] = (x,y,coorSys)
         self.eletrack[eleNo] = [True,"circle"]
         return eleNo
     
@@ -922,8 +923,8 @@ class messageSender:
                                  'windowNo' : str(windowNo)})
         return name["name"]
     
-    def relocateCircle(self, elementNo, x, y, windowNo):
-        self.elelocs[elementNo] = (x,y)
+    def relocateCircle(self, elementNo, x, y, coorSys, windowNo):
+        self.elelocs[elementNo] = (x,y,coorSys)
         self.eletrack[elementNo][0] = True
         
     def getCirclePosition(self, elementNo):
