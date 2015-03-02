@@ -597,6 +597,26 @@ class messageSender:
                                   'surfaceNo' : str(surfaceNo)})
         return width["width"]
     
+    def setSurfaceRealHeight(self,surfaceNo,height):
+        self.sendMessage({'call' : 'set_surface_real_height',
+                          'surfaceNo' : str(surfaceNo),
+                          'height' : str(height)})
+        
+    def setSurfaceRealWidth(self,surfaceNo,width):
+        self.sendMessage({'call' : 'set_surface_real_width',
+                          'surfaceNo' : str(surfaceNo),
+                          'width' : str(width)})
+        
+    def getSurfaceRealHeight(self,surfaceNo):
+        height = self.sendMessage({'call' : 'get_surface_real_height',
+                                   'surfaceNo' : str(surfaceNo)})
+        return height["height"]
+        
+    def getSurfaceRealWidth(self,surfaceNo):
+        width = self.sendMessage({'call' : 'get_surface_real_width',
+                                  'surfaceNo' : str(surfaceNo)})
+        return width["width"]
+    
     def clearSurface(self,surfaceNo):
         self.sendMessage({'call' : 'clear_surface',
                           'surfaceNo' : str(surfaceNo)})

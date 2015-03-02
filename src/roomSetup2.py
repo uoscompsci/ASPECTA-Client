@@ -1341,7 +1341,6 @@ class client:
 	def initGUI(self):
 		self.sender.showSetupSurface()
 		self.sender.newWindow(0, 0, 1024, 1280, 1024, "pix", "setupWindow")
-		self.sender.newCircle(1, 0.5, 0.5, 0.25, "prop", (0,1,0,1), 5, (1,0,0,1), 25)
 		self.mainCur = self.sender.newCursor(0, 1280/2, 1024/2, "pix")
 		
 		self.controlCur = self.mainCur
@@ -1364,6 +1363,18 @@ class client:
 		self.sender.hideElement(circs[2])
 		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
 		self.sender.hideElement(circs[3])
+		mtrrect = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
+		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount2 = self.sender.newText(self.window, "0", 512/2-50, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount3 = self.sender.newText(self.window, "0", 512/2-25, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount4 = self.sender.newText(self.window, "0", 512/2, 460, "pix", 37, "Arial", (0,0,0,1))
+		cm = self.sender.newText(self.window, "cm", 512/2+25, 460, "pix", 35, "Arial", (0,0,0,1))
+		mtrrect = self.sender.newRectangle(self.window, 512-180, 512/2+30, 180, 60, "pix", (0,0,0,0), 0, (1,1,1,1))
+		rightCount1 = self.sender.newText(self.window, "0", 512-175, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount2 = self.sender.newText(self.window, "0", 512-150, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount3 = self.sender.newText(self.window, "0", 512-125, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount4 = self.sender.newText(self.window, "0", 512-100, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		cm = self.sender.newText(self.window, "cm", 512-65, 512/2-13, "pix", 35, "Arial", (0,0,0,1))
 		self.stretchCircs[0] = circs
 		self.surfWindows[0] = self.window
 
