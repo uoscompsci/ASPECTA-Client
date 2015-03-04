@@ -47,6 +47,15 @@ class client:
 	sideToCorners = {"top" : ("tl", "tr"), "bottom" : ("bl", "br"), "left" : ("tl", "bl"), "right" : ("tr", "br")}
 	cursorMode = "default"
 	dragSurf = "none"
+	topmtrrect = {}
+	topCounter = {}
+	topcm = {}
+	rightmtrrect = {}
+	rightCounter = {}
+	rightcm = {}
+	centSurfCirc = {}
+	surfControlMode = "meas"
+	surfaceControl = 0
 	
 	cornerAdj = {"tl": (("tr","top"), ("bl","left")), "tr": (("tl","top"), ("br","right")), "br": (("bl","bottom"), ("tr","right")), "bl": (("br","bottom"), ("tl","left"))}
 	
@@ -317,6 +326,20 @@ class client:
 				self.sender.setLineStart(self.connections[x][2], startLoc[0], startLoc[1])
 				self.sender.setLineEnd(self.connections[x][2], endLoc[0], endLoc[1])
 
+	def incrementDigit(self, elementNo):
+		value = int(self.sender.getText(elementNo))
+		if(value<9):
+			self.sender.setText(elementNo, str(value+1))
+		else:
+			self.sender.setText(elementNo, str(0))
+
+	def decrementDigit(self, elementNo):
+		value = int(self.sender.getText(elementNo))
+		if(value>0):
+			self.sender.setText(elementNo, str(value-1))
+		else:
+			self.sender.setText(elementNo, str(9))
+
 	#Checks for mouse button and keyboard
 	def getInput(self,get_point):
 		#pos=pygame.mouse.get_pos() # mouse shift
@@ -333,10 +356,56 @@ class client:
 					if event.button==4:
 						if(self.controlCur==self.mainCur):
 							self.sender.rotateCursorClockwise(self.mainCur,10) #Tells the server to rotate the cursor clockwise
+						else:
+							if(self.surfControlMode=="meas"):
+								pos = self.sender.getCursorPosition(self.controlCur)
+								if(pos[1]>=512-75):
+									if(pos[0]>(512/2-80)):
+										if(pos[0]<(512/2-50)):
+											self.incrementDigit(self.topCounter[self.surfaceControl][0])
+										elif(pos[0]<(512/2-25)):
+											self.incrementDigit(self.topCounter[self.surfaceControl][1])
+										elif(pos[0]<(512/2)):
+											self.incrementDigit(self.topCounter[self.surfaceControl][2])
+										elif(pos[0]<(512/2+25)):
+											self.incrementDigit(self.topCounter[self.surfaceControl][3])
+								elif(pos[1]<512/2+30 and pos[1]>512/2-30):
+									if(pos[0]>512-180):
+										if(pos[0]<512-150):
+											self.incrementDigit(self.rightCounter[self.surfaceControl][0])
+										elif(pos[0]<512-125):
+											self.incrementDigit(self.rightCounter[self.surfaceControl][1])
+										elif(pos[0]<512-100):
+											self.incrementDigit(self.rightCounter[self.surfaceControl][2])
+										elif(pos[0]<512-75):
+											self.incrementDigit(self.rightCounter[self.surfaceControl][3])
 					#Runs if the mouse wheel is being rolled downwards
 					elif event.button==5:
 						if(self.controlCur==self.mainCur):
 							self.sender.rotateCursorAnticlockwise(self.mainCur,10) #Tells the server to rotate the cursor anticlockwise
+						else:
+							if(self.surfControlMode=="meas"):
+								pos = self.sender.getCursorPosition(self.controlCur)
+								if(pos[1]>=512-75):
+									if(pos[0]>(512/2-80)):
+										if(pos[0]<(512/2-50)):
+											self.decrementDigit(self.topCounter[self.surfaceControl][0])
+										elif(pos[0]<(512/2-25)):
+											self.decrementDigit(self.topCounter[self.surfaceControl][1])
+										elif(pos[0]<(512/2)):
+											self.decrementDigit(self.topCounter[self.surfaceControl][2])
+										elif(pos[0]<(512/2+25)):
+											self.decrementDigit(self.topCounter[self.surfaceControl][3])
+								elif(pos[1]<512/2+30 and pos[1]>512/2-30):
+									if(pos[0]>512-180):
+										if(pos[0]<512-150):
+											self.decrementDigit(self.rightCounter[self.surfaceControl][0])
+										elif(pos[0]<512-125):
+											self.decrementDigit(self.rightCounter[self.surfaceControl][1])
+										elif(pos[0]<512-100):
+											self.decrementDigit(self.rightCounter[self.surfaceControl][2])
+										elif(pos[0]<512-75):
+											self.decrementDigit(self.rightCounter[self.surfaceControl][3])
 					#Runs if the middle mouse button is pressed
 					elif event.button==2:
 						self.mClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
@@ -439,22 +508,23 @@ class client:
 												if (x == 0 or x == (len(self.rightCircles[z])-1)):
 													self.cornerdrag = True
 						else:
-							loc = self.sender.getCursorPosition(self.controlCur)
-							self.stretching = []
-							p = 0
-							if(self.controlCur==self.surfCur[0]):
+							if(self.surfControlMode=="aspect"):
+								loc = self.sender.getCursorPosition(self.controlCur)
+								self.stretching = []
 								p = 0
-							elif(self.controlCur==self.surfCur[1]):
-								p = 1
-							elif(self.controlCur==self.surfCur[2]):
-								p = 2
-							elif(self.controlCur==self.surfCur[3]):
-								p = 3
-							for q in range(len(self.stretchCircs[p])):
-								point = self.sender.getCirclePosition(self.stretchCircs[p][q])
-								radius = self.sender.getCircleRadius(self.stretchCircs[p][q])
-								if(self.isHit((point[0],point[1]), (loc[0],loc[1]), radius)):
-										self.stretching.append((p,q))
+								if(self.controlCur==self.surfCur[0]):
+									p = 0
+								elif(self.controlCur==self.surfCur[1]):
+									p = 1
+								elif(self.controlCur==self.surfCur[2]):
+									p = 2
+								elif(self.controlCur==self.surfCur[3]):
+									p = 3
+								for q in range(len(self.stretchCircs[p])):
+									point = self.sender.getCirclePosition(self.stretchCircs[p][q])
+									radius = self.sender.getCircleRadius(self.stretchCircs[p][q])
+									if(self.isHit((point[0],point[1]), (loc[0],loc[1]), radius)):
+											self.stretching.append((p,q))
 				elif event.type == pygame.MOUSEBUTTONUP:
 					#Runs if the left mouse button has been released
 					if(event.button==1):
@@ -587,14 +657,28 @@ class client:
 															self.sender.hideElement(self.centerPoints[y])
 														except KeyError, e:
 															pass
-														try:
-															self.sender.showElement(self.stretchCircs[x][y])
-														except KeyError, e:
-															pass
-													self.sender.showElement(self.stretchRects[x])
+													self.sender.showElement(self.centSurfCirc[x])
+													self.sender.setRectangleFillColor(self.topmtrrect[x], (1,0,0,1))
+													self.sender.setRectangleFillColor(self.rightmtrrect[x], (1,0,0,1))
 													self.sender.relocateCursor(self.surfCur[x], 512/2, 512/2, self.warpedSurf[x])
 													self.sender.showCursor(self.surfCur[x])
-												
+													self.surfaceControl = x
+							else:
+								loc = self.sender.getCursorPosition(self.controlCur)
+								x = self.surfaceControl
+								point = self.sender.getCirclePosition(self.centSurfCirc[x])
+								radius = 25
+								if(self.isHit((point[0],point[1]),(loc[0],loc[1]), radius)):
+									for y in range(0,4):
+										try:
+											self.sender.showElement(self.stretchCircs[x][y])
+										except KeyError, e:
+											pass
+									self.sender.showElement(self.stretchRects[x])
+									self.sender.hideElement(self.centSurfCirc[x])
+									self.sender.setRectangleFillColor(self.topmtrrect[x], (1,1,1,1))
+									self.sender.setRectangleFillColor(self.rightmtrrect[x], (1,1,1,1))
+									self.surfControlMode = "aspect"
 						if(self.controlCur==self.mainCur):
 							#If appropriate the list of points currently being dragged is cleared
 							for w in range(0,len(self.topCircles)):
@@ -643,24 +727,38 @@ class client:
 								self.sender.hideCursor(self.mainCur)
 						else:
 							if(elapsedSecs<0.25):
-								current = None
-								for x in range(0,len(self.surfCur)):
-									if(self.controlCur==self.surfCur[x]):
-										current = x
-								self.controlCur = self.mainCur
-								self.sender.showCursor(self.mainCur)
-								for x in range(0,4):
-									try:
-										self.sender.showElement(self.centerPoints[x])
-									except KeyError, e:
-										pass
-									try:
-										self.sender.hideElement(self.stretchCircs[current][x])
-									except KeyError, e:
-										pass
-								self.sender.hideCursor(self.surfCur[current])
-								self.sender.hideElement(self.stretchRects[current])
-								
+								if(self.surfControlMode=="meas"):
+									current = None
+									for x in range(0,len(self.surfCur)):
+										if(self.controlCur==self.surfCur[x]):
+											current = x
+									self.controlCur = self.mainCur
+									self.sender.showCursor(self.mainCur)
+									for x in range(0,4):
+										try:
+											self.sender.showElement(self.centerPoints[x])
+										except KeyError, e:
+											pass
+									self.sender.hideElement(self.centSurfCirc[current])
+									self.sender.setRectangleFillColor(self.topmtrrect[current], (1,1,1,1))
+									self.sender.setRectangleFillColor(self.rightmtrrect[current], (1,1,1,1))
+									self.sender.hideCursor(self.surfCur[current])
+									#self.sender.hideElement(self.stretchRects[current])
+								elif(self.surfControlMode=="aspect"):
+									current = None
+									for x in range(0,len(self.surfCur)):
+										if(self.controlCur==self.surfCur[x]):
+											current = x
+									self.surfControlMode="meas"
+									for x in range(0,4):
+										try:
+											self.sender.hideElement(self.stretchCircs[current][x])
+										except KeyError, e:
+											pass
+									self.sender.hideElement(self.stretchRects[current])
+									self.sender.showElement(self.centSurfCirc[current])
+									self.sender.setRectangleFillColor(self.topmtrrect[current], (1,0,0,1))
+									self.sender.setRectangleFillColor(self.rightmtrrect[current], (1,0,0,1))
 					#Runs if the right mouse button has been released
 					if(event.button==3):
 						rClickRelTime=datetime.datetime.now()
@@ -1353,6 +1451,8 @@ class client:
 		self.sender.hideCursor(self.surfCur[0])
 		self.texRects[0] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
 		self.stretchRects[0] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, "pix", (0,0,0,0), 1, (0,0,1,1))
+		self.centSurfCirc[0] = self.sender.newCircle(self.window, 512/2, 512/2, 25, "pix", (0,0,0,0), 0, (1,1,0,1), 10)
+		self.sender.hideElement(self.centSurfCirc[0])
 		self.sender.hideElement(self.stretchRects[0])
 		circs = {}
 		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
@@ -1363,18 +1463,20 @@ class client:
 		self.sender.hideElement(circs[2])
 		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
 		self.sender.hideElement(circs[3])
-		mtrrect = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
+		self.topmtrrect[0] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
 		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
 		topCount2 = self.sender.newText(self.window, "0", 512/2-50, 460, "pix", 37, "Arial", (0,0,0,1))
 		topCount3 = self.sender.newText(self.window, "0", 512/2-25, 460, "pix", 37, "Arial", (0,0,0,1))
 		topCount4 = self.sender.newText(self.window, "0", 512/2, 460, "pix", 37, "Arial", (0,0,0,1))
-		cm = self.sender.newText(self.window, "cm", 512/2+25, 460, "pix", 35, "Arial", (0,0,0,1))
-		mtrrect = self.sender.newRectangle(self.window, 512-180, 512/2+30, 180, 60, "pix", (0,0,0,0), 0, (1,1,1,1))
+		self.topCounter[0] = (topCount1, topCount2, topCount3, topCount4)
+		self.topcm[0] = self.sender.newText(self.window, "cm", 512/2+25, 460, "pix", 35, "Arial", (0,0,0,1))
+		self.rightmtrrect[0] = self.sender.newRectangle(self.window, 512-180, 512/2+30, 180, 60, "pix", (0,0,0,0), 0, (1,1,1,1))
 		rightCount1 = self.sender.newText(self.window, "0", 512-175, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
 		rightCount2 = self.sender.newText(self.window, "0", 512-150, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
 		rightCount3 = self.sender.newText(self.window, "0", 512-125, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
 		rightCount4 = self.sender.newText(self.window, "0", 512-100, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
-		cm = self.sender.newText(self.window, "cm", 512-65, 512/2-13, "pix", 35, "Arial", (0,0,0,1))
+		self.rightCounter[0] = (rightCount1, rightCount2, rightCount3, rightCount4)
+		self.rightcm[0] = self.sender.newText(self.window, "cm", 512-65, 512/2-13, "pix", 35, "Arial", (0,0,0,1))
 		self.stretchCircs[0] = circs
 		self.surfWindows[0] = self.window
 
@@ -1384,6 +1486,8 @@ class client:
 		self.sender.hideCursor(self.surfCur[1])
 		self.texRects[1] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
 		self.stretchRects[1] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, "pix", (0,0,0,0), 1, (0,0,1,1))
+		self.centSurfCirc[1] = self.sender.newCircle(self.window, 512/2, 512/2, 25, "pix", (0,0,0,0), 0, (1,1,0,1), 10)
+		self.sender.hideElement(self.centSurfCirc[1])
 		self.sender.hideElement(self.stretchRects[1])
 		circs = {}
 		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
@@ -1394,6 +1498,20 @@ class client:
 		self.sender.hideElement(circs[2])
 		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
 		self.sender.hideElement(circs[3])
+		self.topmtrrect[1] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
+		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount2 = self.sender.newText(self.window, "0", 512/2-50, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount3 = self.sender.newText(self.window, "0", 512/2-25, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount4 = self.sender.newText(self.window, "0", 512/2, 460, "pix", 37, "Arial", (0,0,0,1))
+		self.topCounter[1] = (topCount1, topCount2, topCount3, topCount4)
+		self.topcm[1] = self.sender.newText(self.window, "cm", 512/2+25, 460, "pix", 35, "Arial", (0,0,0,1))
+		self.rightmtrrect[1] = self.sender.newRectangle(self.window, 512-180, 512/2+30, 180, 60, "pix", (0,0,0,0), 0, (1,1,1,1))
+		rightCount1 = self.sender.newText(self.window, "0", 512-175, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount2 = self.sender.newText(self.window, "0", 512-150, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount3 = self.sender.newText(self.window, "0", 512-125, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount4 = self.sender.newText(self.window, "0", 512-100, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		self.rightCounter[1] = (rightCount1, rightCount2, rightCount3, rightCount4)
+		self.rightcm[1] = self.sender.newText(self.window, "cm", 512-65, 512/2-13, "pix", 35, "Arial", (0,0,0,1))
 		self.stretchCircs[1] = circs
 		self.surfWindows[1] = self.window
 
@@ -1403,6 +1521,8 @@ class client:
 		self.sender.hideCursor(self.surfCur[2])
 		self.texRects[2] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
 		self.stretchRects[2] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, "pix", (0,0,0,0), 1, (0,0,1,1))
+		self.centSurfCirc[2] = self.sender.newCircle(self.window, 512/2, 512/2, 25, "pix", (0,0,0,0), 0, (1,1,0,1), 10)
+		self.sender.hideElement(self.centSurfCirc[2])
 		self.sender.hideElement(self.stretchRects[2])
 		circs = {}
 		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
@@ -1413,6 +1533,20 @@ class client:
 		self.sender.hideElement(circs[2])
 		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
 		self.sender.hideElement(circs[3])
+		self.topmtrrect[2] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
+		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount2 = self.sender.newText(self.window, "0", 512/2-50, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount3 = self.sender.newText(self.window, "0", 512/2-25, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount4 = self.sender.newText(self.window, "0", 512/2, 460, "pix", 37, "Arial", (0,0,0,1))
+		self.topCounter[2] = (topCount1, topCount2, topCount3, topCount4)
+		self.topcm[2] = self.sender.newText(self.window, "cm", 512/2+25, 460, "pix", 35, "Arial", (0,0,0,1))
+		self.rightmtrrect[2] = self.sender.newRectangle(self.window, 512-180, 512/2+30, 180, 60, "pix", (0,0,0,0), 0, (1,1,1,1))
+		rightCount1 = self.sender.newText(self.window, "0", 512-175, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount2 = self.sender.newText(self.window, "0", 512-150, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount3 = self.sender.newText(self.window, "0", 512-125, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount4 = self.sender.newText(self.window, "0", 512-100, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		self.rightCounter[2] = (rightCount1, rightCount2, rightCount3, rightCount4)
+		self.rightcm[2] = self.sender.newText(self.window, "cm", 512-65, 512/2-13, "pix", 35, "Arial", (0,0,0,1))
 		self.stretchCircs[2] = circs
 		self.surfWindows[2] = self.window
 
@@ -1422,6 +1556,8 @@ class client:
 		self.sender.hideCursor(self.surfCur[3])
 		self.texRects[3] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
 		self.stretchRects[3] = self.sender.newRectangle(self.window, 512/2-75, 512/2+75, 150, 150, "pix", (0,0,0,0), 1, (0,0,1,1))
+		self.centSurfCirc[3] = self.sender.newCircle(self.window, 512/2, 512/2, 25, "pix", (0,0,0,0), 0, (1,1,0,1), 10)
+		self.sender.hideElement(self.centSurfCirc[3])
 		self.sender.hideElement(self.stretchRects[3])
 		circs = {}
 		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
@@ -1432,6 +1568,20 @@ class client:
 		self.sender.hideElement(circs[2])
 		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
 		self.sender.hideElement(circs[3])
+		self.topmtrrect[3] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
+		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount2 = self.sender.newText(self.window, "0", 512/2-50, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount3 = self.sender.newText(self.window, "0", 512/2-25, 460, "pix", 37, "Arial", (0,0,0,1))
+		topCount4 = self.sender.newText(self.window, "0", 512/2, 460, "pix", 37, "Arial", (0,0,0,1))
+		self.topCounter[3] = (topCount1, topCount2, topCount3, topCount4)
+		self.topcm[3] = self.sender.newText(self.window, "cm", 512/2+25, 460, "pix", 35, "Arial", (0,0,0,1))
+		self.rightmtrrect[3] = self.sender.newRectangle(self.window, 512-180, 512/2+30, 180, 60, "pix", (0,0,0,0), 0, (1,1,1,1))
+		rightCount1 = self.sender.newText(self.window, "0", 512-175, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount2 = self.sender.newText(self.window, "0", 512-150, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount3 = self.sender.newText(self.window, "0", 512-125, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		rightCount4 = self.sender.newText(self.window, "0", 512-100, 512/2-13, "pix", 37, "Arial", (0,0,0,1))
+		self.rightCounter[3] = (rightCount1, rightCount2, rightCount3, rightCount4)
+		self.rightcm[3] = self.sender.newText(self.window, "cm", 512-65, 512/2-13, "pix", 35, "Arial", (0,0,0,1))
 		self.stretchCircs[3] = circs
 		self.surfWindows[3] = self.window
 		
