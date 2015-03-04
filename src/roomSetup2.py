@@ -386,7 +386,7 @@ class client:
 						else:
 							if(self.surfControlMode=="meas"):
 								pos = self.sender.getCursorPosition(self.controlCur)
-								if(pos[1]>=512-75):
+								if(pos[1]>=512-75 and pos[1]<=512):
 									if(pos[0]>(512/2-80)):
 										if(pos[0]<(512/2-50)):
 											self.decrementDigit(self.topCounter[self.surfaceControl][0])
@@ -396,7 +396,7 @@ class client:
 											self.decrementDigit(self.topCounter[self.surfaceControl][2])
 										elif(pos[0]<(512/2+25)):
 											self.decrementDigit(self.topCounter[self.surfaceControl][3])
-								elif(pos[1]<512/2+30 and pos[1]>512/2-30):
+								elif(pos[1]<=512/2+30 and pos[1]>=512/2-30):
 									if(pos[0]>512-180):
 										if(pos[0]<512-150):
 											self.decrementDigit(self.rightCounter[self.surfaceControl][0])
@@ -676,8 +676,19 @@ class client:
 											pass
 									self.sender.showElement(self.stretchRects[x])
 									self.sender.hideElement(self.centSurfCirc[x])
-									self.sender.setRectangleFillColor(self.topmtrrect[x], (1,1,1,1))
-									self.sender.setRectangleFillColor(self.rightmtrrect[x], (1,1,1,1))
+									self.sender.hideElement(self.topmtrrect[x])
+									self.sender.hideElement(self.rightmtrrect[x])
+									self.sender.hideElement(self.topCounter[x][0])
+									self.sender.hideElement(self.topCounter[x][1])
+									self.sender.hideElement(self.topCounter[x][2])
+									self.sender.hideElement(self.topCounter[x][3])
+									self.sender.hideElement(self.rightCounter[x][0])
+									self.sender.hideElement(self.rightCounter[x][1])
+									self.sender.hideElement(self.rightCounter[x][2])
+									self.sender.hideElement(self.rightCounter[x][3])
+									self.sender.hideElement(self.topcm[x])
+									self.sender.hideElement(self.rightcm[x])
+									
 									self.surfControlMode = "aspect"
 						if(self.controlCur==self.mainCur):
 							#If appropriate the list of points currently being dragged is cleared
@@ -711,8 +722,6 @@ class client:
 								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][1], newHeight*20/512, "pix")
 								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][2], newHeight*20/512, "pix")
 								self.sender.setCircleRadius(self.stretchCircs[self.stretching[0][0]][3], newHeight*20/512, "pix")
-								
-								#self.surfWindows[x[0]
 							self.stretching = []
 					#Runs if the middle mouse button has been released
 					if(event.button==2):
@@ -757,8 +766,18 @@ class client:
 											pass
 									self.sender.hideElement(self.stretchRects[current])
 									self.sender.showElement(self.centSurfCirc[current])
-									self.sender.setRectangleFillColor(self.topmtrrect[current], (1,0,0,1))
-									self.sender.setRectangleFillColor(self.rightmtrrect[current], (1,0,0,1))
+									self.sender.showElement(self.topmtrrect[current])
+									self.sender.showElement(self.rightmtrrect[current])
+									self.sender.showElement(self.topCounter[current][0])
+									self.sender.showElement(self.topCounter[current][1])
+									self.sender.showElement(self.topCounter[current][2])
+									self.sender.showElement(self.topCounter[current][3])
+									self.sender.showElement(self.rightCounter[current][0])
+									self.sender.showElement(self.rightCounter[current][1])
+									self.sender.showElement(self.rightCounter[current][2])
+									self.sender.showElement(self.rightCounter[current][3])
+									self.sender.showElement(self.topcm[current])
+									self.sender.showElement(self.rightcm[current])
 					#Runs if the right mouse button has been released
 					if(event.button==3):
 						rClickRelTime=datetime.datetime.now()
