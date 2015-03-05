@@ -1207,7 +1207,22 @@ class client:
 	def visualizeConnectionLines(self, fromSide, toSide):
 		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][0]), (toSide[0],self.sideToCorners[toSide[1]][0]), True)
 		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][1]), (toSide[0],self.sideToCorners[toSide[1]][1]), True)
-	
+		
+	def loadRealMeasurements(self, measurements):
+		print "loading " + str(measurements)
+		for x in range(0,len(measurements)):
+			widstring = str(measurements[x][0])
+			heistring = str(measurements[x][1])
+			while(len(widstring)<4):
+				widstring = "0" + widstring
+			while(len(heistring)<4):
+				heistring = "0" + heistring
+			for y in range(0,4):
+				self.sender.setText(self.topCounter[x][y], widstring[y])
+				self.sender.setText(self.rightCounter[x][y], heistring[y])
+				
+	#topCounter
+	#rightCounter
 	#Quits the client
 	def quitButton(self):
 		if(self.quit==False):
@@ -1283,6 +1298,7 @@ class client:
 			count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
 			self.redefineSurface(count[1])
 			self.visualizeConnections(count[2])
+			self.loadRealMeasurements(count[3])
 			self.updateRectangle(0)
 			self.updateRectangle(1)
 			self.updateRectangle(2)

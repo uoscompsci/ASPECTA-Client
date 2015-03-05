@@ -549,6 +549,10 @@ class messageSender:
                     side.append((float(point[0]), float(point[1])))
                 sideslist.append(side)
             surfaceslist.append(sideslist)
+        realSizes = count["realSizes"]
+        realSizes = realSizes.split(";")
+        for x in range(0,len(realSizes)):
+            realSizes[x] = realSizes[x].split(":")
         if(count["connections"]!=""):
             connections = count["connections"].split("%")
             connectionslist = []
@@ -559,9 +563,9 @@ class messageSender:
                 conn1list = [int(conn1[0]),conn1[1]]
                 conn2list = [int(conn2[0]),conn2[1]]
                 connectionslist.append([conn1list,conn2list])
-            return (int(count["count"]),surfaceslist,connectionslist)
+            return (int(count["count"]),surfaceslist,connectionslist, realSizes)
         else:
-            return (int(count["count"]),surfaceslist,[])
+            return (int(count["count"]),surfaceslist,[], realSizes)
         
     def getSavedLayouts(self):
         layouts = self.sendMessage({'call' : 'get_saved_layouts'})
