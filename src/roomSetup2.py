@@ -9,7 +9,7 @@ from bezier import *
 from ConfigParser import SafeConfigParser
 import datetime
 import tkMessageBox
-from tkFileDialog   import askopenfilename
+#from tkFileDialog   import askopenfilename
 
 class client:
 	__slots__ = ['ppe']
@@ -678,14 +678,9 @@ class client:
 									self.sender.hideElement(self.centSurfCirc[x])
 									self.sender.hideElement(self.topmtrrect[x])
 									self.sender.hideElement(self.rightmtrrect[x])
-									self.sender.hideElement(self.topCounter[x][0])
-									self.sender.hideElement(self.topCounter[x][1])
-									self.sender.hideElement(self.topCounter[x][2])
-									self.sender.hideElement(self.topCounter[x][3])
-									self.sender.hideElement(self.rightCounter[x][0])
-									self.sender.hideElement(self.rightCounter[x][1])
-									self.sender.hideElement(self.rightCounter[x][2])
-									self.sender.hideElement(self.rightCounter[x][3])
+									for z in range(0,4):
+										self.sender.hideElement(self.topCounter[x][z])
+										self.sender.hideElement(self.rightCounter[x][z])
 									self.sender.hideElement(self.topcm[x])
 									self.sender.hideElement(self.rightcm[x])
 									
@@ -752,6 +747,20 @@ class client:
 									self.sender.setRectangleFillColor(self.topmtrrect[current], (1,1,1,1))
 									self.sender.setRectangleFillColor(self.rightmtrrect[current], (1,1,1,1))
 									self.sender.hideCursor(self.surfCur[current])
+									stringvaluetop = self.sender.getText(self.topCounter[current][0])
+									stringvaluetop += self.sender.getText(self.topCounter[current][1])
+									stringvaluetop += self.sender.getText(self.topCounter[current][2])
+									stringvaluetop += self.sender.getText(self.topCounter[current][3])
+									valuetop = int(stringvaluetop)
+									stringvalueright = self.sender.getText(self.rightCounter[current][0])
+									stringvalueright += self.sender.getText(self.rightCounter[current][1])
+									stringvalueright += self.sender.getText(self.rightCounter[current][2])
+									stringvalueright += self.sender.getText(self.rightCounter[current][3])
+									valueright = int(stringvalueright)
+									self.sender.setSurfaceRealWidth(self.warpedSurf[current], valuetop)
+									self.sender.setSurfaceRealHeight(self.warpedSurf[current], valueright)
+									print "top = " + str(valuetop)
+									print "right = " + str(valueright)
 									#self.sender.hideElement(self.stretchRects[current])
 								elif(self.surfControlMode=="aspect"):
 									current = None
@@ -768,14 +777,9 @@ class client:
 									self.sender.showElement(self.centSurfCirc[current])
 									self.sender.showElement(self.topmtrrect[current])
 									self.sender.showElement(self.rightmtrrect[current])
-									self.sender.showElement(self.topCounter[current][0])
-									self.sender.showElement(self.topCounter[current][1])
-									self.sender.showElement(self.topCounter[current][2])
-									self.sender.showElement(self.topCounter[current][3])
-									self.sender.showElement(self.rightCounter[current][0])
-									self.sender.showElement(self.rightCounter[current][1])
-									self.sender.showElement(self.rightCounter[current][2])
-									self.sender.showElement(self.rightCounter[current][3])
+									for z in range(0,4):
+										self.sender.showElement(self.topCounter[current][z])
+										self.sender.showElement(self.rightCounter[current][z])
 									self.sender.showElement(self.topcm[current])
 									self.sender.showElement(self.rightcm[current])
 					#Runs if the right mouse button has been released
@@ -1377,7 +1381,7 @@ class client:
 			self.mirrored[x] = False
 		for x in self.orientation:
 			self.orientation[x] = 0
-            
+			
 		for x in range(0,len(self.centerPoints)):
 			self.sender.removeElement(self.centerPoints[x], 1)
 		self.centerPoints = {}
