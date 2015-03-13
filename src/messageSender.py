@@ -686,9 +686,9 @@ class messageSender:
                                   'windowNo' : str(windowNo)})
         return owner["owner"]
         
-    def getWindowAppDetails(self, surfaceNo):
+    def getWindowAppDetails(self, windowNo):
         details = self.sendMessage({'call' : 'get_window_app_details',
-                                    'surfaceNo' : str(surfaceNo)})
+                                    'windowNo' : str(windowNo)})
         return (details["app"],details["instance"])
         
     def getWindowsByID(self, ID):

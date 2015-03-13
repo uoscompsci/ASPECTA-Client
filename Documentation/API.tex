@@ -94,6 +94,18 @@ Deletes the surface layout with the given name from the server.
 Sets the height in pixels of the texture which is going to be applied to the given surface.
 \subsubsection{setSurfacePixelWidth(surfaceNo, width)}
 Sets the width in pixels of the texture which is going to be applied to the given surface.
+\subsubsection{getSurfacePixelHeight(surfaceNo)}
+Gets the height in pixels of the texture which is going to be applied to the given surface.
+\subsubsection{getSurfacePixelWidth(surfaceNo)}
+Gets the width in pixels of the texture which is going to be applied to the given surface.
+\subsubsection{setSurfaceRealHeight(surfaceNo, height)}
+Sets the height in centimetres of the texture which is going to be applied to the given surface.
+\subsubsection{setSurfaceRealWidth(surfaceNo, width)}
+Sets the width in centimetres of the texture which is going to be applied to the given surface.
+\subsubsection{getSurfaceRealHeight(surfaceNo)}
+Gets the height in centimetres of the texture which is going to be applied to the given surface.
+\subsubsection{getSurfaceRealWidth(surfaceNo)}
+Gets the width in centimetres of the texture which is going to be applied to the given surface.
 \subsubsection{clearSurface(surfaceNo)}
 Removes all windows and elements from the given surface.
 \subsubsection{rotateSurfaceTo0(surfaceNo)}
@@ -113,10 +125,10 @@ Removes the connection between two surface sides. Sides should be given as one o
 
 \subsection{Window Management}
 Windows are placed on surfaces, so that users can attach elements to them. Windows can be moved and all the elements they contain will be moved too.
-\subsubsection{newWindow(surfaceNo, x, y, width, height, name)}
-This call creates a new window object and returns its window number (windowNo) to be used as an identifier by future calls. The user must supply the number of the surface the window is being applied to, the x and y coordinates on the surface it should be positioned at, and its width and height.
-\subsubsection{newWindowWithID(ID, surfaceNo, x, y, width, height, name)}
-This call creates a new window object with an identifier of the user's choice and returns its window number (windowNo) to be used as an identifier by future calls. The user must supply the number of the surface the window is being applied to, the x and y coordinates on the surface it should be positioned at, and its width and height.
+\subsubsection{newWindow(surfaceNo, x, y, width, height, coorSys, name)}
+This call creates a new window object and returns its window number (windowNo) to be used as an identifier by future calls. The user must supply the number of the surface the window is being applied to, the x and y coordinates on the surface it should be positioned at, and its width and height. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newWindowWithID(ID, surfaceNo, x, y, width, height, coorSys, name)}
+This call creates a new window object with an identifier of the user's choice and returns its window number (windowNo) to be used as an identifier by future calls. The user must supply the number of the surface the window is being applied to, the x and y coordinates on the surface it should be positioned at, and its width and height. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
 \subsubsection{getWindowID(windowNo)}
 This call returns the ID of the window with the given window number.
 \subsubsection{setWindowID(windowNo, ID)}
@@ -133,27 +145,27 @@ This call returns a list of window numbers containing all windows that have the 
 This call returns a list of window numbers containing all windows that have the queried application name.
 \subsubsection{getWindowsByAppDetails(name, instance)}
 This call returns a list of window numbers containing all windows that have the queried application name and instance number.
-\subsubsection{moveWindow(windowNo,xDistance,yDistance)}
+\subsubsection{moveWindow(windowNo, xDistance, yDistance, coorSys)}
 This call moves the stated window by the given x and y distances.
-\subsubsection{relocateWindow(windowNo, x, y, surfaceNo)}
+\subsubsection{relocateWindow(windowNo, x, y, coorSys, surfaceNo)}
 This call relocates the stated window to the given position on the given surface.
 \subsubsection{getWindowPosition(windowNo)}
 This call returns the position of the stated window as an (x,y) tuple.
-\subsubsection{setWindowWidth(windowNo, width)}
+\subsubsection{setWindowWidth(windowNo, width, coorSys)}
 This call resets the width of the stated window to the chosen value.
-\subsubsection{setWindowHeight(windowNo, height)}
+\subsubsection{setWindowHeight(windowNo, height, coorSys)}
 This call resets the height of the stated window to the chosen value.
 \subsubsection{getWindowWidth(windowNo, width)}
 This call returns the width of the stated window.
 \subsubsection{getWindowHeight(windowNo, height)}
 This call returns the height of the stated window.
-\subsubsection{stretchWindowDown(windowNo, distance)}
+\subsubsection{stretchWindowDown(windowNo, distance, coorSys)}
 This call stretches the stated window down by the chosen number of pixels.
-\subsubsection{stretchWindowUp(windowNo, distance)}
+\subsubsection{stretchWindowUp(windowNo, distance, coorSys)}
 This call stretches the stated window up by the chosen number of pixels.
-\subsubsection{stretchWindowLeft(windowNo, distance)}
+\subsubsection{stretchWindowLeft(windowNo, distance, coorSys)}
 This call stretches the stated window left by the chosen number of pixels.
-\subsubsection{stretchWindowRight(windowNo, distance)}
+\subsubsection{stretchWindowRight(windowNo, distance, coorSys)}
 This call stretches the stated window right by the chosen number of pixels.
 \subsubsection{setWindowName(windowNo, name)}
 This call sets the name of the stated window to the chosen value.
@@ -161,10 +173,10 @@ This call sets the name of the stated window to the chosen value.
 This call returns the name of the stated window.
 \subsection{Cursor Management}
 Cursor calls can be locked to mouse events to control a cursor on the wall. For instance, a program could track how much a mouse has moved regularly, and send a message using moveCursor() to duplicate this action on screen. When the user clicks a button on the mouse getCursorPosition() can be used to find the position of the mouse at the moment of the click and act accordingly.
-\subsubsection{newCursor(surfaceNo, x, y)}
-This call creates a new cursor object and returns its cursor number (cursorNo) to be used as an identifier by future calls. The user must supply the number of the surface the circle is being added to and the x and y coordinates of the cursor on the surface.
-\subsubsection{newCursorWithID(ID, surfaceNo, x, y)}
-This call creates a new cursor object with an identifier of the user's choice and returns its cursor number (cursorNo) to be used as an identifier by future calls. The user must supply the number of the surface the circle is being added to and the x and y coordinates of the cursor on the surface.
+\subsubsection{newCursor(surfaceNo, x, y, coorSys)}
+This call creates a new cursor object and returns its cursor number (cursorNo) to be used as an identifier by future calls. The user must supply the number of the surface the circle is being added to and the x and y coordinates of the cursor on the surface. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newCursorWithID(ID, surfaceNo, x, y, coorSys)}
+This call creates a new cursor object with an identifier of the user's choice and returns its cursor number (cursorNo) to be used as an identifier by future calls. The user must supply the number of the surface the circle is being added to and the x and y coordinates of the cursor on the surface. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
 \subsubsection{moveCursor(cursorNo, xDistance, yDistance)}
 This call moves the cursor with the given cursor number the requested x and y distances from its current location. Corrections are automatically made for cursor rotation.
 \subsubsection{testMoveCursor(cursorNo, xDistance, yDistance)}
@@ -226,23 +238,27 @@ This call return a boolean value stating if the given element is visible.
 \subsubsection{removeElement(elementNo, windowNo)}
 This call deletes the given element from the given window.
 \subsection{Circle Management (Element Subclass)}
-\subsubsection{newCircle(windowNo, x, y, radius, lineCol, fillCol, sides)}
-This call creates a new circle object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the circle is being added to, the x and y coordinates of the center point on the window, and its radius, line color (currently ignored), fill color and the number of sides the circle has (this defines the quality of the circle). Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{newCircleWithID(ID, windowNo, x, y, radius, lineCol, fillCol, sides)}
-This call creates a new circle object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the circle is being added to, the x and y coordinates of the center point on the window, and its radius, line color (currently ignored), fill color and the number of sides the circle has (this defines the quality of the circle). Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{relocateCircle(elementNo, x, y, windowNo)}
+\subsubsection{newCircle(windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides)}
+This call creates a new circle object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the circle is being added to, the x and y coordinates of the center point on the window, and its radius, line color (currently ignored), fill color and the number of sides the circle has (this defines the quality of the circle). Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newCircleWithID(ID, windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides)}
+This call creates a new circle object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the circle is being added to, the x and y coordinates of the center point on the window, and its radius, line color (currently ignored), fill color and the number of sides the circle has (this defines the quality of the circle). Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{relocateCircle(elementNo, x, y, coorSys, windowNo)}
 This call relocates the circle with the given element number to the given position on the given window.
 \subsubsection{getCirclePosition(elementNo)}
 This call returns an (x,y) tuple containing the coordinates of the circle with the given element number.
 \subsubsection{setCircleLineColor(elementNo, color)}
 This call sets the line color of the circle with the given element number. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. THIS CALL IS CURRENTLY UNNEEDED, AS OUTLINES AREN'T DISPLAYED ON SHAPES.
+\subsubsection{setCircleLineWidth(elementNo, width)}
+This call sets the line width of the circle with the given element number.
 \subsubsection{setCircleFillColor(elementNo, color)}
 This call sets the fill color of the circle with the given element number. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
 \subsubsection{getCircleLineColor(elementNo)}
 This call gets the line color of the circle with the given element number. Colors are returned as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
+\subsubsection{getCircleLineWidth(elementNo, width)}
+This call gets the line width of the circle with the given element number.
 \subsubsection{getCircleFillColor(elementNo)}
 This call gets the fill color of the circle with the given element number. Colors are returned as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{setCircleRadius(elementNo, radius)}
+\subsubsection{setCircleRadius(elementNo, radius, coorSys)}
 This call sets the radius of the circle with the given element number.
 \subsubsection{getCircleRadius(elementNo)}
 This call returns the radius of the circle with the given element number.
@@ -251,17 +267,17 @@ This call sets the number of sides that are used to define the circle with the g
 \subsubsection{getCircleSides(elementNo)}
 This call returns the number of sides that are used to define the circle with the given element number.
 \subsection{Line Management (Element Subclass)}
-\subsubsection{newLine(windowNo, xStart, yStart, xEnd, yEnd, color, width)}
-This call creates a new line object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line is being added to, the x and y coordinates of both the start and end points on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{newLineWithID(ID, windowNo, xStart, yStart, xEnd, yEnd, color, width)}
-This call creates a new line object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line is being added to, the x and y coordinates of both the start and end points on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
+\subsubsection{newLine(windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width)}
+This call creates a new line object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line is being added to, the x and y coordinates of both the start and end points on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newLineWithID(ID, windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width)}
+This call creates a new line object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line is being added to, the x and y coordinates of both the start and end points on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
 \subsubsection{getLineStart(elementNo)}
 This call returns the start location of the line with the given element number as a (x,y) tuple.
-\subsubsection{setLineStart(elementNo, x, y)}
+\subsubsection{setLineStart(elementNo, x, y, coorSys)}
 This call sets the start location of the line with the given element number.
 \subsubsection{getLineEnd(elementNo)}
 This call returns the end location of the line with the given element number as a (x,y) tuple.
-\subsubsection{setLineEnd(elementNo, x, y)}
+\subsubsection{setLineEnd(elementNo, x, y, coorSys)}
 This call sets the end location of the line with the given element number.
 \subsubsection{setLineColor(elementNo, color)}
 This call sets the color of the line with the given element number. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
@@ -272,17 +288,17 @@ This call sets the width of the line with the given element number.
 \subsubsection{getLineWidth(elementNo)}
 This call gets the width of the line with the given element number.
 \subsection{Line Strip Management (Element Subclass)}
-\subsubsection{newLineStrip(windowNo, x, y, color, width)}
-This call creates a new line strip object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line strip is being added to, the x and y coordinates of the start point on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{newLineStripWithID(ID, windowNo, x, y, color, width)}
-This call creates a new line strip object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line strip is being added to, the x and y coordinates of the start point on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{addLineStripPoint(elementNo, x, y)}
+\subsubsection{newLineStrip(windowNo, x, y, coorSys, color, width)}
+This call creates a new line strip object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line strip is being added to, the x and y coordinates of the start point on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newLineStripWithID(ID, windowNo, x, y, coorSys, color, width)}
+This call creates a new line strip object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the line strip is being added to, the x and y coordinates of the start point on the window, its width and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{addLineStripPoint(elementNo, x, y, coorSys)}
 This call adds a new point with the given coordinates onto the end of the line strip with the given element number.
-\subsubsection{addLineStripPointAt(elementNo, x, y, index)}
+\subsubsection{addLineStripPointAt(elementNo, x, y, coorSys, index)}
 This call adds a new point with the given coordinates at the chosen index of the line strip with the given element number.
 \subsubsection{getLineStripPoint(elementNo, pointNo)}
 This call returns the coordinates of the chosen point of the line strip with the given element number as an (x,y) tuple.
-\subsubsection{moveLineStripPoint(elementNo, pointNo, x, y)}
+\subsubsection{moveLineStripPoint(elementNo, pointNo, x, y, coorSys)}
 This call resets the coordinates of the chosen point of the line strip with the given element number.
 \subsubsection{setLineStripColor(elementNo, color)}
 This call sets the color of the line strip with the given element number. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
@@ -297,15 +313,15 @@ This call returns the number of points in the line strip with the given element 
 \subsubsection{setLineStripContent(elementNo, content)}
 This call sets all the points of the line strip with the given element number when passed in as a list of (x,y) tuples.
 \subsection{Polygon Management (Element Subclass)}
-\subsubsection{newPolygon(windowNo, x, y, lineColor, fillColor)}
-This call creates a new polygon object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the polygon is being added to, the x and y coordinates of the first point on the window, its line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{newPolygonWithID(ID, windowNo, x, y, lineColor, fillColor)}
-This call creates a new polygon object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the polygon is being added to, the x and y coordinates of the first point on the window, its line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{addPolygonPoint(elementNo, x, y)}
+\subsubsection{newPolygon(windowNo, x, y, coorSys, lineColor, lineWidth, fillColor)}
+This call creates a new polygon object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the polygon is being added to, the x and y coordinates of the first point on the window, its line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newPolygonWithID(ID, windowNo, x, y, coorSys, lineColor, lineWidth, fillColor)}
+This call creates a new polygon object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the polygon is being added to, the x and y coordinates of the first point on the window, its line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{addPolygonPoint(elementNo, x, y, coorSys)}
 This call adds a new point with the given coordinates onto the end of the list for the polygon with the given element number.
 \subsubsection{getPolygonPoint(elementNo, pointNo)}
 This call returns the coordinates of the chosen point in the polygon with the given element number as an (x,y) tuple.
-\subsubsection{movePolygonPoint(elementNo, pointNo, x, y)}
+\subsubsection{movePolygonPoint(elementNo, pointNo, x, y, coorSys)}
 This call resets the coordinates of the chosen point in the polygon with the given element number.
 \subsubsection{getPolygonFillColor(elementNo)}
 This call gets the fill color of the polygon with the given element number. Colors are returned as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
@@ -315,14 +331,18 @@ This call sets the fill color of the polygon with the given element number. Colo
 This call sets the line color of the polygon with the given element number. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. THIS CALL IS CURRENTLY UNNEEDED, AS OUTLINES AREN'T DISPLAYED ON SHAPES.
 \subsubsection{getPolygonLineColor(elementNo)}
 This call gets the line color of the polygon with the given element number. Colors are returned as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
+\subsubsection{setPolygonLineWidth(elementNo, width)}
+This call sets the line width of the polygon with the given element number.
+\subsubsection{getPolygonLineWidth(elementNo)}
+This call gets the line width of the polygon with the given element number.
 \subsubsection{getPolygonPointCount(elementNo)}
 This call returns the number of points in the polygon with the given element number.
 \subsection{Rectangle Management (Element Subclass)}
-\subsubsection{newRectangle(windowNo, x, y, width, height, lineColor, fillColor)}
-This call creates a new rectangle object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height, line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{newRectangle(ID, windowNo, x, y, width, height, lineColor, fillColor)}
-This call creates a new rectangle object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height, line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{setRectangleTopLeft(elementNo, x, y)}
+\subsubsection{newRectangle(windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor)}
+This call creates a new rectangle object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height, line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newRectangle(ID, windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor)}
+This call creates a new rectangle object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height, line color (currently ignored) and fill color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{setRectangleTopLeft(elementNo, x, y, coorSys)}
 This call sets the coordinates of the top-left corner of the rectangle with the given element number.
 \subsubsection{getRectangleTopLeft(elementNo)}
 This call returns the coordinates of the top-left of the rectangle with the given element number as an (x,y) tuple.
@@ -332,11 +352,11 @@ This call returns the coordinates of the top-right of the rectangle with the giv
 This call returns the coordinates of the bottom-right of the rectangle with the given element number as an (x,y) tuple.
 \subsubsection{getRectangleBottomLeft(elementNo)}
 This call returns the coordinates of the bottom-left of the rectangle with the given element number as an (x,y) tuple.
-\subsubsection{setRectangleWidth(elementNo, width)}
+\subsubsection{setRectangleWidth(elementNo, width, coorSys)}
 This call sets the width of the rectangle with the given element number.
 \subsubsection{getRectangleWidth(elementNo)}
 This call gets the width of the rectangle with the given element number.
-\subsubsection{setRectangleHeight(elementNo, height)}
+\subsubsection{setRectangleHeight(elementNo, height, coorSys)}
 This call sets the height of the rectangle with the given element number.
 \subsubsection{getRectangleHeight(elementNo)}
 This call gets the height of the rectangle with the given element number.
@@ -348,12 +368,16 @@ This call sets the fill color of the rectangle with the given element number. Co
 This call sets the line color of the rectangle with the given element number. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. THIS CALL IS CURRENTLY UNNEEDED, AS OUTLINES AREN'T DISPLAYED ON SHAPES.
 \subsubsection{getRectangleLineColor(elementNo)}
 This call gets the line color of the rectangle with the given element number. Colors are returned as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
+\subsubsection{setRectangleLineWidth(elementNo, width)}
+This call sets the line width of the rectangle with the given element number.
+\subsubsection{getRectangleLineWidth(elementNo)}
+This call gets the line width of the rectangle with the given element number.
 \subsection{Textured Rectangle Management (Element Subclass)}
-\subsubsection{newTexRectangle(windowNo, x, y, width, height, texture)}
-This call creates a new textured rectangle object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height and texture file name.
-\subsubsection{newTexRectangle(ID, windowNo, x, y, width, height, texture)}
-This call creates a new textured rectangle object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height and texture file name.
-\subsubsection{setTexRectangleTopLeft(elementNo, x, y)}
+\subsubsection{newTexRectangle(windowNo, x, y, width, height, coorSys, texture)}
+This call creates a new textured rectangle object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height and texture file name. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newTexRectangle(ID, windowNo, x, y, width, height, coorSys, texture)}
+This call creates a new textured rectangle object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the rectangle is being added to, the x and y coordinates of the top-left point on the window, its width, height and texture file name. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{setTexRectangleTopLeft(elementNo, x, y, coorSys)}
 This call sets the coordinates of the top-left corner of the textured rectangle with the given element number.
 \subsubsection{getTexRectangleTopLeft(elementNo)}
 This call returns the coordinates of the top-left of the textured rectangle with the given element number as an (x,y) tuple.
@@ -367,24 +391,24 @@ This call returns the coordinates of the bottom-left of the textured rectangle w
 This call returns the name of the texture which is being used for the textured rectangle with the given element number.
 \subsubsection{setTexRectangleTexture(elementNo, texture)}
 This call sets the texture which is being used for the textured rectangle with the given element number by name.
-\subsubsection{setTexRectangleWidth(elementNo, width)}
+\subsubsection{setTexRectangleWidth(elementNo, width, coorSys)}
 This call sets the width of the textured rectangle with the given element number.
 \subsubsection{getTexRectangleWidth(elementNo)}
 This call gets the width of the textured rectangle with the given element number.
-\subsubsection{setTexRectangleHeight(elementNo, height)}
+\subsubsection{setTexRectangleHeight(elementNo, height, coorSys)}
 This call sets the height of the textured rectangle with the given element number.
 \subsubsection{getTexRectangleHeight(elementNo)}
 This call gets the height of the textured rectangle with the given element number.
 \subsection{Text Management (Element Subclass)}
-\subsubsection{newText(windowNo, text, x, y, ptSize, font, color)}
-This call creates a new text block object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the text is being added to, the string that is being displayed, the x and y coordinates of the text on the window, it's point size, font and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
-\subsubsection{newTextWithID(windowNo, text, x, y, ptSize, font, color)}
-This call creates a new text block object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the text is being added to, the string that is being displayed, the x and y coordinates of the text on the window, it's point size, font and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1.
+\subsubsection{newText(windowNo, text, x, y, coorSys, ptSize, font, color)}
+This call creates a new text block object and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the text is being added to, the string that is being displayed, the x and y coordinates of the text on the window, it's point size, font and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
+\subsubsection{newTextWithID(windowNo, text, x, y, coorSys, ptSize, font, color)}
+This call creates a new text block object with an identifier of the user's choice and returns its element number (elementNo) to be used as an identifier by future calls. The user must supply the number of the window the text is being added to, the string that is being displayed, the x and y coordinates of the text on the window, it's point size, font and color. Colors should be passed in as an (r,g,b,$\alpha$) tuple where the values of r, g, b and $\alpha$ are between 0 and 1. The coordinate system that the user wants to use should also be stated as either "pix" for pixels, "prop" for the proportion of the height/width of the surface (between 0 and 1) or "real" for centimetres.
 \subsubsection{setText(elementNo, text)}
 This call sets the string which is shown for the text with the given element number.
 \subsubsection{getText(elementNo)}
 This call returns the string which is shown for the text with the given element number.
-\subsubsection{setTextPosition(elementNo, x, y, windowNo)}
+\subsubsection{setTextPosition(elementNo, x, y, coorSys, windowNo)}
 This call resets the position of the text with the given element number.
 \subsubsection{getTextPosition(elementNo)}
 This call returns the position of the text with the given element number as an (x,y) tuple.
@@ -431,12 +455,12 @@ width = sender.getSurfacePixelWidth(1)
 #Create a window that covers the whole 
 #surface
 win = sender.newWindow(1, 0, height, width, 
-	height,	"HWwin")
+	height, "pix", "HWwin")
 	
 #Render the words "Hello World" in the 
 #middle of the window.
 sender.newText(win, "Hello World", 
-	height/2-150, width/2-25, 60, 
+	height/2-150, width/2-25, "pix", 60, 
 	"Free Sans", (1,1,1,1))
 \end{lstlisting}
 \section{REST API}
@@ -458,18 +482,20 @@ Creates a base64 representation of the image with the chosen filename and sends 
 This example would be run in a UNIX terminal using "curl" assuming that the server is running on the same computer.
 
 \begin{lstlisting}[frame=single]
-curl -i -H "Content-Type: application/json"
-	-X POST -d "{\"surfaceNo\":0,
-	\"x\":0,\"y\":512,\"width\":512,
-	\"height\":512,\"name\":\"HWwin\"}" 
+curl -i -H "Content-Type: application/json" 
+	-X POST -d "{\surfaceNo\":0,\"x\":0,
+	\"y\":512,\"width\":512,
+	\"height\":512,\"coorSys\":\"pix\",
+	\"name\":\"HWwin\"}"
 	http://localhost:5000/api/newWindow
-curl -i -H "Content-Type: application/json"
+
+curl -i -H "Content-Type: application/json" 
 	-X POST -d "{\"windowNo\":1,
 	\"text\":\"Hello World\",\"x\":300,
-	\"y\":300,\"pt\":60,
-	\"font\":\"Free Sans\",
-	\"color\":\"1:1:1:1\"}" 
-	http://localhost:5000/api/newText
+	\"y\":300,\"coorSys\":\"pix\",
+	\"ptSize\":60,\"font\":
+	\"Free Sans\",\"color\":\"1:1:1:1\"
+	}" http://localhost:5000/api/newText
 
 
 \end{lstlisting}
