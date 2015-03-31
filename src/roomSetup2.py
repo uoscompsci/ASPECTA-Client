@@ -1485,7 +1485,7 @@ class client:
 		self.sender.hideCursor(self.mainCur)
 		
 		self.warpedSurf[0] = self.sender.newSurface()
-		self.window = self.sender.newWindow(self.warpedSurf[0], 200, 200, 100, 100, "pix", "Bob")
+		self.window = self.sender.newWindow(self.warpedSurf[0], 0, 512, 512, 512, "pix", "Bob")
 		self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512/2, 512/2, "pix")
 		self.sender.hideCursor(self.surfCur[0])
 		self.texRects[0] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
@@ -1520,7 +1520,7 @@ class client:
 		self.surfWindows[0] = self.window
 
 		self.warpedSurf[1] = self.sender.newSurface()
-		self.window = self.sender.newWindow(self.warpedSurf[1], 200, 200, 100, 100, "pix", "Bob")
+		self.window = self.sender.newWindow(self.warpedSurf[1], 0, 512, 512, 512, "pix", "Bob")
 		self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512/2, 512/2, "pix")
 		self.sender.hideCursor(self.surfCur[1])
 		self.texRects[1] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
@@ -1555,7 +1555,7 @@ class client:
 		self.surfWindows[1] = self.window
 
 		self.warpedSurf[2] = self.sender.newSurface()
-		self.window = self.sender.newWindow(self.warpedSurf[2], 200, 200, 100, 100, "pix", "Bob")
+		self.window = self.sender.newWindow(self.warpedSurf[2], 0, 512, 512, 512, "pix", "Bob")
 		self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512/2, 512/2, "pix")
 		self.sender.hideCursor(self.surfCur[2])
 		self.texRects[2] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
@@ -1590,7 +1590,7 @@ class client:
 		self.surfWindows[2] = self.window
 
 		self.warpedSurf[3] = self.sender.newSurface()
-		self.window = self.sender.newWindow(self.warpedSurf[3], 200, 200, 100, 100, "pix", "Bob")
+		self.window = self.sender.newWindow(self.warpedSurf[3], 0, 512, 512, 512, "pix", "Bob")
 		self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512/2, 512/2, "pix")
 		self.sender.hideCursor(self.surfCur[3])
 		self.texRects[3] = self.sender.newTexRectangle(self.window, 0, 512, 512, 512, "pix", "checks.jpg")
