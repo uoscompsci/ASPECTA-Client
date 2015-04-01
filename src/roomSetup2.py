@@ -78,7 +78,7 @@ class client:
 						self.bezierUpdates[x][3] = False
 				except:
 					pass
-			time.sleep(0.0/30)
+			time.sleep(1.0/60)
 			
 	def lineIntersection(self, x1a, y1a, x2a, y2a, x1b, y1b, x2b, y2b):
 		dx = x2a - x1a
@@ -1209,7 +1209,6 @@ class client:
 		self.createConnectionLine((fromSide[0],self.sideToCorners[fromSide[1]][1]), (toSide[0],self.sideToCorners[toSide[1]][1]), True)
 		
 	def loadRealMeasurements(self, measurements):
-		print "loading " + str(measurements)
 		for x in range(0,len(measurements)):
 			widstring = str(measurements[x][0])
 			heistring = str(measurements[x][1])
@@ -1683,7 +1682,7 @@ class client:
 				self.getInput(False)
 				self.screen.blit(self.background, (0, 0))
 				pygame.display.flip()
-				time.sleep(1/30)
+				time.sleep(1.0/60)
 		time.sleep(0.2)
 		pygame.quit()
 client()

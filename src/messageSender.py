@@ -53,6 +53,7 @@ class messageSender:
     
     def eleUpdater(self):
         while self.loop:
+            time.sleep(1.0/60)
             #print str(self.eletrack)
             strips = 0
             for x in range(0,len(self.elelocs)):
