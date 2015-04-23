@@ -806,13 +806,13 @@ class messageSender:
         self.sendMessage({'call' : 'stop_being_element_admin',
                           'elementNo' : str(elementNo)})
     
-    def moveCursor(self, cursorNo, xDistance, yDistance):
+    def shiftCursor(self, cursorNo, xDistance, yDistance):
         self.sendMessage({'call' : 'move_cursor',
                           'cursorNo' : str(cursorNo),
                           'xDist' : str(xDistance),
                           'yDist' : str(yDistance)})
         
-    def testMoveCursor(self, cursorNo, xDistance, yDistance):
+    def testShiftCursor(self, cursorNo, xDistance, yDistance):
         loc = self.sendMessage({'call' : 'test_move_cursor',
                                 'cursorNo' : str(cursorNo),
                                 'xDist' : str(xDistance),
@@ -880,7 +880,7 @@ class messageSender:
                                        'cursorNo' : str(cursorNo)})
         return visibility["visibility"]
     
-    def moveWindow(self, windowNo, xDistance, yDistance, coorSys):
+    def shiftWindow(self, windowNo, xDistance, yDistance, coorSys):
         self.sendMessage({'call' : 'move_window',
                           'windowNo' : str(windowNo),
                           'xDist' : str(xDistance),
@@ -956,6 +956,13 @@ class messageSender:
                                  'windowNo' : str(windowNo)})
         return name["name"]
     
+    def shiftCircle(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_circle',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
+                          'coorSys' : str(coorSys)})
+        
     def relocateCircle(self, elementNo, x, y, coorSys, windowNo):
         self.elelocs[elementNo] = (x,y,coorSys)
         self.eletrack[elementNo][0] = True
@@ -1022,6 +1029,22 @@ class messageSender:
                                   'elementNo' : str(elementNo)})
         return sides["sides"]
     
+    def shiftLine(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_line',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
+                          'coorSys' : str(coorSys)})
+        
+    def relocateLine(self, elementNo, refPoint, x, y, coorSys, windowNo):
+        self.sendMessage({'call' : 'relocate_line',
+                          'elementNo' : str(elementNo),
+                          'refPoint' : str(refPoint),
+                          'x' : str(x),
+                          'y' : str(y),
+                          'coorSys' : str(coorSys),
+                          'windowNo' : str(windowNo)})
+    
     def getLineStart(self, elementNo):
         loc = self.sendMessage({'call' : 'get_line_start',
                                 'elementNo' : str(elementNo)})
@@ -1085,6 +1108,22 @@ class messageSender:
                                     'elementNo' : str(elementNo),
                                     'index' : str(pointNo)})
             return [loc["x"],loc["y"]]
+        
+    def shiftLineStrip(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_line_strip',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
+                          'coorSys' : str(coorSys)})
+        
+    def relocateLineStrip(self, elementNo, refPoint, x, y, coorSys, windowNo):
+        self.sendMessage({'call' : 'relocate_line_strip',
+                          'elementNo' : str(elementNo),
+                          'refPoint' : str(refPoint),
+                          'x' : str(x),
+                          'y' : str(y),
+                          'coorSys' : str(coorSys),
+                          'windowNo' : str(windowNo)})
     
     def moveLineStripPoint(self, elementNo, pointNo, x, y, coorSys):
         self.stripLock.acquire()
@@ -1138,6 +1177,22 @@ class messageSender:
                                 'index' : str(pointNo)})
         return (loc["x"],loc["y"])
     
+    def shiftPolygon(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_polygon',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
+                          'coorSys' : str(coorSys)})
+        
+    def relocatePolygon(self, elementNo, refPoint, x, y, coorSys, windowNo):
+        self.sendMessage({'call' : 'relocate_polygon',
+                          'elementNo' : str(elementNo),
+                          'refPoint' : str(refPoint),
+                          'x' : str(x),
+                          'y' : str(y),
+                          'coorSys' : str(coorSys),
+                          'windowNo' : str(windowNo)})
+    
     def movePolygonPoint(self, elementNo, pointNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_polygon_point',
                           'elementNo' : str(elementNo),
@@ -1179,11 +1234,19 @@ class messageSender:
                                   'elementNo' : str(elementNo)})
         return count["count"]
     
-    def setRectangleTopLeft(self, elementNo, x, y, coorSys):
+    def relocateRectangle(self, elementNo, x, y, coorSys, windowNo):
         self.sendMessage({'call' : 'set_rectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
+                          'coorSys' : str(coorSys),
+                          'windowNo' : str(windowNo)})
+        
+    def shiftRectangle(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_rectangle',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
     def getRectangleTopLeft(self, elementNo):
@@ -1256,11 +1319,19 @@ class messageSender:
                                  'elementNo' : str(elementNo)})
         return width["width"]
     
-    def setTexRectangleTopLeft(self, elementNo, x, y, coorSys):
+    def relocateTexRectangle(self, elementNo, x, y, coorSys, windowNo):
         self.sendMessage({'call' : 'set_texrectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
+                          'coorSys' : str(coorSys),
+                          'windowNo' : str(windowNo)})
+        
+    def shiftTexRectangle(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_texrectangle',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
     def getTexRectangleTopLeft(self, elementNo):
@@ -1329,13 +1400,20 @@ class messageSender:
                                  'elementNo' : str(elementNo)})
         return text["text"]
     
-    def setTextPosition(self, elementNo, x, y, coorSys, windowNo):
+    def relocateText(self, elementNo, x, y, coorSys, windowNo):
         self.sendMessage({'call' : 'relocate_text',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
                           'windowNo' : str(windowNo)})
+        
+    def shiftText(self, elementNo, xDist, yDist, coorSys):
+        self.sendMessage({'call' : 'shift_text',
+                          'elementNo' : str(elementNo),
+                          'xDist' : str(xDist),
+                          'yDist' : str(yDist),
+                          'coorSys' : str(coorSys)})
         
     def getTextPosition(self, elementNo):
         loc = self.sendMessage({'call' : 'get_text_pos',

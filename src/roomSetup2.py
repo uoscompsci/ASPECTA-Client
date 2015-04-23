@@ -708,7 +708,7 @@ class client:
 								self.sender.setRectangleHeight(self.stretchRects[self.stretching[0][0]], 150, "pix")
 								self.sender.setSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]], int(newWidth))
 								self.sender.setSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]], int(newHeight))
-								self.sender.setRectangleTopLeft(self.stretchRects[self.stretching[0][0]], newWidth/2-75, newHeight/2+75, "pix")
+								self.sender.relocateRectangle(self.stretchRects[self.stretching[0][0]], newWidth/2-75, newHeight/2+75, "pix", self.surfWindows[self.warpedSurf[self.stretching[0][0]]-1])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][0], newWidth/2, newHeight/2+75, "pix", self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][1], newWidth/2, newHeight/2-75, "pix", self.surfWindows[self.stretching[0][0]])
 								self.sender.relocateCircle(self.stretchCircs[self.stretching[0][0]][2], newWidth/2-75, newHeight/2, "pix", self.surfWindows[self.stretching[0][0]])
@@ -915,7 +915,7 @@ class client:
 				if (not(xdist==0 and ydist==0)):
 					pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
 					
-					self.sender.moveCursor(self.controlCur, -xdist, ydist)
+					self.sender.shiftCursor(self.controlCur, -xdist, ydist)
 
 					loc = self.sender.getCursorPosition(self.controlCur)
 					if(len(self.dragging)!=0):
@@ -1003,7 +1003,7 @@ class client:
 		width = abs(left-right)
 		self.sender.setRectangleHeight(self.stretchRects[surfaceRectNo], height, "pix")
 		self.sender.setRectangleWidth(self.stretchRects[surfaceRectNo], width, "pix")
-		self.sender.setRectangleTopLeft(self.stretchRects[surfaceRectNo], left, top, "pix")
+		self.sender.relocateRectangle(self.stretchRects[surfaceRectNo], left, top, "pix", self.surfWindows[surfaceRectNo])
 			
 	#Defines all required surfaces according to a layout data structure				
 	def redefineSurface(self,layout):
