@@ -759,8 +759,6 @@ class client:
 									valueright = int(stringvalueright)
 									self.sender.setSurfaceRealWidth(self.warpedSurf[current], valuetop)
 									self.sender.setSurfaceRealHeight(self.warpedSurf[current], valueright)
-									print "top = " + str(valuetop)
-									print "right = " + str(valueright)
 									#self.sender.hideElement(self.stretchRects[current])
 								elif(self.surfControlMode=="aspect"):
 									current = None
