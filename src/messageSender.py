@@ -14,8 +14,6 @@ class messageSender:
               6 : "Application name not yet set",
               7 : "Must be owner to change admin setting"
     }
-    elelocs = {} #Could act as cache inside bus in future versions (to allow multiple clients)
-    eletrack = {}
     stripLock = threading.Lock()
     sendlock = threading.Lock()
     loop = True
@@ -51,43 +49,6 @@ class messageSender:
         s.close()
         return int(imageNo)
     
-    def eleUpdater(self):
-        while self.loop:
-            time.sleep(1.0/60)
-            #print str(self.eletrack)
-            strips = 0
-            for x in range(0,len(self.elelocs)):
-                try:
-                    if(self.eletrack[self.elelocs.keys()[x]][0] == True):
-                        if(self.eletrack[self.elelocs.keys()[x]][1] == "lineStrip"):
-                            strips += 1
-                            self.stripLock.acquire()
-                            converted = str(self.elelocs[self.elelocs.keys()[x]][0][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][0][1])
-                            for y in range(0,len(self.elelocs[self.elelocs.keys()[x]])):
-                                converted += ";" + str(self.elelocs[self.elelocs.keys()[x]][y][0]) + ":" + str(self.elelocs[self.elelocs.keys()[x]][y][1])
-                            self.sendMessage({'call' : 'set_line_strip_content', 
-                                              'elementNo' : str(self.elelocs.keys()[x]), 
-                                              'content' : converted})
-                            self.stripLock.release()
-                        elif(self.eletrack[self.elelocs.keys()[x]][1] == "circle"):
-                            self.sendMessage({'call' : 'relocate_circle', 
-                                              'elementNo' : str(self.elelocs.keys()[x]), 
-                                              'x' : str(self.elelocs[self.elelocs.keys()[x]][0]), 
-                                              'y' : str(self.elelocs[self.elelocs.keys()[x]][1]), 
-                                              'coorSys' : str(self.elelocs[self.elelocs.keys()[x]][2])})
-                        elif(self.eletrack[self.elelocs.keys()[x]][1] == "line"):
-                            self.sendMessage({'call' : 'relocate_text',
-                                              'elementNo' : str(self.elelocs.keys()[x]),
-                                              'x' : str(self.elelocs[self.elelocs.keys()[x]][0]), 
-                                              'y' : str(self.elelocs[self.elelocs.keys()[x]][1]), 
-                                              'coorSys' : str(self.elelocs[self.elelocs.keys()[x]][2]),
-                                              'windowNo' : str(self.elelocs[self.elelocs.keys()[x]][3])})
-                        self.eletrack[self.elelocs.keys()[x]][0]=False
-                except IndexError, e:
-                    pass
-            time.sleep(self.refreshrate)
-        print "Closing"
-    
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
@@ -97,8 +58,6 @@ class messageSender:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.s.settimeout(2)
-        thread = threading.Thread(target=self.eleUpdater, args=()) #Creates the display thread
-        thread.start() #Starts the display thread
         try:
             self.s.connect((self.host,self.port))
         except:
@@ -158,13 +117,9 @@ class messageSender:
     def quit(self):
         self.sendMessage({'call' : 'quit'})
         self.loop=False
-        self.eletrack = {}
-        self.elelocs = {}
         
     def quitClientOnly(self):
         self.loop=False
-        self.eletrack = {}
-        self.elelocs = {}
         
     def login(self, username):
         self.sendMessage({'call' : 'login', 
@@ -239,8 +194,6 @@ class messageSender:
                                 'fillColor' : self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]), 
                                 'sides' : str(sides)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y,coorSys)
-        self.eletrack[eleNo] = [True,"circle"]
         return eleNo
     
     def newCircleWithID(self, ID, windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
@@ -256,8 +209,6 @@ class messageSender:
                                 'fillColor' : self.colorString(fillCol[0], fillCol[1], fillCol[2], fillCol[3]),
                                 'sides' : str(sides)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y,coorSys)
-        self.eletrack[eleNo] = [True,"circle"]
         return eleNo
     
     def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
@@ -271,8 +222,6 @@ class messageSender:
                                 'color' : self.colorString(color[0], color[1], color[2], color[3]),
                                 'width' : str(width)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (xStart,yStart,xEnd,yEnd)
-        self.eletrack[eleNo] = [True,"line"]
         return eleNo
     
     def newLineWithID(self, ID, windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
@@ -287,8 +236,6 @@ class messageSender:
                                 'color' : self.colorString(color[0], color[1], color[2], color[3]),
                                 'width' : str(width)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (xStart,yStart,xEnd,yEnd)
-        self.eletrack[eleNo] = [True,"line"]
         return eleNo
     
     def newLineStrip(self, windowNo, x, y, coorSys, color, width):
@@ -300,8 +247,6 @@ class messageSender:
                                 'color' : self.colorString(color[0], color[1], color[2], color[3]),
                                 'width' : str(width)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y,coorSys]]
-        self.eletrack[eleNo] = [True,"lineStrip"]
         return eleNo
     
     def newLineStripWithID(self, ID, windowNo, x, y, coorSys, color, width):
@@ -314,8 +259,6 @@ class messageSender:
                                 'color' : self.colorString(color[0], color[1], color[2], color[3]),
                                 'width' : str(width)})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y,coorSys]]
-        self.eletrack[eleNo] = [True,"lineStrip"]
         return eleNo
     
     def newPolygon(self, windowNo, x, y, coorSys, lineColor, lineWidth, fillColor):
@@ -328,8 +271,6 @@ class messageSender:
                                 'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y,coorSys]]
-        self.eletrack[eleNo] = [True,"polygon"]
         return eleNo
     
     def newPolygonWithID(self, ID, windowNo, x, y, coorSys, lineColor, lineWidth, fillColor):
@@ -343,8 +284,6 @@ class messageSender:
                                 'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y,coorSys]]
-        self.eletrack[eleNo] = [True,"polygon"]
         return eleNo
     
     def newTexRectangle(self, windowNo, x, y, width, height, coorSys, filename):
@@ -361,8 +300,6 @@ class messageSender:
                                     'textureData' : encoded_string,
                                     'extension' : extension})
             eleNo = int(ele["elementNo"])
-            self.elelocs[eleNo] = (x,y)
-            self.eletrack[eleNo] = [True,"texrectangle"]
             return eleNo
     
     def newTexRectangleWithID(self, ID, windowNo, x, y, width, height, coorSys, filename):
@@ -380,8 +317,6 @@ class messageSender:
                                     'textureData' : encoded_string,
                                     'extension' : extension})
             eleNo = int(ele["elementNo"])
-            self.elelocs[eleNo] = (x,y)
-            self.eletrack[eleNo] = [True,"texrectangle"]
             return eleNo
     
     def newRectangle(self, windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
@@ -396,8 +331,6 @@ class messageSender:
                                 'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y)
-        self.eletrack[eleNo] = [True,"rectangle"]
         return eleNo
     
     def newRectangleWithID(self, ID, windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
@@ -413,8 +346,6 @@ class messageSender:
                                 'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y)
-        self.eletrack[eleNo] = [True,"rectangle"]
         return eleNo
     
     def newText(self, windowNo, text, x, y, coorSys, ptSize, font, color):
@@ -428,8 +359,6 @@ class messageSender:
                                 'font' : font,
                                 'color' : self.colorString(color[0], color[1], color[2], color[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y,coorSys,windowNo)
-        self.eletrack[eleNo] = [True,"text"]
         return eleNo
     
     def newTextWithID(self, ID, windowNo, text, x, y, coorSys, ptSize, font, color):
@@ -444,8 +373,6 @@ class messageSender:
                                 'font' : font,
                                 'color' : self.colorString(color[0], color[1], color[2], color[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y,coorSys,windowNo)
-        self.eletrack[eleNo] = [True,"text"]
         return eleNo
     
     def subscribeToSurface(self, surfaceNo):
@@ -971,16 +898,17 @@ class messageSender:
                           'coorSys' : str(coorSys)})
         
     def relocateCircle(self, elementNo, x, y, coorSys, windowNo):
-        self.elelocs[elementNo] = (x,y,coorSys)
-        self.eletrack[elementNo][0] = True
+        self.sendMessage({'call' : 'relocate_circle', 
+                          'elementNo' : elementNo, 
+                          'x' : x, 
+                          'y' : y, 
+                          'coorSys' : coorSys,
+                          'windowNo' : windowNo})
         
     def getCirclePosition(self, elementNo):
-        if (self.elelocs.has_key(elementNo)):
-            return [self.elelocs[elementNo][0],self.elelocs[elementNo][1]]
-        else:
-            loc = self.sendMessage({'call' : 'get_circle_pos',
+        loc = self.sendMessage({'call' : 'get_circle_pos',
                                     'elementNo' : str(elementNo)})
-            return [loc["x"],loc["y"]]
+        return [loc["x"],loc["y"]]
     
     def getElementType(self, elementNo):
         type = self.sendMessage({'call' : 'get_element_type',
@@ -1096,25 +1024,25 @@ class messageSender:
         return width["width"]
     
     def addLineStripPoint(self, elementNo, x, y, coorSys):
-        self.stripLock.acquire()
-        self.elelocs[elementNo].append([x,y,coorSys])
-        self.eletrack[elementNo][0] = True
-        self.stripLock.release()
+        self.sendMessage({'call' : 'add_line_strip_point',
+                          'elementNo' : str(elementNo),
+                          'x' : str(x),
+                          'y' : str(y),
+                          'coorSys' : coorSys})
         
     def addLineStripPointAt(self, elementNo, x, y, coorSys, index):
-        self.stripLock.acquire()
-        self.elelocs[elementNo].insert(index,[x,y,coorSys])
-        self.eletrack[elementNo][0] = True
-        self.stripLock.release()
+        self.sendMessage({'call' : 'add_line_strip_point_at',
+                          'elementNo' : str(elementNo),
+                          'x' : str(x),
+                          'y' : str(y),
+                          'coorSys' : coorSys,
+                          'index' : str(index)})
         
     def getLineStripPoint(self, elementNo, pointNo):
-        if(self.elelocs.has_key(elementNo)):
-            return [self.elelocs[elementNo][pointNo][0],self.elelocs[elementNo][pointNo][1]]
-        else:
-            loc = self.sendMessage({'call' : 'get_line_strip_point',
-                                    'elementNo' : str(elementNo),
-                                    'index' : str(pointNo)})
-            return [loc["x"],loc["y"]]
+        loc = self.sendMessage({'call' : 'get_line_strip_point',
+                                'elementNo' : str(elementNo),
+                                'index' : str(pointNo)})
+        return [loc["x"],loc["y"]]
         
     def shiftLineStrip(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_line_strip',
@@ -1133,10 +1061,12 @@ class messageSender:
                           'windowNo' : str(windowNo)})
     
     def moveLineStripPoint(self, elementNo, pointNo, x, y, coorSys):
-        self.stripLock.acquire()
-        self.elelocs[elementNo][pointNo] = [x,y,coorSys]
-        self.eletrack[elementNo][0] = True
-        self.stripLock.release()
+        self.sendMessage({'call' : 'relocate_line_strip_point',
+                          'elementNo' : str(elementNo),
+                          'pointNo' : str(pointNo),
+                          'x' : str(x),
+                          'y' : str(y),
+                          'coorSys' : coorSys})
         
     def getLineStripColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_line_strip_color',
@@ -1163,13 +1093,12 @@ class messageSender:
         return count["count"]
     
     def setLineStripContent(self, elementNo, content):
-        self.stripLock.acquire()
-        self.elelock = True
-        self.elelocs[elementNo] = [[content[0][0],content[0][1],"pix"]]
-        for x in range(1,len(content)):
-            self.elelocs[elementNo].append([content[x][0],content[x][1],"pix"])
-        self.eletrack[elementNo][0] = True
-        self.stripLock.release()
+        converted = str(content[0][0]) + ":" + str(content[0][1])
+        for y in range(0,len(content)):
+            converted += ";" + str(content[y][0]) + ":" + str(content[y][1])
+        self.sendMessage({'call' : 'set_line_strip_content', 
+                          'elementNo' : str(elementNo), 
+                          'content' : converted})
     
     def addPolygonPoint(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'add_polygon_point',
@@ -1408,8 +1337,12 @@ class messageSender:
         return text["text"]
     
     def relocateText(self, elementNo, x, y, coorSys, windowNo):
-        self.elelocs[elementNo] = (x,y,coorSys,windowNo)
-        self.eletrack[elementNo][0] = True
+        self.sendMessage({'call' : 'relocate_text',
+                          'elementNo' : elementNo,
+                          'x' : x, 
+                          'y' : y, 
+                          'coorSys' : coorSys,
+                          'windowNo' : windowNo})
         
     def shiftText(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_text',
