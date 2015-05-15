@@ -75,6 +75,13 @@ class messageSender:
                                               'x' : str(self.elelocs[self.elelocs.keys()[x]][0]), 
                                               'y' : str(self.elelocs[self.elelocs.keys()[x]][1]), 
                                               'coorSys' : str(self.elelocs[self.elelocs.keys()[x]][2])})
+                        elif(self.eletrack[self.elelocs.keys()[x]][1] == "line"):
+                            self.sendMessage({'call' : 'relocate_text',
+                                              'elementNo' : str(self.elelocs.keys()[x]),
+                                              'x' : str(self.elelocs[self.elelocs.keys()[x]][0]), 
+                                              'y' : str(self.elelocs[self.elelocs.keys()[x]][1]), 
+                                              'coorSys' : str(self.elelocs[self.elelocs.keys()[x]][2]),
+                                              'windowNo' : str(self.elelocs[self.elelocs.keys()[x]][3])})
                         self.eletrack[self.elelocs.keys()[x]][0]=False
                 except IndexError, e:
                     pass
@@ -321,7 +328,7 @@ class messageSender:
                                 'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y]]
+        self.elelocs[eleNo] = [[x,y,coorSys]]
         self.eletrack[eleNo] = [True,"polygon"]
         return eleNo
     
@@ -336,7 +343,7 @@ class messageSender:
                                 'lineWidth' : str(lineWidth),
                                 'fillColor' : self.colorString(fillColor[0], fillColor[1], fillColor[2], fillColor[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = [[x,y]]
+        self.elelocs[eleNo] = [[x,y,coorSys]]
         self.eletrack[eleNo] = [True,"polygon"]
         return eleNo
     
@@ -421,7 +428,7 @@ class messageSender:
                                 'font' : font,
                                 'color' : self.colorString(color[0], color[1], color[2], color[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y)
+        self.elelocs[eleNo] = (x,y,coorSys,windowNo)
         self.eletrack[eleNo] = [True,"text"]
         return eleNo
     
@@ -437,7 +444,7 @@ class messageSender:
                                 'font' : font,
                                 'color' : self.colorString(color[0], color[1], color[2], color[3])})
         eleNo = int(ele["elementNo"])
-        self.elelocs[eleNo] = (x,y)
+        self.elelocs[eleNo] = (x,y,coorSys,windowNo)
         self.eletrack[eleNo] = [True,"text"]
         return eleNo
     
@@ -1401,12 +1408,8 @@ class messageSender:
         return text["text"]
     
     def relocateText(self, elementNo, x, y, coorSys, windowNo):
-        self.sendMessage({'call' : 'relocate_text',
-                          'elementNo' : str(elementNo),
-                          'x' : str(x),
-                          'y' : str(y),
-                          'coorSys' : str(coorSys),
-                          'windowNo' : str(windowNo)})
+        self.elelocs[elementNo] = (x,y,coorSys,windowNo)
+        self.eletrack[elementNo][0] = True
         
     def shiftText(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_text',
