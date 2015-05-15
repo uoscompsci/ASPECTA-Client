@@ -24,8 +24,8 @@ class messageSender:
             l = "0" + l
         return l
 
-    def uploadImage(self, file):
-        filename = file.split("/")
+    def uploadImage(self, fileParam):
+        filename = fileParam.split("/")
         filename = filename[-1]
         self.sendMessage({'call' : 'set_upload_name', 'filename' : filename})
         time.sleep(0.5)
@@ -33,7 +33,7 @@ class messageSender:
         s.connect((self.host,self.port+1))
         imageNo = s.recv(1024)
         
-        f=open(file, "rb") 
+        f=open(fileParam, "rb") 
         data=f.read()
         
         s.sendall(self.encode_length(len(data)))
@@ -911,9 +911,9 @@ class messageSender:
         return [loc["x"],loc["y"]]
     
     def getElementType(self, elementNo):
-        type = self.sendMessage({'call' : 'get_element_type',
+        typeName = self.sendMessage({'call' : 'get_element_type',
                                  'elementNo' : str(elementNo)})
-        return type["type"]
+        return typeName["type"]
     
     def setCircleLineColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_circle_line_color',
