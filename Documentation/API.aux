@@ -63,8 +63,8 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Cursor Management}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.1}newCursor(surfaceNo, x, y, coorSys)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.2}newCursorWithID(ID, surfaceNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.3}moveCursor(cursorNo, xDistance, yDistance)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.4}testMoveCursor(cursorNo, xDistance, yDistance)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.3}shiftCursor(cursorNo, xDistance, yDistance)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.4}testShiftCursor(cursorNo, xDistance, yDistance)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.5}relocateCursor(cursorNo, x, y, surfaceNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.6}getCursorPosition(cursorNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.7}rotateCursorClockwise(cursorNo, degrees)}{\thepage }}
@@ -97,99 +97,109 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.1}newCircle(windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.2}newCircleWithID(ID, windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.3}relocateCircle(elementNo, x, y, coorSys, windowNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.4}getCirclePosition(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.5}setCircleLineColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.6}setCircleLineWidth(elementNo, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.7}setCircleFillColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.8}getCircleLineColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.9}getCircleLineWidth(elementNo, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.10}getCircleFillColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.11}setCircleRadius(elementNo, radius, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.12}getCircleRadius(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.13}setCircleSides(elementNo, sides)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.14}getCircleSides(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.4}shiftCircle(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.5}getCirclePosition(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.6}setCircleLineColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.7}setCircleLineWidth(elementNo, width)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.8}setCircleFillColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.9}getCircleLineColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.10}getCircleLineWidth(elementNo, width)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.11}getCircleFillColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.12}setCircleRadius(elementNo, radius, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.13}getCircleRadius(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.14}setCircleSides(elementNo, sides)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.6.15}getCircleSides(elementNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.7}Line Management (Element Subclass)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.1}newLine(windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.2}newLineWithID(ID, windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.3}getLineStart(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.4}setLineStart(elementNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.5}getLineEnd(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.6}setLineEnd(elementNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.7}setLineColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.8}getLineColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.9}setLineWidth(elementNo, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.10}getLineWidth(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.3}relocateLine(elementNo, refPoint, x, y, coorSys, windowNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.4}shiftLine(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.5}getLineStart(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.6}setLineStart(elementNo, x, y, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.7}getLineEnd(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.8}setLineEnd(elementNo, x, y, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.9}setLineColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.10}getLineColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.11}setLineWidth(elementNo, width)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.7.12}getLineWidth(elementNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.8}Line Strip Management (Element Subclass)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.1}newLineStrip(windowNo, x, y, coorSys, color, width)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.2}newLineStripWithID(ID, windowNo, x, y, coorSys, color, width)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.3}addLineStripPoint(elementNo, x, y, coorSys)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.4}addLineStripPointAt(elementNo, x, y, coorSys, index)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.5}getLineStripPoint(elementNo, pointNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.6}moveLineStripPoint(elementNo, pointNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.7}setLineStripColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.8}getLineStripColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.9}setLineStripWidth(elementNo, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.10}getLineStripWidth(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.11}getLineStripPointCount(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.12}setLineStripContent(elementNo, content)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.5}relocateLineStrip(elementNo, refPoint, x, y, coorSys, windowNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.6}shiftLineStrip(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.7}getLineStripPoint(elementNo, pointNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.8}moveLineStripPoint(elementNo, pointNo, x, y, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.9}setLineStripColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.10}getLineStripColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.11}setLineStripWidth(elementNo, width)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.12}getLineStripWidth(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.13}getLineStripPointCount(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.8.14}setLineStripContent(elementNo, content)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.9}Polygon Management (Element Subclass)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.1}newPolygon(windowNo, x, y, coorSys, lineColor, lineWidth, fillColor)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.2}newPolygonWithID(ID, windowNo, x, y, coorSys, lineColor, lineWidth, fillColor)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.3}addPolygonPoint(elementNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.4}getPolygonPoint(elementNo, pointNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.5}movePolygonPoint(elementNo, pointNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.6}getPolygonFillColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.7}setPolygonFillColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.8}setPolygonLineColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.9}getPolygonLineColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.10}setPolygonLineWidth(elementNo, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.11}getPolygonLineWidth(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.12}getPolygonPointCount(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.4}relocatePolygon(elementNo, refPoint, x, y, coorSys, windowNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.5}shiftPolygon(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.6}getPolygonPoint(elementNo, pointNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.7}movePolygonPoint(elementNo, pointNo, x, y, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.8}getPolygonFillColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.9}setPolygonFillColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.10}setPolygonLineColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.11}getPolygonLineColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.12}setPolygonLineWidth(elementNo, width)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.13}getPolygonLineWidth(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.9.14}getPolygonPointCount(elementNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.10}Rectangle Management (Element Subclass)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.1}newRectangle(windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.2}newRectangle(ID, windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.3}setRectangleTopLeft(elementNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.4}getRectangleTopLeft(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.5}getRectangleTopRight(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.6}getRectangleBottomRight(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.7}getRectangleBottomLeft(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.8}setRectangleWidth(elementNo, width, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.9}getRectangleWidth(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.10}setRectangleHeight(elementNo, height, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.11}getRectangleHeight(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.12}getRectangleFillColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.13}setRectangleFillColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.14}setRectangleLineColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.15}getRectangleLineColor(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.16}setRectangleLineWidth(elementNo, width)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.17}getRectangleLineWidth(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.3}relocateRectangle(elementNo, x, y, coorSys, windowNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.4}shiftRectangle(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.5}getRectangleTopLeft(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.6}getRectangleTopRight(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.7}getRectangleBottomRight(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.8}getRectangleBottomLeft(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.9}setRectangleWidth(elementNo, width, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.10}getRectangleWidth(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.11}setRectangleHeight(elementNo, height, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.12}getRectangleHeight(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.13}getRectangleFillColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.14}setRectangleFillColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.15}setRectangleLineColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.16}getRectangleLineColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.17}setRectangleLineWidth(elementNo, width)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.10.18}getRectangleLineWidth(elementNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.11}Textured Rectangle Management (Element Subclass)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.1}newTexRectangle(windowNo, x, y, width, height, coorSys, texture)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.2}newTexRectangle(ID, windowNo, x, y, width, height, coorSys, texture)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.3}setTexRectangleTopLeft(elementNo, x, y, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.4}getTexRectangleTopLeft(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.5}getTexRectangleTopRight(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.6}getTexRectangleBottomRight(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.7}getTexRectangleBottomLeft(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.8}getTexRectangleTexture(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.9}setTexRectangleTexture(elementNo, texture)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.10}setTexRectangleWidth(elementNo, width, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.11}getTexRectangleWidth(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.12}setTexRectangleHeight(elementNo, height, coorSys)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.13}getTexRectangleHeight(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.3}relocateTexRectangle(elementNo, x, y, coorSys, windowNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.4}shiftTexRectangle(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.5}getTexRectangleTopLeft(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.6}getTexRectangleTopRight(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.7}getTexRectangleBottomRight(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.8}getTexRectangleBottomLeft(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.9}getTexRectangleTexture(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.10}setTexRectangleTexture(elementNo, texture)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.11}setTexRectangleWidth(elementNo, width, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.12}getTexRectangleWidth(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.13}setTexRectangleHeight(elementNo, height, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.11.14}getTexRectangleHeight(elementNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.12}Text Management (Element Subclass)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.1}newText(windowNo, text, x, y, coorSys, ptSize, font, color)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.2}newTextWithID(windowNo, text, x, y, coorSys, ptSize, font, color)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.3}setText(elementNo, text)}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.4}getText(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.5}setTextPosition(elementNo, x, y, coorSys, windowNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.6}getTextPosition(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.7}setPointSize(elementNo, pointSize)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.8}getPointSize(elementNo, pointSize)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.9}setFont(elementNo, font)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.10}getFont(elementNo)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.11}setTextColor(elementNo, color)}{\thepage }}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.12}getTextColor(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.5}relocateText(elementNo, x, y, coorSys, windowNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.6}shiftText(elementNo, xDist, yDist, coorSys)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.7}getTextPosition(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.8}setPointSize(elementNo, pointSize)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.9}getPointSize(elementNo, pointSize)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.10}setFont(elementNo, font)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.11}getFont(elementNo)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.12}setTextColor(elementNo, color)}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.12.13}getTextColor(elementNo)}{\thepage }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.13}General Calls}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.13.1}quit()}{\thepage }}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.13.2}quitClientOnly()}{\thepage }}
