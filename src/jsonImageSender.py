@@ -1,7 +1,7 @@
 import base64, pycurl, json
 
 class jsonImageSender:
-    def newTexRectangle(self,windowNo,filename,x,y,width,height):
+    def newTexRectangle(self,windowNo,filename,x,y,width,height,coorSys):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
@@ -12,7 +12,8 @@ class jsonImageSender:
                                "width" : width, 
                                "height" : height, 
                                "textureData" : encoded_string, 
-                               "extension" : extension})
+                               "extension" : extension,
+                               "coorSys" : coorSys})
             c = pycurl.Curl()
             c.setopt(pycurl.URL, url)
             c.setopt(pycurl.HTTPHEADER, ['Content-Type: application/json'])
@@ -20,7 +21,7 @@ class jsonImageSender:
             c.setopt(pycurl.POSTFIELDS, data)
             c.perform()
             
-    def newTexRectangleWithID(self,ID,windowNo,filename,x,y,width,height):
+    def newTexRectangleWithID(self,ID,windowNo,filename,x,y,width,height,coorSys):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
@@ -32,7 +33,8 @@ class jsonImageSender:
                                "width" : width, 
                                "height" : height, 
                                "textureData" : encoded_string, 
-                               "extension" : extension})
+                               "extension" : extension,
+                               "coorSys" : coorSys})
             c = pycurl.Curl()
             c.setopt(pycurl.URL, url)
             c.setopt(pycurl.HTTPHEADER, ['Content-Type: application/json'])
