@@ -135,7 +135,7 @@ class client:
 				midpoint = self.getMidPoints((point1[0],point1[1]), (point2[0],point2[1])) 
 				insert.append(midpoint)
 			for x in reversed(range(0,len(insert))):
-				ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 20)
+				ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 10)
 				self.hideable.append(ele)
 				circles.insert(x+1, ele)
 			if(side == "top"):
@@ -445,14 +445,14 @@ class client:
 									if(hit==True):
 										cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
 										self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0], loc[1], "pix", (1, 0, 0, 1), 3)
-										self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, "pix", (1, 0, 0, 0), 1, (1, 0, 0, 1), 20)
+										self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, "pix", (1, 0, 0, 0), 1, (1, 0, 0, 1), 10)
 					elif event.button==1:
 						self.lClickTime=datetime.datetime.now() #Saves the current time so that when the button is released click duration can be checked
 						if(self.controlCur==self.mainCur):
 							#If the user is trying to create a corner point it is defined then returned
 							if(get_point==True):
 								loc = self.sender.getCursorPosition(self.controlCur)
-								ele = self.sender.newCircle(1, loc[0], loc[1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
+								ele = self.sender.newCircle(1, loc[0], loc[1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 10)
 								self.hideable.append(ele)
 								return (loc, ele)
 							#If the user isn't trying to create a corner point it is checked whether they have clicked on an existing point so it can be dragged
@@ -1023,9 +1023,9 @@ class client:
 					self.sender.addLineStripPoint(self.topbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 10)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 10)
 				self.topCircles[self.surfaceCounter].append(ele)
 			y=1
 			for z in list(reversed(range(0,len(layout[x][y])))):
@@ -1035,9 +1035,9 @@ class client:
 					self.sender.addLineStripPoint(self.bottombz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 10)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 10)
 				self.bottomCircles[self.surfaceCounter].append(ele)
 			y=2
 			for z in range(0,len(layout[x][y])):
@@ -1047,9 +1047,9 @@ class client:
 					self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 10)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 10)
 				self.leftCircles[self.surfaceCounter].append(ele)
 			y=3
 			for z in list(reversed(range(0,len(layout[x][y])))):
@@ -1059,9 +1059,9 @@ class client:
 					self.sender.addLineStripPoint(self.rightbz[self.surfaceCounter], layout[x][y][z][0], layout[x][y][z][1], "pix")
 				ele = None
 				if ((z==0) or (z==(len(layout[x][y])-1))):
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1), 10)
 				else:
-					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 20)
+					ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1), 10)
 				self.rightCircles[self.surfaceCounter].append(ele)
 			self.bezierUpdates[self.surfaceCounter] = [True,True,True,True]
 			tlcoor = self.sender.getCirclePosition(self.topCircles[self.surfaceCounter][0])
@@ -1069,7 +1069,7 @@ class client:
 			brcoor = self.sender.getCirclePosition(self.bottomCircles[self.surfaceCounter][0])
 			blcoor = self.sender.getCirclePosition(self.bottomCircles[self.surfaceCounter][len(self.bottomCircles[self.surfaceCounter])-1])
 			center = self.lineIntersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1], trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-			self.centerPoints[self.surfaceCounter] = self.sender.newCircle(1, center[0], center[1], 10, "pix", (0,0,0,0), 1, (1,0,1,1), 20)
+			self.centerPoints[self.surfaceCounter] = self.sender.newCircle(1, center[0], center[1], 10, "pix", (0,0,0,0), 1, (1,0,1,1), 10)
 			self.surfaceCounter+=1
 			self.dontFlip[self.surfaceCounter-1] = True
 	
@@ -1152,7 +1152,7 @@ class client:
 			self.leftCircles[self.surfaceCounter].append(tl[1])
 			self.sender.addLineStripPoint(self.leftbz[self.surfaceCounter], tl[0][0], tl[0][1], "pix")
 			center = self.lineIntersection(tl[0][0], tl[0][1], br[0][0], br[0][1], tr[0][0], tr[0][1], bl[0][0], bl[0][1])
-			self.centerPoints[self.surfaceCounter] = self.sender.newCircle(1, center[0], center[1], 10, "pix", (0,0,0,0), 1, (1,0,1,1), 20)
+			self.centerPoints[self.surfaceCounter] = self.sender.newCircle(1, center[0], center[1], 10, "pix", (0,0,0,0), 1, (1,0,1,1), 10)
 			self.surfaceCounter += 1
 			self.dontFlip[self.surfaceCounter-1] = True
 		if(self.cursorMode!="wall"):
@@ -1491,13 +1491,13 @@ class client:
 		self.sender.hideElement(self.centSurfCirc[0])
 		self.sender.hideElement(self.stretchRects[0])
 		circs = {}
-		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[0])
-		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[1])
-		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[2])
-		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[3])
 		self.topmtrrect[0] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
 		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
@@ -1526,13 +1526,13 @@ class client:
 		self.sender.hideElement(self.centSurfCirc[1])
 		self.sender.hideElement(self.stretchRects[1])
 		circs = {}
-		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[0])
-		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[1])
-		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[2])
-		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[3])
 		self.topmtrrect[1] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
 		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
@@ -1561,13 +1561,13 @@ class client:
 		self.sender.hideElement(self.centSurfCirc[2])
 		self.sender.hideElement(self.stretchRects[2])
 		circs = {}
-		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[0])
-		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[1])
-		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[2])
-		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[3])
 		self.topmtrrect[2] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
 		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
@@ -1596,13 +1596,13 @@ class client:
 		self.sender.hideElement(self.centSurfCirc[3])
 		self.sender.hideElement(self.stretchRects[3])
 		circs = {}
-		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[0] = self.sender.newCircle(self.window, 512/2, 512/2+75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[0])
-		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[1] = self.sender.newCircle(self.window, 512/2, 512/2-75, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[1])
-		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[2] = self.sender.newCircle(self.window, 512/2-75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[2])
-		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 20)
+		circs[3] = self.sender.newCircle(self.window, 512/2+75, 512/2, 15, "pix", (0,0,0,0), 1, (0,1,0,1), 10)
 		self.sender.hideElement(circs[3])
 		self.topmtrrect[3] = self.sender.newRectangle(self.window, 512/2 - 80, 512, 160, 75, "pix", (0,0,0,0), 0, (1,1,1,1))
 		topCount1 = self.sender.newText(self.window, "0", 512/2-75, 460, "pix", 37, "Arial", (0,0,0,1))
