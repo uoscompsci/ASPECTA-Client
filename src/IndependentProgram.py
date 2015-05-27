@@ -44,7 +44,7 @@ class client:
                 if (not(xdist==0 and ydist==0)):
                     pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
                     
-                    self.sender.moveCursor(self.currentCur, -xdist, ydist)
+                    self.sender.shiftCursor(self.currentCur, -xdist, ydist)
         
     def blueCircleAnimation(self):
         while(self.quit==False):
@@ -55,9 +55,9 @@ class client:
             if(pos[0]<=0):
                 self.dirleft = True
             if(self.dirleft):
-                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], self.window)
+                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], "pix", self.window)
             else:
-                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], self.window)
+                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], "pix", self.window)
     
     def __init__(self):
         self.sender = messageSender()
@@ -85,62 +85,66 @@ class client:
         self.sender.setapp("indapp")
         #self.sender.loadDefinedSurfaces("spaceSave")
         
-        window = self.sender.newWindow(1, 200, 200, 100, 100, "Bob")
-        self.currentCur = self.sender.newCursor(1, 512/2, 512/2)
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "Mona_Lisa.jpg")
-        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
-        self.sender.newCircle(window, 50, 50, 50, (1,1,1,1), (1,0,1,1), 50)
-        self.sender.newCircle(window, 250, 100, 50, (1,1,1,1), (0,1,0,1), 50)
-        self.sender.newCircle(window, 415, 250, 50, (1,1,1,1), (1,1,0,1), 50)
-        self.sender.newCircle(window, 200, 200, 50, (1,1,1,1), (1,0,0,1), 50)
-        self.blueCirc = self.sender.newCircle(window, 400, 300, 50, (1,1,1,1), (0,0,1,1), 50)
-        self.sender.newCircle(window, 300, 512, 50, (1,1,1,1), (0.5,0.5,0.5,1), 50)
+        window1 = self.sender.newWindow(1, 0, 512, 512, 512, "pix", "Bob")
+        self.currentCur = self.sender.newCursor(1, 512/2, 512/2, "pix")
         
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Hello World  | dlroW olleH", 100, 400, 30, "Arial", (1,1,0,1))
+        self.sender.newTexRectangle(window1, 200, 400, 300, 400, "pix", "Mona_Lisa.jpg")
+        self.sender.newRectangle(window1, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
+        self.sender.newCircle(window1, 50, 50, 50, "pix", (1,1,1,1), 10, (1,0,1,1), 50)
+        self.sender.newCircle(window1, 250, 100, 50, "pix", (1,1,1,1), 0, (0,1,0,1), 50)
+        self.sender.newCircle(window1, 415, 250, 50, "pix", (1,1,1,1), 0, (1,1,0,1), 50)
+        self.sender.newCircle(window1, 200, 200, 50, "pix", (1,1,1,1), 0, (1,0,0,1), 50)
         
-        ele = self.sender.newPolygon(window, 100, 100, (1,1,1,1), (0.5,0.5,0.5,1))
-        self.sender.addPolygonPoint(ele, 200, 150)
-        self.sender.addPolygonPoint(ele, 200, 200)
-        self.sender.addPolygonPoint(ele, 150, 175)
-        self.sender.addPolygonPoint(ele, 75, 175)
-        self.sender.addPolygonPoint(ele, 50, 150)
+        self.blueCirc = self.sender.newCircle(window1, 0.5, 0.5, 0.1, "prop", (1,1,1,1), 0, (0,0,1,1), 50)
+        
+        self.sender.newCircle(window1, 300, 512, 50, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1), 50)
+        
+        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window1, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 400, "pix", 30, "Arial", (1,1,0,1))
+        
+        ele = self.sender.newPolygon(window1, 100, 100, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1))
+        self.sender.addPolygonPoint(ele, 200, 150, "pix")
+        self.sender.addPolygonPoint(ele, 200, 200, "pix")
+        self.sender.addPolygonPoint(ele, 150, 175, "pix")
+        self.sender.addPolygonPoint(ele, 75, 175, "pix")
+        self.sender.addPolygonPoint(ele, 50, 150, "pix")
+        
+        
+        window2 = self.sender.newWindow(2, 0, 512, 512, 512, "pix", "Bob")
+        self.sender.newTexRectangle(window2, 200, 400, 300, 400, "pix", "american_gothic.jpg")
+        self.sender.newRectangle(window2, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
+        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window2, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
+        
+        ele = self.sender.newPolygon(window2, 100, 100, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1))
+        self.sender.addPolygonPoint(ele, 200, 150, "pix")
+        self.sender.addPolygonPoint(ele, 200, 200, "pix")
+        self.sender.addPolygonPoint(ele, 150, 175, "pix")
+        self.sender.addPolygonPoint(ele, 75, 175, "pix")
+        self.sender.addPolygonPoint(ele, 50, 150, "pix")
 
-        window = self.sender.newWindow(2, 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "american_gothic.jpg")
-        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye circles  | selcric eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
+        window3 = self.sender.newWindow(3, 0, 512, 512, 512, "pix", "Bob")
+        self.sender.newTexRectangle(window3, 200, 400, 300, 400, "pix", "van_gough.jpg")
+        self.sender.newRectangle(window3, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
+        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window3, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
         
-        ele = self.sender.newPolygon(window, 100, 100, (1,1,1,1), (0.5,0.5,0.5,1))
-        self.sender.addPolygonPoint(ele, 200, 150)
-        self.sender.addPolygonPoint(ele, 200, 200)
-        self.sender.addPolygonPoint(ele, 150, 175)
-        self.sender.addPolygonPoint(ele, 75, 175)
-        self.sender.addPolygonPoint(ele, 50, 150)
-
-        window = self.sender.newWindow(3, 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "van_gough.jpg")
-        self.sender.newRectangle(window, 50, 400, 100, 200, (1,1,1,1), (0.5,0.3,0.5,1))
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye polygon  | nogylop eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
-        
-        window = self.sender.newWindow(4, 200, 200, 100, 100, "Bob")
-        self.sender.newTexRectangle(window, 200, 400, 300, 400, "the_scream.jpg")
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window, 0, 0, 512, 512, (0,1,1,1), 2)
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 300, 30, "Arial", (1,1,0,1))
-        self.sender.newText(window, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, 30, "Arial", (1,1,0,1))
+        window4 = self.sender.newWindow(4, 0, 512, 512, 512, "pix", "Bob")
+        self.sender.newTexRectangle(window4, 200, 400, 300, 400, "pix", "the_scream.jpg")
+        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(window4, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
         
         self.mouseLock=True
         pygame.mouse.set_visible(False)
@@ -150,7 +154,7 @@ class client:
         
         if(self.quit==False):
             self.dirleft = True
-            self.window = window
+            self.window = window1
             circAnim = threading.Thread(target=self.blueCircleAnimation, args=()) #Creates the display thread
             circAnim.start() #Starts the display thread
             while(self.quit==False):
