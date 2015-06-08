@@ -1363,8 +1363,21 @@ class messageSender:
                           'font' : str(font)})
         return float(width['width'])
     
+    def getTextHeight(self, text, font, pointSize):
+        height = self.sendMessage({'call' : 'get_text_height',
+                          'text' : str(text),
+                          'pt' : str(pointSize),
+                          'font' : str(font)})
+        return float(height['height'])
+    
     def getTextLineHeight(self, font, pointSize):
         height = self.sendMessage({'call' : 'get_text_line_height',
+                          'pt' : str(pointSize),
+                          'font' : str(font)})
+        return float(height['height'])
+    
+    def getTextDescenderHeight(self, font, pointSize):
+        height = self.sendMessage({'call' : 'get_text_descender_height',
                           'pt' : str(pointSize),
                           'font' : str(font)})
         return float(height['height'])
