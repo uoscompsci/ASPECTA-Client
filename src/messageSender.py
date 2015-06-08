@@ -1362,6 +1362,13 @@ class messageSender:
                           'pt' : str(pointSize),
                           'font' : str(font)})
         return float(width['width'])
+    
+    def getTextLineHeight(self, text, font, pointSize):
+        height = self.sendMessage({'call' : 'get_text_line_height',
+                          'text' : str(text),
+                          'pt' : str(pointSize),
+                          'font' : str(font)})
+        return float(height['height'])
         
     def setPointSize(self, elementNo, pointSize):
         self.sendMessage({'call' : 'set_text_point_size',
