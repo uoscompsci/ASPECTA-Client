@@ -55,9 +55,9 @@ class client:
             if(pos[0]<=0):
                 self.dirleft = True
             if(self.dirleft):
-                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], "pix", self.window)
+                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], "pix", self.canvas)
             else:
-                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], "pix", self.window)
+                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], "pix", self.canvas)
     
     def __init__(self):
         self.sender = messageSender()
@@ -85,27 +85,27 @@ class client:
         self.sender.setapp("indapp")
         #self.sender.loadDefinedSurfaces("spaceSave")
         
-        window1 = self.sender.newWindow(1, 0, 512, 512, 512, "pix", "Bob")
+        canvas1 = self.sender.newCanvas(1, 0, 512, 512, 512, "pix", "Bob")
         self.currentCur = self.sender.newCursor(1, 512/2, 512/2, "pix")
         
-        self.sender.newTexRectangle(window1, 200, 400, 300, 400, "pix", "Mona_Lisa.jpg")
-        self.sender.newRectangle(window1, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
-        self.sender.newCircle(window1, 50, 50, 50, "pix", (1,1,1,1), 10, (1,0,1,1), 50)
-        self.sender.newCircle(window1, 250, 100, 50, "pix", (1,1,1,1), 0, (0,1,0,1), 50)
-        self.sender.newCircle(window1, 415, 250, 50, "pix", (1,1,1,1), 0, (1,1,0,1), 50)
-        self.sender.newCircle(window1, 200, 200, 50, "pix", (1,1,1,1), 0, (1,0,0,1), 50)
+        self.sender.newTexRectangle(canvas1, 200, 400, 300, 400, "pix", "Mona_Lisa.jpg")
+        self.sender.newRectangle(canvas1, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
+        self.sender.newCircle(canvas1, 50, 50, 50, "pix", (1,1,1,1), 10, (1,0,1,1), 50)
+        self.sender.newCircle(canvas1, 250, 100, 50, "pix", (1,1,1,1), 0, (0,1,0,1), 50)
+        self.sender.newCircle(canvas1, 415, 250, 50, "pix", (1,1,1,1), 0, (1,1,0,1), 50)
+        self.sender.newCircle(canvas1, 200, 200, 50, "pix", (1,1,1,1), 0, (1,0,0,1), 50)
         
-        self.blueCirc = self.sender.newCircle(window1, 0.5, 0.5, 0.1, "prop", (1,1,1,1), 0, (0,0,1,1), 50)
+        self.blueCirc = self.sender.newCircle(canvas1, 0.5, 0.5, 0.1, "prop", (1,1,1,1), 0, (0,0,1,1), 50)
         
-        self.sender.newCircle(window1, 300, 512, 50, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1), 50)
+        self.sender.newCircle(canvas1, 300, 512, 50, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1), 50)
         
-        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 100, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window1, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
-        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 200, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 300, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window1, "Hello World  | dlroW olleH", 100, 400, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas1, "Hello World  | dlroW olleH", 100, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(canvas1, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(canvas1, "Hello World  | dlroW olleH", 100, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas1, "Hello World  | dlroW olleH", 100, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas1, "Hello World  | dlroW olleH", 100, 400, "pix", 30, "Arial", (1,1,0,1))
         
-        ele = self.sender.newPolygon(window1, 100, 100, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1))
+        ele = self.sender.newPolygon(canvas1, 100, 100, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1))
         self.sender.addPolygonPoint(ele, 200, 150, "pix")
         self.sender.addPolygonPoint(ele, 200, 200, "pix")
         self.sender.addPolygonPoint(ele, 150, 175, "pix")
@@ -113,38 +113,38 @@ class client:
         self.sender.addPolygonPoint(ele, 50, 150, "pix")
         
         
-        window2 = self.sender.newWindow(2, 0, 512, 512, 512, "pix", "Bob")
-        self.sender.newTexRectangle(window2, 200, 400, 300, 400, "pix", "american_gothic.jpg")
-        self.sender.newRectangle(window2, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
-        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window2, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
-        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window2, "Goodbye circles  | selcric eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
+        canvas2 = self.sender.newCanvas(2, 0, 512, 512, 512, "pix", "Bob")
+        self.sender.newTexRectangle(canvas2, 200, 400, 300, 400, "pix", "american_gothic.jpg")
+        self.sender.newRectangle(canvas2, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
+        self.sender.newText(canvas2, "Goodbye circles  | selcric eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(canvas2, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(canvas2, "Goodbye circles  | selcric eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas2, "Goodbye circles  | selcric eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas2, "Goodbye circles  | selcric eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
         
-        ele = self.sender.newPolygon(window2, 100, 100, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1))
+        ele = self.sender.newPolygon(canvas2, 100, 100, "pix", (1,1,1,1), 0, (0.5,0.5,0.5,1))
         self.sender.addPolygonPoint(ele, 200, 150, "pix")
         self.sender.addPolygonPoint(ele, 200, 200, "pix")
         self.sender.addPolygonPoint(ele, 150, 175, "pix")
         self.sender.addPolygonPoint(ele, 75, 175, "pix")
         self.sender.addPolygonPoint(ele, 50, 150, "pix")
 
-        window3 = self.sender.newWindow(3, 0, 512, 512, 512, "pix", "Bob")
-        self.sender.newTexRectangle(window3, 200, 400, 300, 400, "pix", "van_gough.jpg")
-        self.sender.newRectangle(window3, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
-        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window3, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
-        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window3, "Goodbye polygon  | nogylop eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
+        canvas3 = self.sender.newCanvas(3, 0, 512, 512, 512, "pix", "Bob")
+        self.sender.newTexRectangle(canvas3, 200, 400, 300, 400, "pix", "van_gough.jpg")
+        self.sender.newRectangle(canvas3, 50, 400, 100, 200, "pix", (1,1,1,1), 0, (0.5,0.3,0.5,1))
+        self.sender.newText(canvas3, "Goodbye polygon  | nogylop eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(canvas3, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(canvas3, "Goodbye polygon  | nogylop eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas3, "Goodbye polygon  | nogylop eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas3, "Goodbye polygon  | nogylop eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
         
-        window4 = self.sender.newWindow(4, 0, 512, 512, 512, "pix", "Bob")
-        self.sender.newTexRectangle(window4, 200, 400, 300, 400, "pix", "the_scream.jpg")
-        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newLine(window4, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
-        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
-        self.sender.newText(window4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
+        canvas4 = self.sender.newCanvas(4, 0, 512, 512, 512, "pix", "Bob")
+        self.sender.newTexRectangle(canvas4, 200, 400, 300, 400, "pix", "the_scream.jpg")
+        self.sender.newText(canvas4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newLine(canvas4, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
+        self.sender.newText(canvas4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 300, "pix", 30, "Arial", (1,1,0,1))
+        self.sender.newText(canvas4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
         
         self.mouseLock=True
         pygame.mouse.set_visible(False)
@@ -154,7 +154,7 @@ class client:
         
         if(self.quit==False):
             self.dirleft = True
-            self.window = window1
+            self.canvas = canvas1
             circAnim = threading.Thread(target=self.blueCircleAnimation, args=()) #Creates the display thread
             circAnim.start() #Starts the display thread
             while(self.quit==False):

@@ -157,8 +157,8 @@ class messageSender:
         curNo = int(cur["cursorNo"])
         return curNo
     
-    def newWindow(self, surfaceNo, x, y, width, height, coorSys, name):
-        win = self.sendMessage({'call' : 'new_window', 
+    def newCanvas(self, surfaceNo, x, y, width, height, coorSys, name):
+        win = self.sendMessage({'call' : 'new_canvas', 
                                 'surfaceNo' : str(surfaceNo), 
                                 'x' : str(x), 
                                 'y' :  str(y), 
@@ -166,11 +166,11 @@ class messageSender:
                                 'height' : str(height),
                                 'coorSys' : coorSys,
                                 'name' : name})
-        winNo = int(win["windowNo"])
+        winNo = int(win["canvasNo"])
         return winNo
     
-    def newWindowWithID(self, ID, surfaceNo, x, y, width, height, coorSys, name):
-        win = self.sendMessage({'call' : 'new_window_with_ID', 
+    def newCanvasWithID(self, ID, surfaceNo, x, y, width, height, coorSys, name):
+        win = self.sendMessage({'call' : 'new_canvas_with_ID', 
                                 'ID' : str(ID), 
                                 'surfaceNo' : str(surfaceNo), 
                                 'x' : str(x), 
@@ -179,12 +179,12 @@ class messageSender:
                                 'height' : str(height),
                                 'coorSys' : coorSys,
                                 'name' : name})
-        winNo = int(win["windowNo"])
+        winNo = int(win["canvasNo"])
         return winNo
     
-    def newCircle(self, windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
+    def newCircle(self, canvasNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
         ele = self.sendMessage({'call' : 'new_circle', 
-                                'windowNo' :  str(windowNo), 
+                                'canvasNo' :  str(canvasNo), 
                                 'x' : str(x), 
                                 'y' : str(y), 
                                 'radius' : str(radius),
@@ -196,10 +196,10 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newCircleWithID(self, ID, windowNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
+    def newCircleWithID(self, ID, canvasNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
         ele = self.sendMessage({'call' : 'new_circle_with_ID',
                                 'ID' : str(ID),
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'radius' : str(radius), 
@@ -211,9 +211,9 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLine(self, windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
+    def newLine(self, canvasNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
         ele = self.sendMessage({'call' : 'new_line',
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'xStart' : str(xStart),
                                 'yStart' : str(yStart),
                                 'xEnd' : str(xEnd),
@@ -224,10 +224,10 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLineWithID(self, ID, windowNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
+    def newLineWithID(self, ID, canvasNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
         ele = self.sendMessage({'call' : 'new_line_with_ID',
                                 'ID' : str(ID),
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'xStart' : str(xStart),
                                 'yStart' : str(yStart),
                                 'xEnd' : str(xEnd),
@@ -238,9 +238,9 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLineStrip(self, windowNo, x, y, coorSys, color, width):
+    def newLineStrip(self, canvasNo, x, y, coorSys, color, width):
         ele = self.sendMessage({'call' : 'new_line_strip', 
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'coorSys' : coorSys,
@@ -249,10 +249,10 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLineStripWithID(self, ID, windowNo, x, y, coorSys, color, width):
+    def newLineStripWithID(self, ID, canvasNo, x, y, coorSys, color, width):
         ele = self.sendMessage({'call' : 'new_line_strip_with_ID',
                                 'ID' : str(ID), 
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'coorSys' : coorSys,
@@ -261,9 +261,9 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newPolygon(self, windowNo, x, y, coorSys, lineColor, lineWidth, fillColor):
+    def newPolygon(self, canvasNo, x, y, coorSys, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_polygon',
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'coorSys' : coorSys,
@@ -273,10 +273,10 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newPolygonWithID(self, ID, windowNo, x, y, coorSys, lineColor, lineWidth, fillColor):
+    def newPolygonWithID(self, ID, canvasNo, x, y, coorSys, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_polygon_with_ID',
                                 'ID' : str(ID),
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
                                 'coorSys' : coorSys,
@@ -286,12 +286,12 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newTexRectangle(self, windowNo, x, y, width, height, coorSys, filename):
+    def newTexRectangle(self, canvasNo, x, y, width, height, coorSys, filename):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
             ele = self.sendMessage({'call' : 'new_texrectangle',
-                                    'windowNo' : str(windowNo),
+                                    'canvasNo' : str(canvasNo),
                                     'x' : str(x),
                                     'y' : str(y),
                                     'width' : str(width),
@@ -302,13 +302,13 @@ class messageSender:
             eleNo = int(ele["elementNo"])
             return eleNo
     
-    def newTexRectangleWithID(self, ID, windowNo, x, y, width, height, coorSys, filename):
+    def newTexRectangleWithID(self, ID, canvasNo, x, y, width, height, coorSys, filename):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
             ele = self.sendMessage({'call' : 'new_texrectangle_with_ID',
                                     'ID' : str(ID),
-                                    'windowNo' : str(windowNo),
+                                    'canvasNo' : str(canvasNo),
                                     'x' : str(x),
                                     'y' : str(y),
                                     'width' : str(width),
@@ -319,9 +319,9 @@ class messageSender:
             eleNo = int(ele["elementNo"])
             return eleNo
     
-    def newRectangle(self, windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
+    def newRectangle(self, canvasNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_rectangle',
-                                'windowNo' : str(windowNo), 
+                                'canvasNo' : str(canvasNo), 
                                 'x' : str(x),
                                 'y' : str(y),
                                 'width' : str(width),
@@ -333,10 +333,10 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newRectangleWithID(self, ID, windowNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
+    def newRectangleWithID(self, ID, canvasNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
         ele = self.sendMessage({'call' : 'new_rectangle_with_ID',
                                 'ID' : str(ID),
-                                'windowNo' : str(windowNo), 
+                                'canvasNo' : str(canvasNo), 
                                 'x' : str(x),
                                 'y' : str(y),
                                 'width' : str(width),
@@ -348,9 +348,9 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newText(self, windowNo, text, x, y, coorSys, ptSize, font, color):
+    def newText(self, canvasNo, text, x, y, coorSys, ptSize, font, color):
         ele = self.sendMessage({'call' : 'new_text',
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'text' : text,
                                 'x' : str(x),
                                 'y' : str(y),
@@ -361,10 +361,10 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newTextWithID(self, ID, windowNo, text, x, y, coorSys, ptSize, font, color):
+    def newTextWithID(self, ID, canvasNo, text, x, y, coorSys, ptSize, font, color):
         ele = self.sendMessage({'call' : 'new_text_with_ID',
                                 'ID' : str(ID),
-                                'windowNo' : str(windowNo),
+                                'canvasNo' : str(canvasNo),
                                 'text' : text,
                                 'x' : str(x),
                                 'y' : str(y),
@@ -602,70 +602,70 @@ class messageSender:
                           'surfaceNo2' : str(surfaceNo2),
                           'side2' : side2})
         
-    def subscribeToWindow(self, windowNo):
-        self.sendMessage({'call' : 'subscribe_to_window',
-                          'windowNo' : str(windowNo)})
+    def subscribeToCanvas(self, canvasNo):
+        self.sendMessage({'call' : 'subscribe_to_canvas',
+                          'canvasNo' : str(canvasNo)})
         
-    def getWindowID(self, windowNo):
-        ID = self.sendMessage({'call' : 'get_window_ID',
-                               'windowNo' : str(windowNo)})
+    def getCanvasID(self, canvasNo):
+        ID = self.sendMessage({'call' : 'get_canvas_ID',
+                               'canvasNo' : str(canvasNo)})
         return ID["ID"]
     
-    def setWindowID(self, windowNo, ID):
-        self.sendMessage({'call' : 'set_window_ID',
-                          'windowNo' : str(windowNo),
+    def setCanvasID(self, canvasNo, ID):
+        self.sendMessage({'call' : 'set_canvas_ID',
+                          'canvasNo' : str(canvasNo),
                           'ID' : str(ID)})
     
-    def getWindowOwner(self, windowNo):
-        owner = self.sendMessage({'call' : 'get_window_owner',
-                                  'windowNo' : str(windowNo)})
+    def getCanvasOwner(self, canvasNo):
+        owner = self.sendMessage({'call' : 'get_canvas_owner',
+                                  'canvasNo' : str(canvasNo)})
         return owner["owner"]
         
-    def getWindowAppDetails(self, windowNo):
-        details = self.sendMessage({'call' : 'get_window_app_details',
-                                    'windowNo' : str(windowNo)})
+    def getCanvasAppDetails(self, canvasNo):
+        details = self.sendMessage({'call' : 'get_canvas_app_details',
+                                    'canvasNo' : str(canvasNo)})
         return (details["app"],details["instance"])
         
-    def getWindowsByID(self, ID):
-        windows = self.sendMessage({'call' : 'get_windows_by_ID',
+    def getCanvasesByID(self, ID):
+        canvases = self.sendMessage({'call' : 'get_canvases_by_ID',
                                     'ID' : str(ID)})
-        windowlist = []
-        for x in range(0,int(windows["count"])):
-            windowlist.append(int(windows[x]))
-        return windowlist
+        canvaslist = []
+        for x in range(0,int(canvases["count"])):
+            canvaslist.append(int(canvases[x]))
+        return canvaslist
         
-    def getWindowsByOwner(self, owner):
-        windows = self.sendMessage({'call' : 'get_windows_by_owner',
+    def getCanvasesByOwner(self, owner):
+        canvases = self.sendMessage({'call' : 'get_canvases_by_owner',
                                     'owner' : str(owner)})
-        windowlist = []
-        for x in range(0,int(windows["count"])):
-            windowlist.append(int(windows[x]))
-        return windowlist
+        canvaslist = []
+        for x in range(0,int(canvases["count"])):
+            canvaslist.append(int(canvases[x]))
+        return canvaslist
         
-    def getWindowsByAppName(self, name):
-        windows = self.sendMessage({'call' : 'get_windows_by_app_name',
+    def getCanvasesByAppName(self, name):
+        canvases = self.sendMessage({'call' : 'get_canvases_by_app_name',
                                     'name' : str(name)})
-        windowlist = []
-        for x in range(0,int(windows["count"])):
-            windowlist.append(int(windows[x]))
-        return windowlist
+        canvaslist = []
+        for x in range(0,int(canvases["count"])):
+            canvaslist.append(int(canvases[x]))
+        return canvaslist
         
-    def getWindowssByAppDetails(self, name, instance):
-        windows = self.sendMessage({'call' : 'get_windows_by_app_details',
+    def getCanvasesByAppDetails(self, name, instance):
+        canvases = self.sendMessage({'call' : 'get_canvases_by_app_details',
                                     'name' : str(name),
                                     'number' : str(instance)})
-        windowlist = []
-        for x in range(0,int(windows["count"])):
-            windowlist.append(int(windows[x]))
-        return windowlist
+        canvaslist = []
+        for x in range(0,int(canvases["count"])):
+            canvaslist.append(int(canvases[x]))
+        return canvaslist
         
-    def becomeWindowAdmin(self, windowNo):
-        self.sendMessage({'call' : 'become_window_admin',
-                          'windowNo' : str(windowNo)})
+    def becomeCanvasAdmin(self, canvasNo):
+        self.sendMessage({'call' : 'become_canvas_admin',
+                          'canvasNo' : str(canvasNo)})
         
-    def stopBeingWindowAdmin(self, windowNo):
-        self.sendMessage({'call' : 'stop_being_window_admin', 
-                          'windowNo' : str(windowNo)})
+    def stopBeingCanvasAdmin(self, canvasNo):
+        self.sendMessage({'call' : 'stop_being_canvas_admin', 
+                          'canvasNo' : str(canvasNo)})
         
     def subscribeToElement(self, elementNo):
         self.sendMessage({'call' : 'subscribe_to_element',
@@ -724,9 +724,9 @@ class messageSender:
             elementlist.append(int(elements[x]))
         return elementlist
     
-    def getElementsOnWindow(self, windowNo):
-        elements = self.sendMessage({'call' : 'get_elements_on_window',
-                                     'windowNo' : str(windowNo)})
+    def getElementsOnCanvas(self, canvasNo):
+        elements = self.sendMessage({'call' : 'get_elements_on_canvas',
+                                     'canvasNo' : str(canvasNo)})
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
@@ -814,80 +814,80 @@ class messageSender:
                                        'cursorNo' : str(cursorNo)})
         return visibility["visibility"]
     
-    def shiftWindow(self, windowNo, xDistance, yDistance, coorSys):
-        self.sendMessage({'call' : 'move_window',
-                          'windowNo' : str(windowNo),
+    def shiftCanvas(self, canvasNo, xDistance, yDistance, coorSys):
+        self.sendMessage({'call' : 'move_canvas',
+                          'canvasNo' : str(canvasNo),
                           'xDist' : str(xDistance),
                           'yDist' : str(yDistance),
                           'coorSys' : str(coorSys)})
         
-    def relocateWindow(self, windowNo, x, y, coorSys, surfaceNo):
-        self.sendMessage({'call' : 'relocate_window',
-                          'windowNo' : str(windowNo),
+    def relocateCanvas(self, canvasNo, x, y, coorSys, surfaceNo):
+        self.sendMessage({'call' : 'relocate_canvas',
+                          'canvasNo' : str(canvasNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
                           'surfaceNo' : str(surfaceNo)})
         
-    def setWindowWidth(self, windowNo, width, coorSys):
-        self.sendMessage({'call' : 'set_window_width',
-                          'windowNo' : str(windowNo),
+    def setCanvasWidth(self, canvasNo, width, coorSys):
+        self.sendMessage({'call' : 'set_canvas_width',
+                          'canvasNo' : str(canvasNo),
                           'width' : str(width),
                           'coorSys' : str(coorSys)})
         
-    def setWindowHeight(self, windowNo, height, coorSys):
-        self.sendMessage({'call' : 'set_window_height',
-                          'windowNo' : str(windowNo),
+    def setCanvasHeight(self, canvasNo, height, coorSys):
+        self.sendMessage({'call' : 'set_canvas_height',
+                          'canvasNo' : str(canvasNo),
                           'height' : str(height),
                           'coorSys' : str(coorSys)})
         
-    def getWindowPosition(self, windowNo):
-        loc = self.sendMessage({'call' : 'get_window_pos',
-                                'windowNo' : str(windowNo)})
+    def getCanvasPosition(self, canvasNo):
+        loc = self.sendMessage({'call' : 'get_canvas_pos',
+                                'canvasNo' : str(canvasNo)})
         return [loc["x"],loc["y"]]
         
-    def getWindowWidth(self, windowNo):
-        width = self.sendMessage({'call' : 'get_window_width',
-                                  'windowNo' : str(windowNo)})
+    def getCanvasWidth(self, canvasNo):
+        width = self.sendMessage({'call' : 'get_canvas_width',
+                                  'canvasNo' : str(canvasNo)})
         return width["width"]
         
-    def getWindowHeight(self, windowNo):
-        height = self.sendMessage({'call' : 'get_window_height',
-                                   'windowNo' : str(windowNo)})
+    def getCanvasHeight(self, canvasNo):
+        height = self.sendMessage({'call' : 'get_canvas_height',
+                                   'canvasNo' : str(canvasNo)})
         return height["height"]
         
-    def stretchWindowDown(self, windowNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_window_down',
-                          'windowNo' : str(windowNo),
+    def stretchCanvasDown(self, canvasNo, distance, coorSys):
+        self.sendMessage({'call' : 'stretch_canvas_down',
+                          'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def stretchWindowUp(self, windowNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_window_up',
-                          'windowNo' : str(windowNo),
+    def stretchCanvasUp(self, canvasNo, distance, coorSys):
+        self.sendMessage({'call' : 'stretch_canvas_up',
+                          'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def stretchWindowLeft(self, windowNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_window_left',
-                          'windowNo' : str(windowNo),
+    def stretchCanvasLeft(self, canvasNo, distance, coorSys):
+        self.sendMessage({'call' : 'stretch_canvas_left',
+                          'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def stretchWindowRight(self, windowNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_window_right',
-                          'windowNo' : str(windowNo),
+    def stretchCanvasRight(self, canvasNo, distance, coorSys):
+        self.sendMessage({'call' : 'stretch_canvas_right',
+                          'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def setWindowName(self, windowNo, name):
-        self.sendMessage({'call' : 'set_window_name',
-                          'windowNo' : str(windowNo),
+    def setCanvasName(self, canvasNo, name):
+        self.sendMessage({'call' : 'set_canvas_name',
+                          'canvasNo' : str(canvasNo),
                           'name' : name})
         
-    def getWindowName(self, windowNo):
-        name = self.sendMessage({'call' : 'get_window_name',
-                                 'windowNo' : str(windowNo)})
+    def getCanvasName(self, canvasNo):
+        name = self.sendMessage({'call' : 'get_canvas_name',
+                                 'canvasNo' : str(canvasNo)})
         return name["name"]
     
     def shiftCircle(self, elementNo, xDist, yDist, coorSys):
@@ -897,13 +897,13 @@ class messageSender:
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocateCircle(self, elementNo, x, y, coorSys, windowNo):
+    def relocateCircle(self, elementNo, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'relocate_circle', 
                           'elementNo' : elementNo, 
                           'x' : x, 
                           'y' : y, 
                           'coorSys' : coorSys,
-                          'windowNo' : windowNo})
+                          'canvasNo' : canvasNo})
         
     def getCirclePosition(self, elementNo):
         loc = self.sendMessage({'call' : 'get_circle_pos',
@@ -971,14 +971,14 @@ class messageSender:
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocateLine(self, elementNo, refPoint, x, y, coorSys, windowNo):
+    def relocateLine(self, elementNo, refPoint, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'relocate_line',
                           'elementNo' : str(elementNo),
                           'refPoint' : str(refPoint),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
-                          'windowNo' : str(windowNo)})
+                          'canvasNo' : str(canvasNo)})
     
     def getLineStart(self, elementNo):
         loc = self.sendMessage({'call' : 'get_line_start',
@@ -1051,14 +1051,14 @@ class messageSender:
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocateLineStrip(self, elementNo, refPoint, x, y, coorSys, windowNo):
+    def relocateLineStrip(self, elementNo, refPoint, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'relocate_line_strip',
                           'elementNo' : str(elementNo),
                           'refPoint' : str(refPoint),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
-                          'windowNo' : str(windowNo)})
+                          'canvasNo' : str(canvasNo)})
     
     def moveLineStripPoint(self, elementNo, pointNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_line_strip_point',
@@ -1120,14 +1120,14 @@ class messageSender:
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocatePolygon(self, elementNo, refPoint, x, y, coorSys, windowNo):
+    def relocatePolygon(self, elementNo, refPoint, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'relocate_polygon',
                           'elementNo' : str(elementNo),
                           'refPoint' : str(refPoint),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
-                          'windowNo' : str(windowNo)})
+                          'canvasNo' : str(canvasNo)})
     
     def movePolygonPoint(self, elementNo, pointNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_polygon_point',
@@ -1170,13 +1170,13 @@ class messageSender:
                                   'elementNo' : str(elementNo)})
         return count["count"]
     
-    def relocateRectangle(self, elementNo, x, y, coorSys, windowNo):
+    def relocateRectangle(self, elementNo, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'set_rectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
-                          'windowNo' : str(windowNo)})
+                          'canvasNo' : str(canvasNo)})
         
     def shiftRectangle(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_rectangle',
@@ -1255,13 +1255,13 @@ class messageSender:
                                  'elementNo' : str(elementNo)})
         return width["width"]
     
-    def relocateTexRectangle(self, elementNo, x, y, coorSys, windowNo):
+    def relocateTexRectangle(self, elementNo, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'set_texrectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
-                          'windowNo' : str(windowNo)})
+                          'canvasNo' : str(canvasNo)})
         
     def shiftTexRectangle(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_texrectangle',
@@ -1336,13 +1336,13 @@ class messageSender:
                                  'elementNo' : str(elementNo)})
         return text["text"]
     
-    def relocateText(self, elementNo, x, y, coorSys, windowNo):
+    def relocateText(self, elementNo, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'relocate_text',
                           'elementNo' : elementNo,
                           'x' : x, 
                           'y' : y, 
                           'coorSys' : coorSys,
-                          'windowNo' : windowNo})
+                          'canvasNo' : canvasNo})
         
     def shiftText(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_text',
@@ -1443,7 +1443,7 @@ class messageSender:
             elementlist.append(int(elements[x]))
         return elementlist
     
-    def removeElement(self, elementNo, windowNo):
+    def removeElement(self, elementNo, canvasNo):
         self.sendMessage({'call' : 'remove_element',
                           'elementNo' : str(elementNo),
-                          'windowNo' : str(windowNo)})
+                          'canvasNo' : str(canvasNo)})

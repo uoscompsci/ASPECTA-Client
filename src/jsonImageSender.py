@@ -1,12 +1,12 @@
 import base64, pycurl, json
 
 class jsonImageSender:
-    def newTexRectangle(self,windowNo,filename,x,y,width,height,coorSys):
+    def newTexRectangle(self,canvasNo,filename,x,y,width,height,coorSys):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
             url = "http://" + self.HOST + ":" + self.PORT + "/api/newTexRectangle"
-            data = json.dumps({"windowNo" : windowNo, 
+            data = json.dumps({"canvasNo" : canvasNo, 
                                "x" : x, 
                                "y" : y, 
                                "width" : width, 
@@ -21,13 +21,13 @@ class jsonImageSender:
             c.setopt(pycurl.POSTFIELDS, data)
             c.perform()
             
-    def newTexRectangleWithID(self,ID,windowNo,filename,x,y,width,height,coorSys):
+    def newTexRectangleWithID(self,ID,canvasNo,filename,x,y,width,height,coorSys):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
             url = "http://" + self.HOST + ":" + self.PORT + "/api/newTexRectangleWithID"
             data = json.dumps({"ID" : ID,
-                               "windowNo" : windowNo, 
+                               "canvasNo" : canvasNo, 
                                "x" : x, 
                                "y" : y, 
                                "width" : width, 
