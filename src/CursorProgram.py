@@ -100,7 +100,7 @@ class client:
 				ydist = (self.winHeight/2)-pos[1]
 				if (not(xdist==0 and ydist==0)):
 					pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-					self.sender.moveCursor(self.controlCur, -xdist, ydist)
+					self.sender.shiftCursor(self.controlCur, -xdist, ydist)
 	
 	#Locks the mouse so that the server can be controlled
 	def LockMouse(self):
@@ -122,7 +122,7 @@ class client:
 	
 	#Sets up the surfaces which can be defined within the client
 	def initGUI(self):
-		self.mainCur = self.sender.newCursor(1, 512/2, 512/2)
+		self.mainCur = self.sender.newCursor(1, 512/2, 512/2,"pix")
 		self.controlCur = self.mainCur
 
 	#The main loop
