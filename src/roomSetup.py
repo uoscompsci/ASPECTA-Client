@@ -660,7 +660,7 @@ class client:
 													self.sender.showElement(self.centSurfCirc[x])
 													self.sender.setRectangleFillColor(self.topmtrrect[x], (1,0,0,1))
 													self.sender.setRectangleFillColor(self.rightmtrrect[x], (1,0,0,1))
-													self.sender.relocateCursor(self.surfCur[x], 512/2, 512/2, self.warpedSurf[x])
+													self.sender.relocateCursor(self.surfCur[x], 512/2, 512/2, "pix", self.warpedSurf[x])
 													self.sender.showCursor(self.surfCur[x])
 													self.surfaceControl = x
 							else:

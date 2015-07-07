@@ -753,11 +753,12 @@ class messageSender:
                                 'yDist' : str(yDistance)})
         return [loc["x"],loc["y"]]
     
-    def relocateCursor(self, cursorNo, x, y, surfaceNo):
+    def relocateCursor(self, cursorNo, x, y, coorSys, surfaceNo):
         self.sendMessage({'call' : 'relocate_cursor',
                           'cursorNo' : str(cursorNo),
                           'x' : str(x),
                           'y' : str(y),
+                          'coorSys' : str(coorSys),
                           'surfaceNo' : str(surfaceNo)})
     
     def getCursorPosition(self, cursorNo):
