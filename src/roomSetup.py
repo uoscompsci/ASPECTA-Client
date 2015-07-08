@@ -1334,27 +1334,6 @@ class client:
         else:
             tkMessageBox.showerror("Error", "Please make a selection first")
 
-    #Ask the server to delete the layout that is currently selected in the layout list
-    def deleteImage(self):
-        if(len(self.imageList.curselection())>0):
-            if(self.imageList.selection_get()!="checks.jpg"):
-                self.sender.deleteImage(self.imageList.selection_get())
-                self.images = self.sender.getSavedImages()
-                self.imageList.delete(0, END)
-                for x in range(0, len(self.images)):
-                    self.imageList.insert(END, self.images[x])
-            else:
-                tkMessageBox.showinfo("Error", "You are not allowed to delete the \"checks.jpg\" image")
-        else:
-            tkMessageBox.showerror("Error", "Please make a selection first")
-
-    #Refreshes the layout list by querying the server for an updated list
-    def refreshImages(self):
-        self.images = self.sender.getSavedImages()
-        self.imageList.delete(0, END)
-        for x in range(0, len(self.images)):
-            self.imageList.insert(END, self.images[x])
-
     #Clear the currently defined layout on both the client and server side
     def clearLayout(self):
         time.sleep(3)
