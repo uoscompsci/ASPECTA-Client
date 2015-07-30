@@ -4,7 +4,7 @@ import pygame
 import threading
 import time
 from pygame.locals import *
-from math import *
+from math import sqrt
 from bezier import *
 from ConfigParser import SafeConfigParser
 import datetime
@@ -169,7 +169,7 @@ class Client:
         for x in range(0, len(circles)):
             pos = self.sender.getCirclePosition(circles[x])
             points.append((pos[0], pos[1]))
-        calc = bezierCalc()
+        calc = BezierCalc()
         if side == "top":
             curve = calc.getCurvePoints(points, self.ppe)
             self.sender.setLineStripContent(self.topbz[surface], curve)
