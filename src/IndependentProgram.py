@@ -43,21 +43,23 @@ class client:
                 ydist = (self.winHeight/2)-pos[1]
                 if (not(xdist==0 and ydist==0)):
                     pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-                    
+
                     self.sender.shiftCursor(self.currentCur, -xdist, ydist)
         
     def blueCircleAnimation(self):
         while(self.quit==False):
             time.sleep(1.0/30)
-            pos = self.sender.getCirclePosition(self.blueCirc)
+            pos = self.sender.getCirclePosition(self.redCirc)
             if(pos[0]>=self.sender.getSurfacePixelWidth(1)):
                 self.dirleft = False
             if(pos[0]<=0):
                 self.dirleft = True
             if(self.dirleft):
-                self.sender.relocateCircle(self.blueCirc, pos[0]+5, pos[1], "pix", self.canvas)
+                self.sender.relocateCircle(self.redCirc, pos[0]+5, pos[1], "pix", self.canvas)
+                #self.sender.shiftCircle(self.blueCirc, 5, 0, "pix")
             else:
-                self.sender.relocateCircle(self.blueCirc, pos[0]-5, pos[1], "pix", self.canvas)
+                self.sender.relocateCircle(self.redCirc, pos[0]-5, pos[1], "pix", self.canvas)
+                #self.sender.shiftCircle(self.blueCirc, -5, 0, "pix")
     
     def __init__(self):
         self.sender = messageSender()
@@ -93,7 +95,7 @@ class client:
         self.sender.newCircle(canvas1, 50, 50, 50, "pix", (1,1,1,1), 10, (1,0,1,1), 50)
         self.sender.newCircle(canvas1, 250, 100, 50, "pix", (1,1,1,1), 0, (0,1,0,1), 50)
         self.sender.newCircle(canvas1, 415, 250, 50, "pix", (1,1,1,1), 0, (1,1,0,1), 50)
-        self.sender.newCircle(canvas1, 200, 200, 50, "pix", (1,1,1,1), 0, (1,0,0,1), 50)
+        self.redCirc = self.sender.newCircle(canvas1, 200, 200, 50, "pix", (1,1,1,1), 0, (1,0,0,1), 50)
         
         self.blueCirc = self.sender.newCircle(canvas1, 0.5, 0.5, 0.1, "prop", (1,1,1,1), 0, (0,0,1,1), 50)
         
@@ -139,7 +141,7 @@ class client:
         self.sender.newText(canvas3, "Goodbye polygon  | nogylop eybdooG", 30, 400, "pix", 30, "Arial", (1,1,0,1))
         
         canvas4 = self.sender.newCanvas(4, 0, 512, 512, 512, "pix", "Bob")
-        self.sender.newTexRectangle(canvas4, 200, 400, 300, 400, "pix", "the_scream.jpg")
+        self.scream = self.sender.newTexRectangle(canvas4, 200, 400, 300, 400, "pix", "the_scream.jpg")
         self.sender.newText(canvas4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 100, "pix", 30, "Arial", (1,1,0,1))
         self.sender.newLine(canvas4, 0, 0, 512, 512, "pix", (0,1,1,1), 2)
         self.sender.newText(canvas4, "Goodbye rectangle  | elgnatcer eybdooG", 30, 200, "pix", 30, "Arial", (1,1,0,1))
