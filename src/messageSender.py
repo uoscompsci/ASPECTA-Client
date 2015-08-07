@@ -809,6 +809,11 @@ class messageSender:
     def hideCursor(self, cursorNo):
         self.sendMessage({'call' : 'hide_cursor',
                           'cursorNo' : str(cursorNo)})
+
+    def getCursorsSurface(self, cursorNo):
+        surfaceNo = self.sendMessage({'call' : 'get_cursors_surface',
+                                      'cursorNo' : str(cursorNo)})
+        return surfaceNo["surfaceNo"]
     
     def isCursorVisible(self, cursorNo):
         visibility = self.sendMessage({'call' : 'isCursorVisible',
@@ -890,6 +895,11 @@ class messageSender:
         name = self.sendMessage({'call' : 'get_canvas_name',
                                  'canvasNo' : str(canvasNo)})
         return name["name"]
+
+    def getCanvasSurface(self, canvasNo):
+        surfaceNo = self.sendMessage({'call' : 'get_canvas_surface',
+                                      'canvasNo' : str(canvasNo)})
+        return surfaceNo["surfaceNo"]
     
     def shiftCircle(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_circle',
@@ -915,6 +925,11 @@ class messageSender:
         typeName = self.sendMessage({'call' : 'get_element_type',
                                  'elementNo' : str(elementNo)})
         return typeName["type"]
+
+    def getElementsCanvas(self, elementNo):
+        canvasNo = self.sendMessage({'call' : 'get_elements_canvas',
+                                     'elementNo' : str(elementNo)})
+        return canvasNo["canvasNo"]
     
     def setCircleLineColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_circle_line_color',
