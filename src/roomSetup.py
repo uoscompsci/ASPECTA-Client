@@ -68,15 +68,19 @@ class Client:
                 try:
                     if self.bezierUpdates[x][0]:
                         self.update_bezier("top", x)
+                        self.update_mesh(x)
                         self.bezierUpdates[x][0] = False
                     if self.bezierUpdates[x][1]:
                         self.update_bezier("bottom", x)
+                        self.update_mesh(x)
                         self.bezierUpdates[x][1] = False
                     if self.bezierUpdates[x][2]:
                         self.update_bezier("left", x)
+                        self.update_mesh(x)
                         self.bezierUpdates[x][2] = False
                     if self.bezierUpdates[x][3]:
                         self.update_bezier("right", x)
+                        self.update_mesh(x)
                         self.bezierUpdates[x][3] = False
                 except:
                     pass
