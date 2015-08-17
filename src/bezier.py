@@ -1,5 +1,5 @@
 import math
-
+from scipy.weave import inline
 
 class BezierCalc:
     @staticmethod
@@ -21,48 +21,75 @@ class BezierCalc:
 
     @staticmethod
     def find_third(point1, point2):
-        xdiff = float(point2[0] - point1[0])
-        ydiff = float(point2[1] - point1[1])
-        csq = pow(xdiff, 2) + pow(ydiff, 2)
-        c = math.sqrt(csq)
-        xdiff /= c
-        ydiff /= c
-        xdiff *= c / 3 * 2
-        ydiff *= c / 3 * 2
-        return point1[0] + xdiff, point1[1] + ydiff
+        point10 = point1[0]
+        point11 = point1[1]
+        point20 = point2[0]
+        point21 = point2[1]
+        code = """
+            #include <math.h>
+            float xdiff = point20 - point10;
+            float ydiff = point21 - point11;
+            float csq = pow(xdiff,2) + pow(ydiff,2);
+            float c = sqrt(csq);
+            xdiff = xdiff/c;
+            ydiff = ydiff/c;
+            xdiff = xdiff * (c/3*2);
+            ydiff = ydiff * (c/3*2);
+            py::list ret;
+            ret.append(point10+xdiff);
+            ret.append(point11+ydiff);
+            return_val = ret;
+        """
+        ret = inline(code, ['point10', 'point11', 'point20', 'point21'])
+        return ret
 
     def calculateBezierPoint(self, points, control_points, t):
         t = round(t, 2)
-        point = self.calculateBezierSubPoint(t % 1, points[int(math.floor(t))], control_points[int(math.floor(t))],
+        point = self.weaveCalculateBezierSubPoint(t % 1, points[int(math.floor(t))], control_points[int(math.floor(t))],
                                              self.opposite_control_point(points[int(math.ceil(t))],
                                              control_points[int(math.ceil(t))]),
                                              points[int(math.ceil(t))])
         return point
 
-    def calculateBezierSubPoint(self, t, p1, p1_direct, p2_direct, p2):
-        u = 1 - t
-        tpow2 = t * t
-        upow2 = u * u
-        upow3 = upow2 * u
-        tpow3 = tpow2 * t
+    def weaveCalculateBezierSubPoint(self, t, p1, p1_direct, p2_direct, p2):
+        code = """
+        float u = 1-t;
+        float tpow2 = t*t;
+        float upow2 = u*u;
+        float upow3 = upow2*u;
+        float tpow3 = tpow2*t;
 
-        px = upow3 * float(p1[0])
-        px += 3 * upow2 * t * p1_direct[0]
-        px += 3 * u * tpow2 * p2_direct[0]
-        px += tpow3 * float(p2[0])
+        float px = upow3 * p10;
+        px = px + (3 * upow2 * t * p1direct0);
+        px = px + (3 * u * tpow2 * p2direct0);
+        px = px + (tpow3 * p20);
 
-        py = upow3 * float(p1[1])
-        py += 3 * upow2 * t * p1_direct[1]
-        py += 3 * u * tpow2 * p2_direct[1]
-        py += tpow3 * float(p2[1])
+        float py = upow3 * p11;
+        py = py + (3 * upow2 * t * p1direct1);
+        py = py + (3 * u * tpow2 * p2direct1);
+        py = py + (tpow3 * p21);
 
-        return px, py
+        py::list ret;
+        ret.append(px);
+        ret.append(py);
+        return_val = ret;
+        """
+        p10 = p1[0]
+        p1direct0 = p1_direct[0]
+        p11 = p1[1]
+        p1direct1 = p1_direct[1]
+        p20 = p2[0]
+        p2direct0 = p2_direct[0]
+        p21 = p2[1]
+        p2direct1 = p2_direct[1]
+        ret = inline(code, ['t', 'p10', 'p11', 'p1direct0', 'p1direct1', 'p2direct0', 'p2direct1', 'p20', 'p21'])
+        return ret
 
     def getSubCurvePoints(self, num_points, p1, p1_direct, p2_direct, p2):
         points = []
         for i in range(0, num_points + 1):
             t = i / float(num_points)
-            point = self.calculateBezierSubPoint(t, p1, p1_direct, p2_direct, p2)
+            point = self.weaveCalculateBezierSubPoint(t, p1, p1_direct, p2_direct, p2)
             points.append(point)
         return points
 
