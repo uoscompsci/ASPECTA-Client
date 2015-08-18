@@ -88,23 +88,33 @@ class Client:
 
     @staticmethod
     def line_intersection(x1a, y1a, x2a, y2a, x1b, y1b, x2b, y2b):
-        dx = x2a - x1a
-        dy = y2a - y1a
-        m1 = dy / dx
-        c1 = y1a - m1 * x1a
+        code = """
+            float dx = x2a - x1a;
+            float dy = y2a - y1a;
+            float m1 = dy/dx;
+            float c1 = y1a - m1 * x1a;
 
-        dx = x2b - x1b
-        dy = y2b - y1b
-        m2 = dy / dx
-        c2 = y1b - m2 * x1b
+            dx = x2b - x1b;
+            dy = y2b - y1b;
+            float m2 = dy/dx;
+            float c2 = y1b - m2 * x1b;
 
-        if (m1 - m2) == 0:
+            py::list ret;
+            if((m1-m2)!=0){
+                float intersection_x = (c2-c1)/(m1-m2);
+                float intersection_y = m1 * intersection_x + c1;
+                ret.append(intersection_x);
+                ret.append(intersection_y);
+            }
+            return_val = ret;
+
+        """
+        c_ret = inline(code, ['x1a', 'y1a', 'x2a', 'y2a', 'x1b', 'y1b', 'x2b', 'y2b'])
+        if len(c_ret) == 0:
             print "No Intersection"
             return None
         else:
-            intersection_x = (c2 - c1) / (m1 - m2)
-            intersection_y = m1 * intersection_x + c1
-            return intersection_x, intersection_y
+            return c_ret[0], c_ret[1]
 
     # Get the midpoint between two points
     @staticmethod
@@ -1007,6 +1017,8 @@ class Client:
                     loc = self.sender.getCursorPosition(self.controlCur)
                     if len(self.dragging) != 0:
                         for x in range(0, len(self.dragging)):
+                            print str(len(self.dragging))
+                            print str(x)
                             self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), "pix", 1)
                             for y in range(0, len(self.bezierUpdates)):
                                 try:
