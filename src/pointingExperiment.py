@@ -32,6 +32,8 @@ class client:
     username = None
     currentTrackerData = ""
     targets = None #An array of target positions each target has [0] - x  [1] - y  [2] - diameter
+    currentTarget = 0
+    defaultTarget = True
 
 
     #Checks for mouse button and keyboard
@@ -99,12 +101,15 @@ class client:
         while(self.quit==False):
             time.sleep(1.0/60)
             if(self.mouseLock==True):
-                pos=pygame.mouse.get_pos()
-                xdist = (self.winWidth/2)-pos[0]
-                ydist = (self.winHeight/2)-pos[1]
-                if (not(xdist==0 and ydist==0)):
-                    pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-                    self.sender.shiftCursor(self.controlCur, -xdist, ydist)
+                if(self.mouseTask==True):
+                    pos=pygame.mouse.get_pos()
+                    xdist = (self.winWidth/2)-pos[0]
+                    ydist = (self.winHeight/2)-pos[1]
+                    if (not(xdist==0 and ydist==0)):
+                        pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
+                        self.sender.shiftCursor(self.controlCur, -xdist, ydist)
+                else:
+                    #TODO Update position according to pointer
 
     #Locks the mouse so that the server can be controlled
     def LockMouse(self):
@@ -169,7 +174,6 @@ class client:
 
         self.mainCur = self.sender.newCursor(self.wall1C, 0.5, 0.5,"prop")
         self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
-        self.currentTarget = 0
         self.controlCur = self.mainCur
 
     #The main loop
