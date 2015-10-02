@@ -31,6 +31,8 @@ class client:
     controlCur = None
     username = None
     currentTrackerData = ""
+    targets = None #An array of target positions each target has [0] - x  [1] - y  [2] - diameter
+
 
     #Checks for mouse button and keyboard
     def getInput(self,get_point):
@@ -160,7 +162,14 @@ class client:
 
     #Sets up the surfaces which can be defined within the client
     def initGUI(self):
-        self.mainCur = self.sender.newCursor(1, 512/2, 512/2,"pix")
+        self.wall1C = self.sender.newCanvas(1,0,1,1,1,"prop","wall1")
+        self.wall2C = self.sender.newCanvas(2,0,1,1,1,"prop","wall2")
+        self.wall3C = self.sender.newCanvas(3,0,1,1,1,"prop","wall3")
+        self.wall4C = self.sender.newCanvas(4,0,1,1,1,"prop","wall4")
+
+        self.mainCur = self.sender.newCursor(self.wall1C, 0.5, 0.5,"prop")
+        self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
+        self.currentTarget = 0
         self.controlCur = self.mainCur
 
     #The main loop
