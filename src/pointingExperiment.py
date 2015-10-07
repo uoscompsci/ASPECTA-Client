@@ -88,7 +88,7 @@ class client:
                             self.mouseLock = False
                             pygame.mouse.set_visible(True)
                             self.master.focus_force()
-                            self.sender.hideCursor(self.mainCur)
+                            '''self.sender.hideCursor(self.mainCur)'''
                         else:
                             pass
 
@@ -106,9 +106,9 @@ class client:
         print self.currentTrackerData
         trackerData = self.currentTrackerData
         trackerData = trackerData.split(";")
-        for x in range(0,len(trackerData)):
+        for x in range(0, len(trackerData)):
             trackerData[x] = trackerData[x].split(",")
-            for y in range(0,len(trackerData[x])):
+            for y in range(0, len(trackerData[x])):
                 trackerData[x][y] = float(trackerData[x][y])
         return trackerData
 
@@ -148,7 +148,7 @@ class client:
                     ydist = (self.winHeight/2)-pos[1]
                     if (not(xdist==0 and ydist==0)):
                         pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-                        self.sender.shiftCursor(self.controlCur, -xdist, ydist)
+                        '''self.sender.shiftCursor(self.controlCur, -xdist, ydist)'''
                 else:
                     intersections = [0, 0, 0, 0, 0]
                     mouseLocations = []
@@ -171,18 +171,18 @@ class client:
                                 intersections[x] = 0
                     for x in range(0,len(self.pointingMice)):
                         if x < len(mouseLocations):
-                            self.sender.relocateCursor(self.pointingMice[x], mouseLocations[x][0], mouseLocations[x][1],
+                            '''self.sender.relocateCursor(self.pointingMice[x], mouseLocations[x][0], mouseLocations[x][1],
                                                        "prop", 12) #TODO Need to work out surface number
-                            self.sender.showCursor(self.pointingMice[x])
+                            self.sender.showCursor(self.pointingMice[x])'''
                         else:
-                            self.sender.hideCursor(self.pointingMice[x])
+                            '''self.sender.hideCursor(self.pointingMice[x])'''
 
 
     #Locks the mouse so that the server can be controlled
     def LockMouse(self):
         self.mouseLock = True
         pygame.mouse.set_visible(False)
-        self.sender.showCursor(self.mainCur)
+        '''self.sender.showCursor(self.mainCur)'''
 
     def serverInit(self):
         CONNECTION_LIST = []
@@ -234,13 +234,14 @@ class client:
 
     #Sets up the surfaces which can be defined within the client
     def initGUI(self):
-        self.wall1C = self.sender.newCanvas(1, 0, 1, 1, 1, "prop", "wall1")
+        '''self.wall1C = self.sender.newCanvas(1, 0, 1, 1, 1, "prop", "wall1")
         self.wall2C = self.sender.newCanvas(2, 0, 1, 1, 1, "prop", "wall2")
         self.wall3C = self.sender.newCanvas(3, 0, 1, 1, 1, "prop", "wall3")
         self.wall4C = self.sender.newCanvas(4, 0, 1, 1, 1, "prop", "wall4")
 
         self.mainCur = self.sender.newCursor(self.wall1C, 0.5, 0.5,"prop")
         self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
+        '''
         self.controlCur = self.mainCur
 
     def loadWallCoordinates(self, filename):
@@ -267,7 +268,7 @@ class client:
         thread = Thread(target=self.serverInit,args=())
         thread.start()
 
-        self.sender = messageSender()
+        '''self.sender = messageSender()'''
         self.winWidth = 320
         self.winHeight = 240
 
@@ -292,11 +293,12 @@ class client:
 
         while(self.username==None):
             pass
-
+'''
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
         self.sender.loadDefinedSurfaces("experimentLayout") #TODO Make layout file
         self.loadWallCoordinates('layout.csv')
+'''
         self.initGUI()
 
         self.mouseLock=False
