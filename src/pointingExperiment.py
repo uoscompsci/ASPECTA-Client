@@ -38,7 +38,7 @@ class client:
     targets = None #An array of target positions each target has [0] - x  [1] - y  [2] - diameter  [3] - surface
     currentTarget = 0
     defaultTarget = True
-    mouseTask = True
+    mouseTask = False
     planes = []
 
 
@@ -103,38 +103,47 @@ class client:
         return None
 
     def getTrackerData(self):
-        print self.currentTrackerData
+        #print self.currentTrackerData
         trackerData = self.currentTrackerData
         trackerData = trackerData.split(";")
         for x in range(0, len(trackerData)):
             trackerData[x] = trackerData[x].split(",")
             for y in range(0, len(trackerData[x])):
-                trackerData[x][y] = float(trackerData[x][y])
+                #if(len(trackerData[x])>3):
+                #print "TrackerData = " + str(trackerData[x])
+                try:
+                    trackerData[x][y] = float(trackerData[x][y])
+                except:
+                    pass
         return trackerData
 
     def segmentPlane(self, plane):
+        #print "Plane = " + str(plane)
         data = self.getTrackerData()
-        planeNormal = scipy.array([plane[0], plane[1], plane[2]])
-        planeOrigin = scipy.array([plane[4], plane[5], plane[6]])
+        planeNormal = scipy.array([plane[0][0], plane[0][1], plane[0][2]])
+        planeOrigin = scipy.array([plane[1][0], plane[1][1], plane[1][2]])
         rayOrigin = scipy.array([data[0][0], data[0][1], data[0][2]])
         rayVector = scipy.array([data[1][0], data[1][1], data[1][2]])
         originDistance = rayOrigin - planeOrigin
         D = planeNormal.dot(rayVector)
+        #print "D = " + str(D)
         N = -planeNormal.dot(originDistance)
-        if (fabs(D)<0.00000001):
+        #print "N = " + str(N)
+        #print str(D)
+        if (scipy.fabs(D)<0.00000001):
             if(N==0):
-                print "Segment lies in plane! The laws of physics don't apply anymore! What do!?"
+                #print "Segment lies in plane! The laws of physics don't apply anymore! What do!?"
                 return 2
             else:
-                print "No intersection. Almost exactly parallel to plane!"
+                #print "No intersection. Almost exactly parallel to plane!"
                 return 0
         rayDistanceProp = N/D
         self.intersect = rayOrigin + rayDistanceProp * rayVector
         if rayDistanceProp >= 0:
-            print "Intersect = " + str(self.intersect)
+            #print "Intersect = " + str(self.intersect)
             return 1
         else:
-            print "Ray facing away from surface"
+            #print "Ray facing away from surface"
             return 3
 
     #Loops until the program is closed and monitors mouse movement
@@ -159,23 +168,31 @@ class client:
                             diagVec = intersections[x] - self.planes[x][2]
                             hVec = self.planes[x][3]-self.planes[x][2]
                             vVec = self.planes[x][5]-self.planes[x][2]
-                            hdist = diagVec.dot(hVec)
-                            vdist = diagVec.dot(vVec)
+                            hdot = diagVec.dot(hVec)
+                            vdot = diagVec.dot(vVec)
                             hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
                             vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
-                            hProp = hdist/hVecDist
-                            vProp = vdist/vVecDist
+                            hproj = (hdot/pow(hVecDist, 2))*hVec
+                            vproj = (vdot/pow(vVecDist, 2))*vVec
+                            hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
+                            vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
+                            hProp = hProjDist/hVecDist
+                            vProp = vProjDist/vVecDist
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1):
                                 mouseLocations.append((hProp, vProp, x))
                             else:
                                 intersections[x] = 0
-                    for x in range(0,len(self.pointingMice)):
+                    for x in range(0,len(mouseLocations)):
+                        print "Mouseloc = " + str(mouseLocations[x][0]) + "," + str(mouseLocations[x][1])
+                    print ""
+                    '''for x in range(0,len(self.pointingMice)):
                         if x < len(mouseLocations):
-                            '''self.sender.relocateCursor(self.pointingMice[x], mouseLocations[x][0], mouseLocations[x][1],
+                            print mouseLocations[0] + "," + mouseLocations[1]'''
+                    '''self.sender.relocateCursor(self.pointingMice[x], mouseLocations[x][0], mouseLocations[x][1],
                                                        "prop", 12) #TODO Need to work out surface number
                             self.sender.showCursor(self.pointingMice[x])'''
-                        else:
-                            '''self.sender.hideCursor(self.pointingMice[x])'''
+                    #else:
+                    '''self.sender.hideCursor(self.pointingMice[x])'''
 
 
     #Locks the mouse so that the server can be controlled
@@ -242,7 +259,7 @@ class client:
         self.mainCur = self.sender.newCursor(self.wall1C, 0.5, 0.5,"prop")
         self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
         '''
-        self.controlCur = self.mainCur
+        #self.controlCur = self.mainCur
 
     def loadWallCoordinates(self, filename):
         with open(filename, 'rb') as csvfile:
@@ -255,6 +272,7 @@ class client:
                     temp.append(float(row[x]))
                 temp = scipy.array([temp[0], temp[1], temp[2]])
                 content.append(temp)
+            #print str(content)
             self.planes.append([content[0], content[1], content[2], content[3], content[4], content[5]])
             self.planes.append([content[6], content[7], content[8], content[9], content[10], content[11]])
             self.planes.append([content[12], content[13], content[14], content[15], content[16], content[17]])
@@ -293,12 +311,12 @@ class client:
 
         while(self.username==None):
             pass
-'''
+        '''
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
         self.sender.loadDefinedSurfaces("experimentLayout") #TODO Make layout file
+        '''
         self.loadWallCoordinates('layout.csv')
-'''
         self.initGUI()
 
         self.mouseLock=False
