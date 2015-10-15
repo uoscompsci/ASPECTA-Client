@@ -157,7 +157,9 @@ class client:
                     ydist = (self.winHeight/2)-pos[1]
                     if (not(xdist==0 and ydist==0)):
                         pygame.mouse.set_pos([self.winWidth/2,self.winHeight/2])
-                        '''self.sender.shiftCursor(self.controlCur, -xdist, ydist)'''
+                        self.sender.hideCursor(self.curs[1])
+                        self.sender.showCursor(self.curs[0])
+                        self.sender.shiftCursor(self.curs[0], -xdist, ydist)
                 else:
                     intersections = [0, 0, 0, 0, 0]
                     mouseLocations = []
@@ -178,28 +180,35 @@ class client:
                             vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
                             hProp = hProjDist/hVecDist
                             vProp = vProjDist/vVecDist
-                            if (0 <= hProp <= 1) and (0 <= vProp <= 1):
+                            #checkVec = self.planes[x][3]-intersections[x]
+                            #checkDist = sqrt(pow(checkVec[0], 2) + pow(checkVec[1], 2) + pow(checkVec[2], 2))
+                            #checkPythDist = sqrt(pow(vProjDist,2) + pow(hVecDist-hProjDist,2))
+                            if (0 <= hProp <= 1) and (0 <= vProp <= 1):# and abs(checkPythDist-checkDist)<0.05:
                                 mouseLocations.append((hProp, vProp, x))
                             else:
                                 intersections[x] = 0
+                    print "Hi!"
                     for x in range(0,len(mouseLocations)):
                         print "Mouseloc = " + str(mouseLocations[x][0]) + "," + str(mouseLocations[x][1])
                     print ""
-                    '''for x in range(0,len(self.pointingMice)):
-                        if x < len(mouseLocations):
-                            print mouseLocations[0] + "," + mouseLocations[1]'''
-                    '''self.sender.relocateCursor(self.pointingMice[x], mouseLocations[x][0], mouseLocations[x][1],
-                                                       "prop", 12) #TODO Need to work out surface number
-                            self.sender.showCursor(self.pointingMice[x])'''
-                    #else:
-                    '''self.sender.hideCursor(self.pointingMice[x])'''
+                    if len(mouseLocations) > 0:
+                        self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0-mouseLocations[0][1], "prop", 1)
+                        self.sender.showCursor(self.curs[0])
+                        if len(mouseLocations) > 1:
+                            self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0-mouseLocations[1][1], "prop", 1)
+                            self.sender.showCursor(self.curs[1])
+                        else:
+                            self.sender.hideCursor(self.curs[1])
+                    else:
+                        self.sender.hideCursor(self.curs[0])
+                        self.sender.hideCursor(self.curs[1])
 
 
     #Locks the mouse so that the server can be controlled
     def LockMouse(self):
         self.mouseLock = True
         pygame.mouse.set_visible(False)
-        '''self.sender.showCursor(self.mainCur)'''
+        self.sender.showCursor(self.curs[0])
 
     def serverInit(self):
         CONNECTION_LIST = []
@@ -255,10 +264,15 @@ class client:
         self.wall2C = self.sender.newCanvas(2, 0, 1, 1, 1, "prop", "wall2")
         self.wall3C = self.sender.newCanvas(3, 0, 1, 1, 1, "prop", "wall3")
         self.wall4C = self.sender.newCanvas(4, 0, 1, 1, 1, "prop", "wall4")
-
-        self.mainCur = self.sender.newCursor(self.wall1C, 0.5, 0.5,"prop")
-        self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
         '''
+        self.curs = []
+        self.curs.append(self.sender.newCursor(1, 0.5, 0.5, "prop"))
+        self.sender.hideCursor(self.curs[0])
+        print "Cursor 1 created"
+        self.curs.append(self.sender.newCursor(1, 0.5, 0.5, "prop"))
+        self.sender.hideCursor(self.curs[1])
+        print "Cursor 2 created"
+        #self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
         #self.controlCur = self.mainCur
 
     def loadWallCoordinates(self, filename):
@@ -286,7 +300,7 @@ class client:
         thread = Thread(target=self.serverInit,args=())
         thread.start()
 
-        '''self.sender = messageSender()'''
+        self.sender = messageSender()
         self.winWidth = 320
         self.winHeight = 240
 
@@ -311,11 +325,9 @@ class client:
 
         while(self.username==None):
             pass
-        '''
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
-        self.sender.loadDefinedSurfaces("experimentLayout") #TODO Make layout file
-        '''
+        self.sender.loadDefinedSurfaces("DEFAULT")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
 
