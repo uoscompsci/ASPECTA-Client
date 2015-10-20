@@ -188,7 +188,6 @@ class client:
                                 mouseLocations.append((hProp, vProp, x))
                             else:
                                 intersections[x] = 0
-                    print "Hi!"
                     for x in range(0,len(mouseLocations)):
                         print "Mouseloc = " + str(mouseLocations[x][0]) + "," + str(mouseLocations[x][1])
                     print ""
