@@ -183,14 +183,14 @@ class client:
                             vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
                             hProp = hProjDist/hVecDist
                             vProp = vProjDist/vVecDist
-                            vecangle = scipy.arccos(hdot/(self.length(diagVec)*self.length(hVec)))
-                            if (0 <= hProp <= 1) and (0 <= vProp <= 1) and vecangle < 90:# and abs(checkPythDist-checkDist)<0.05:
+                            hvecangle = scipy.arccos(hdot/(self.length(diagVec)*self.length(hVec)))
+                            hvecangle = numpy.rad2deg(hvecangle)
+                            vvecangle = scipy.arccos(vdot/(self.length(diagVec)*self.length(vVec)))
+                            vvecangle = numpy.rad2deg(vvecangle)
+                            if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle < 90 and vvecangle < 90:# and abs(checkPythDist-checkDist)<0.05:
                                 mouseLocations.append((hProp, vProp, x))
                             else:
                                 intersections[x] = 0
-                    for x in range(0,len(mouseLocations)):
-                        print "Mouseloc = " + str(mouseLocations[x][0]) + "," + str(mouseLocations[x][1])
-                    print ""
                     if len(mouseLocations) > 0:
                         self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0-mouseLocations[0][1], "prop", 1)
                         self.sender.showCursor(self.curs[0])
