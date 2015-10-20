@@ -327,7 +327,7 @@ class client:
             pass
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
-        self.sender.loadDefinedSurfaces("DEFAULT")
+        #self.sender.loadDefinedSurfaces("DEFAULT")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
 
