@@ -146,6 +146,9 @@ class client:
             #print "Ray facing away from surface"
             return 3
 
+    def length(self, v):
+        return scipy.sqrt(v.dot(v))
+
     #Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
         while(self.quit==False):
@@ -180,10 +183,8 @@ class client:
                             vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
                             hProp = hProjDist/hVecDist
                             vProp = vProjDist/vVecDist
-                            #checkVec = self.planes[x][3]-intersections[x]
-                            #checkDist = sqrt(pow(checkVec[0], 2) + pow(checkVec[1], 2) + pow(checkVec[2], 2))
-                            #checkPythDist = sqrt(pow(vProjDist,2) + pow(hVecDist-hProjDist,2))
-                            if (0 <= hProp <= 1) and (0 <= vProp <= 1):# and abs(checkPythDist-checkDist)<0.05:
+                            vecangle = scipy.arccos(hdot/(self.length(diagVec)*self.length(hVec)))
+                            if (0 <= hProp <= 1) and (0 <= vProp <= 1) and vecangle < 90:# and abs(checkPythDist-checkDist)<0.05:
                                 mouseLocations.append((hProp, vProp, x))
                             else:
                                 intersections[x] = 0
