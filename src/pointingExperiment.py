@@ -187,7 +187,7 @@ class client:
                             hvecangle = numpy.rad2deg(hvecangle)
                             vvecangle = scipy.arccos(vdot/(self.length(diagVec)*self.length(vVec)))
                             vvecangle = numpy.rad2deg(vvecangle)
-                            if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle < 90 and vvecangle < 90:# and abs(checkPythDist-checkDist)<0.05:
+                            if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                 mouseLocations.append((hProp, vProp, x))
                             else:
                                 intersections[x] = 0
