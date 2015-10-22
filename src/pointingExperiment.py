@@ -346,10 +346,6 @@ class client:
     def initGUI(self):
         self.wallCanvases = []
         self.wallCanvases.append(self.sender.newCanvas(1, 0, 1, 1, 1, "prop", "wall1"))
-        '''print "Adding red to wall " + str(self.wallCanvases[0])
-        self.sender.newRectangle(self.wallCanvases[0], 0, 1, 1, 1, "prop", (0,0,0,0), 0, (1,0,0,1))
-        self.sender.newTexRectangle(self.wallCanvases[0], 0, 1, 1, 1, "prop", "img/5.png")
-        '''
         self.assignRandomTargets(1, 25)
         '''self.wall2C = self.sender.newCanvas(2, 0, 1, 1, 1, "prop", "wall2")
         self.wall3C = self.sender.newCanvas(3, 0, 1, 1, 1, "prop", "wall3")
