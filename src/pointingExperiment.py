@@ -302,10 +302,17 @@ class client:
             if noOfTargets <= 25:
                 targets = []
                 for x in range(0, noOfTargets):
-                    # Create random grid coordinates
-                    xrand = randint(0, 4)
-                    yrand = randint(0, 4)
-
+                    foundSpace = False
+                    while not foundSpace:
+                        # Create random grid coordinates
+                        xrand = randint(0, 4)
+                        yrand = randint(0, 4)
+                        hit = False
+                        for y in range(0, len(targets)):
+                            if targets[y][0] == xrand and targets[y][1] == yrand:
+                                hit = True
+                        if not hit:
+                            foundSpace = True
                     print "X = " + str(xrand)
                     print "Y = " + str(yrand)
 
@@ -316,7 +323,6 @@ class client:
                     print "realX = " + str(realX)
                     print "realY = " + str(realY)
 
-                    # TODO Prevent duplicate locations on wall
                     fileNumber = randint(7, 144)  # TODO Prevent duplicates across all walls
                     print "Creating tex rectangle"
                     print str(self.wallCanvases[wallNo-1])
