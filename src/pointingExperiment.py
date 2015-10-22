@@ -313,19 +313,20 @@ class client:
                                 hit = True
                         if not hit:
                             foundSpace = True
-                    print "X = " + str(xrand)
-                    print "Y = " + str(yrand)
 
                     # Convert grid coordinates to surface coordinates
                     realX = xrand*2/10.0+0.1
                     realY = 1-(yrand*2/10.0+0.1)
-
-                    print "realX = " + str(realX)
-                    print "realY = " + str(realY)
-
-                    fileNumber = randint(7, 144)  # TODO Prevent duplicates across all walls
-                    print "Creating tex rectangle"
-                    print str(self.wallCanvases[wallNo-1])
+                    foundUnused = False
+                    while not foundUnused:
+                        fileNumber = randint(7, 144)
+                        hit = False
+                        for y in range(0, len(self.wallTargets)):
+                            for z in range(0, len(self.wallTargets[y])):
+                                if self.wallTargets[y][z][2] == fileNumber:
+                                    hit = True
+                        if not hit:
+                            foundUnused = True
                     icon = self.sender.newTexRectangle(self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1, 0.1, "prop",
                                                        "img/" + str(fileNumber) + ".png")
                     targets.append((xrand, yrand, fileNumber, icon))
