@@ -303,20 +303,26 @@ class client:
                 targets = []
                 for x in range(0, noOfTargets):
                     # Create random grid coordinates
-                    x = randint(0, 4)
-                    y = randint(0, 4)
+                    xrand = randint(0, 4)
+                    yrand = randint(0, 4)
+
+                    print "X = " + str(xrand)
+                    print "Y = " + str(yrand)
 
                     # Convert grid coordinates to surface coordinates
-                    realX = x*2/10+0.1
-                    realY = 1-(y*2/10+0.1)
+                    realX = xrand*2/10.0+0.1
+                    realY = 1-(yrand*2/10.0+0.1)
+
+                    print "realX = " + str(realX)
+                    print "realY = " + str(realY)
 
                     # TODO Prevent duplicate locations on wall
                     fileNumber = randint(7, 144)  # TODO Prevent duplicates across all walls
-                    icon = self.sender.newTexRectangle(self.wallCanvases[wallNo-1], realX, realY,
-                                                       self.sender.getCanvasWidth(self.wallCanvases[wallNo-1])/10,
-                                                       self.sender.getCanvasHeight(self.wallCanvases[wallNo-1])/10,
-                                                       "pix", "img/" + str(fileNumber) + ".png")
-                    targets.append((x, y, fileNumber, icon))
+                    print "Creating tex rectangle"
+                    print str(self.wallCanvases[wallNo-1])
+                    icon = self.sender.newTexRectangle(self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1, 0.1, "prop",
+                                                       "img/" + str(fileNumber) + ".png")
+                    targets.append((xrand, yrand, fileNumber, icon))
                 self.wallTargets[wallNo-1] = targets
             else:
                 print "You can't have that many targets"
@@ -333,7 +339,11 @@ class client:
     def initGUI(self):
         self.wallCanvases = []
         self.wallCanvases.append(self.sender.newCanvas(1, 0, 1, 1, 1, "prop", "wall1"))
-        self.assignRandomTargets(1, 4)
+        '''print "Adding red to wall " + str(self.wallCanvases[0])
+        self.sender.newRectangle(self.wallCanvases[0], 0, 1, 1, 1, "prop", (0,0,0,0), 0, (1,0,0,1))
+        self.sender.newTexRectangle(self.wallCanvases[0], 0, 1, 1, 1, "prop", "img/5.png")
+        '''
+        self.assignRandomTargets(1, 25)
         '''self.wall2C = self.sender.newCanvas(2, 0, 1, 1, 1, "prop", "wall2")
         self.wall3C = self.sender.newCanvas(3, 0, 1, 1, 1, "prop", "wall3")
         self.wall4C = self.sender.newCanvas(4, 0, 1, 1, 1, "prop", "wall4")
