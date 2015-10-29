@@ -225,16 +225,16 @@ class client:
                             vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                             vvecangle = numpy.rad2deg(vvecangle)
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
-                                mouseLocations.append((hProp, vProp, x))
+                                mouseLocations.append((hProp, vProp, x+1))
                             else:
                                 intersections[x] = 0
                     if len(mouseLocations) > 0:
                         self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0 - mouseLocations[0][1],
-                                                   "prop", 1)
+                                                   "prop", mouseLocations[0][2])
                         self.sender.showCursor(self.curs[0])
                         if len(mouseLocations) > 1:
                             self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
-                                                       "prop", 1)
+                                                       "prop", mouseLocations[0][2])
                             self.sender.showCursor(self.curs[1])
                         else:
                             self.sender.hideCursor(self.curs[1])
@@ -327,8 +327,8 @@ class client:
                                     hit = True
                         if not hit:
                             foundUnused = True
-                    icon = self.sender.newTexRectangle(self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1, 0.1, "prop",
-                                                       "img/" + str(fileNumber) + ".png")
+                    icon = self.sender.newTexRectangle(self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1,
+                                                       0.1, "prop", "img/" + str(fileNumber) + ".png")
                     targets.append((xrand, yrand, fileNumber, icon))
                 self.wallTargets[wallNo-1] = targets
             else:
