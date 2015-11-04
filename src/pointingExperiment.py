@@ -1,7 +1,9 @@
 from Tkinter import *
+import math
 from messageSender import *
 import pygame
 import scipy
+import scipy.linalg
 import numpy
 import threading
 from threading import Thread
@@ -37,7 +39,7 @@ class client:
     mainCur = None
     controlCur = None
     username = None
-    currentTrackerData = ""
+    currentTrackerData = []
     targets = None  # An array of target positions each target has [0] - x  [1] - y  [2] - diameter  [3] - surface
     currentTarget = 0
     defaultTarget = True
@@ -140,23 +142,30 @@ class client:
         return None
 
     def getTrackerData(self):
-        # print self.currentTrackerData
-        trackerData = self.currentTrackerData
-        trackerData = trackerData.split(";")
-        for x in range(0, len(trackerData)):
-            trackerData[x] = trackerData[x].split(",")
-            for y in range(0, len(trackerData[x])):
-                # if(len(trackerData[x])>3):
-                # print "TrackerData = " + str(trackerData[x])
+        pointerTrackerData = self.currentTrackerData[0]
+        pointerTrackerData = pointerTrackerData.split(";")
+        for x in range(0, len(pointerTrackerData)):
+            pointerTrackerData[x] = pointerTrackerData[x].split(",")
+            for y in range(0, len(pointerTrackerData[x])):
                 try:
-                    trackerData[x][y] = float(trackerData[x][y])
+                    pointerTrackerData[x][y] = float(pointerTrackerData[x][y])
                 except:
                     pass
-        return trackerData
+        if(len(currentTrackerData)>1):
+            headTrackerData = self.currentTrackerData[1]
+            headTrackerData = headTrackerData.split(";")
+            for x in range(0, len(headTrackerData)):
+                headTrackerData[x] = headTrackerData[x].split(",")
+                for y in range(0, len(headTrackerData[x])):
+                    try:
+                        pointerTrackerData[x][y] = float(headTrackerData[x][y])
+                    except:
+                        pass
+            return pointerTrackerData, headTrackerData
+        return pointerTrackerData, None
 
-    def segmentPlane(self, plane):
+    def segmentPlane(self, plane, data):
         # print "Plane = " + str(plane)
-        data = self.getTrackerData()
         planeNormal = scipy.array([plane[0][0], plane[0][1], plane[0][2]])
         planeOrigin = scipy.array([plane[1][0], plane[1][1], plane[1][2]])
         rayOrigin = scipy.array([data[0][0], data[0][1], data[0][2]])
@@ -186,6 +195,14 @@ class client:
     def length(self, v):
         return scipy.sqrt(v.dot(v))
 
+    def M(self, axis, theta):
+        return scipy.linalg.expm3(numpy.cross(numpy.eye(3), axis / scipy.linalg.norm(axis) * theta))
+
+    def rotateVector(self, v, axis, degrees):
+        theta = degrees*(math.pi/180)
+        M0 = self.M(axis, theta)
+        return numpy.dot(M0, v)
+
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
         while (self.quit == False):
@@ -197,14 +214,12 @@ class client:
                     ydist = (self.winHeight / 2) - pos[1]
                     if (not (xdist == 0 and ydist == 0)):
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
-                        self.sender.hideCursor(self.curs[1])
-                        self.sender.showCursor(self.curs[0])
-                        self.sender.shiftCursor(self.curs[0], -xdist, ydist)
+
                 else:
                     intersections = [0, 0, 0, 0, 0]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
-                        segCheck = self.segmentPlane(self.planes[x])
+                        segCheck = self.segmentPlane(self.planes[x], self.getTrackerData()[0])
                         if segCheck == 1:
                             intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                             diagVec = intersections[x] - self.planes[x][2]
@@ -275,7 +290,7 @@ class client:
                     try:
                         data = sock.recv(RECV_BUFFER)
                         if data:
-                            self.currentTrackerData = str(data)
+                            self.currentTrackerData = str(data).split("$")  # Separate the pointer and head data
                     except:
                         print "Client (%s, %s) is offline" % addr
                         sock.close()
@@ -356,8 +371,6 @@ class client:
         self.sender.hideCursor(self.curs[0])
         self.curs.append(self.sender.newCursor(1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(self.curs[1])
-        # self.target = self.sender.newTexRectangle(self.wall1C,self.targets[0][0]-self.targets[0][2]/2,self.targets[0][1]+self.targets[0][2]/2,self.targets[0][2],self.targets[0][2],"pix","target.jpg") #TODO Create Target Image
-        # self.controlCur = self.mainCur
 
     def loadWallCoordinates(self, filename):
         with open(filename, 'rb') as csvfile:
