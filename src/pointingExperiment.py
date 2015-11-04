@@ -151,7 +151,7 @@ class client:
                     pointerTrackerData[x][y] = float(pointerTrackerData[x][y])
                 except:
                     pass
-        if(len(currentTrackerData)>1):
+        if(len(self.currentTrackerData)>1):
             headTrackerData = self.currentTrackerData[1]
             headTrackerData = headTrackerData.split(";")
             for x in range(0, len(headTrackerData)):
