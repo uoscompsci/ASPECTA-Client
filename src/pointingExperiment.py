@@ -39,7 +39,7 @@ class client:
     mainCur = None
     controlCur = None
     username = None
-    currentTrackerData = []
+    currentTrackerData = ["", ""]
     targets = None  # An array of target positions each target has [0] - x  [1] - y  [2] - diameter  [3] - surface
     currentTarget = 0
     defaultTarget = True
@@ -172,10 +172,7 @@ class client:
         rayVector = scipy.array([data[1][0], data[1][1], data[1][2]])
         originDistance = rayOrigin - planeOrigin
         D = planeNormal.dot(rayVector)
-        # print "D = " + str(D)
         N = -planeNormal.dot(originDistance)
-        # print "N = " + str(N)
-        # print str(D)
         if (scipy.fabs(D) < 0.00000001):
             if (N == 0):
                 # print "Segment lies in plane! The laws of physics don't apply anymore! What do!?"
@@ -290,7 +287,11 @@ class client:
                     try:
                         data = sock.recv(RECV_BUFFER)
                         if data:
-                            self.currentTrackerData = str(data).split("$")  # Separate the pointer and head data
+                            tempTrackerData = str(data).split("$")  # Separate the pointer and head data
+                            if tempTrackerData[0] != "":
+                                self.currentTrackerData[0] = tempTrackerData[0]
+                            if tempTrackerData[1] != "":
+                                self.currentTrackerData[1] = tempTrackerData[1]
                     except:
                         print "Client (%s, %s) is offline" % addr
                         sock.close()
