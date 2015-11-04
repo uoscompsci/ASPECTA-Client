@@ -249,7 +249,7 @@ class client:
                         self.sender.showCursor(self.curs[0])
                         if len(mouseLocations) > 1:
                             self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
-                                                       "prop", mouseLocations[0][2])
+                                                       "prop", mouseLocations[1][2])
                             self.sender.showCursor(self.curs[1])
                         else:
                             self.sender.hideCursor(self.curs[1])
