@@ -43,7 +43,7 @@ class client:
     targets = None  # An array of target positions each target has [0] - x  [1] - y  [2] - diameter  [3] - surface
     currentTarget = 0
     defaultTarget = True
-    mouseTask = False
+    mouseTask = True
     planes = []
     wallgrids = [[[0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0],
@@ -141,6 +141,7 @@ class client:
                             pass
         return None
 
+    #  Returns a tuple containing the tracker data for the pointer and the head
     def getTrackerData(self):
         pointerTrackerData = self.currentTrackerData[0]
         pointerTrackerData = pointerTrackerData.split(";")
@@ -164,12 +165,12 @@ class client:
             return pointerTrackerData, headTrackerData
         return pointerTrackerData, None
 
-    def segmentPlane(self, plane, data):
+    def segmentPlane(self, plane, rayOrigin, rayVector):
         # print "Plane = " + str(plane)
         planeNormal = scipy.array([plane[0][0], plane[0][1], plane[0][2]])
         planeOrigin = scipy.array([plane[1][0], plane[1][1], plane[1][2]])
-        rayOrigin = scipy.array([data[0][0], data[0][1], data[0][2]])
-        rayVector = scipy.array([data[1][0], data[1][1], data[1][2]])
+        rayOrigin = scipy.array([rayOrigin[0], rayOrigin[1], rayOrigin[2]])
+        rayVector = scipy.array([rayVector[0], rayVector[1], rayVector[2]])
         originDistance = rayOrigin - planeOrigin
         D = planeNormal.dot(rayVector)
         N = -planeNormal.dot(originDistance)
@@ -196,12 +197,47 @@ class client:
         return scipy.linalg.expm3(numpy.cross(numpy.eye(3), axis / scipy.linalg.norm(axis) * theta))
 
     def rotateVector(self, v, axis, degrees):
+        print "Initial vector = " + str(self.normalizeVec(v))
+        print "Rotated by " + str(degrees) + " degrees on axis " + str(axis)
         theta = degrees*(math.pi/180)
         M0 = self.M(axis, theta)
-        return numpy.dot(M0, v)
+        out = numpy.dot(M0, v)
+        print "Final vector = " + str(self.normalizeVec(out))
+        return out
+
+    def distToAngle(self, dist):
+        return dist*0.1
+
+    def getHeadVerticalVec(self):
+        data = self.getTrackerData()[0] #TODO MAKE 1
+        a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
+        b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
+        normal = numpy.cross(a, b)
+        return scipy.array([normal[0], normal[1], normal[2]])
+
+    def getHeadForwardVec(self):
+        data = self.getTrackerData()[0]#TODO MAKE 1
+        return scipy.array([data[1][0], data[1][1], data[1][2]])
+
+    def getHeadLoc(self):
+        data = self.getTrackerData()[0]#TODO MAKE 1
+        return scipy.array([data[0][0], data[0][1], data[0][2]])
+
+    def getHeadHorizontalVec(self):
+        return numpy.cross(self.getHeadVerticalVec(), self.getHeadForwardVec())
+
+    # Returns vector after setting magnitude to 1
+    def normalizeVec(self, vec):
+        return vec/scipy.linalg.norm(vec)
 
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
+        CurVec = self.getHeadForwardVec()
+        '''hit = None
+        CurIntersect = None
+        for x in range(0, len(self.planes)):
+            self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
+            CurIntersect = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])'''
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -211,12 +247,60 @@ class client:
                     ydist = (self.winHeight / 2) - pos[1]
                     if (not (xdist == 0 and ydist == 0)):
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
+                        headUp = self.normalizeVec(self.getHeadVerticalVec())
+                        CurVec = self.rotateVector(CurVec, headUp, self.distToAngle(xdist))
+                        #  self.CurVec = self.rotateVector(self.CurVec, self.getHeadHorizontalVec(), self.distToAngle(ydist))
 
+
+
+
+                        # Loop through planes and find intersections on curvec
+
+                        intersections = [0, 0, 0, 0, 0]
+                        mouseLocations = []
+                        for x in range(0, len(self.planes)):
+                            segCheck = self.segmentPlane(self.planes[x], CurVec, self.getHeadLoc())
+                            if segCheck == 1:
+                                intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
+                                diagVec = intersections[x] - self.planes[x][2]
+                                hVec = self.planes[x][3] - self.planes[x][2]
+                                vVec = self.planes[x][5] - self.planes[x][2]
+                                hdot = diagVec.dot(hVec)
+                                vdot = diagVec.dot(vVec)
+                                hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
+                                vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
+                                hproj = (hdot / pow(hVecDist, 2)) * hVec
+                                vproj = (vdot / pow(vVecDist, 2)) * vVec
+                                hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
+                                vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
+                                hProp = hProjDist / hVecDist
+                                vProp = vProjDist / vVecDist
+                                hvecangle = scipy.arccos(hdot / (self.length(diagVec) * self.length(hVec)))
+                                hvecangle = numpy.rad2deg(hvecangle)
+                                vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
+                                vvecangle = numpy.rad2deg(vvecangle)
+                                if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
+                                    mouseLocations.append((hProp, vProp, x+1))
+                                else:
+                                    intersections[x] = 0
+                        if len(mouseLocations) > 0:
+                            self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0 - mouseLocations[0][1],
+                                                       "prop", mouseLocations[0][2])
+                            self.sender.showCursor(self.curs[0])
+                            if len(mouseLocations) > 1:
+                                self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
+                                                           "prop", mouseLocations[1][2])
+                                self.sender.showCursor(self.curs[1])
+                            else:
+                                self.sender.hideCursor(self.curs[1])
+                        else:
+                            self.sender.hideCursor(self.curs[0])
+                            self.sender.hideCursor(self.curs[1])
                 else:
                     intersections = [0, 0, 0, 0, 0]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
-                        segCheck = self.segmentPlane(self.planes[x], self.getTrackerData()[0])
+                        segCheck = self.segmentPlane(self.planes[x], self.getTrackerData()[0][0], self.getTrackerData()[0][1])
                         if segCheck == 1:
                             intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                             diagVec = intersections[x] - self.planes[x][2]
