@@ -196,13 +196,22 @@ class client:
     def M(self, axis, theta):
         return scipy.linalg.expm3(numpy.cross(numpy.eye(3), axis / scipy.linalg.norm(axis) * theta))
 
+    def testAngleBetweenVectors(self, v1, v2):
+        return math.acos(v1.dot(v2)/(sqrt(pow(v1[0],2) + pow(v1[1],2) + pow(v1[2],2))*sqrt(pow(v2[0],2) + pow(v2[1],2) + pow(v2[2],2))))
+
+    def radToDeg(self, radians):
+        return radians*(180/math.pi)
+
+    def degToRad(self, degrees):
+        return degrees*(math.pi/180)
+
     def rotateVector(self, v, axis, degrees):
-        print "Initial vector = " + str(self.normalizeVec(v))
-        print "Rotated by " + str(degrees) + " degrees on axis " + str(axis)
-        theta = degrees*(math.pi/180)
+        theta = self.degToRad(degrees)
+        axis = self.normalizeVec(axis)
         M0 = self.M(axis, theta)
+        v = self.normalizeVec(v)
         out = numpy.dot(M0, v)
-        print "Final vector = " + str(self.normalizeVec(out))
+        #print "Tested angle = " + str(self.radToDeg(self.testAngleBetweenVectors(self.normalizeVec(v), self.normalizeVec(out))))
         return out
 
     def distToAngle(self, dist):
@@ -233,11 +242,6 @@ class client:
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
         CurVec = self.getHeadForwardVec()
-        '''hit = None
-        CurIntersect = None
-        for x in range(0, len(self.planes)):
-            self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
-            CurIntersect = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])'''
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -249,6 +253,8 @@ class client:
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
                         headUp = self.normalizeVec(self.getHeadVerticalVec())
                         CurVec = self.rotateVector(CurVec, headUp, self.distToAngle(xdist))
+                        horizAxis = numpy.cross(headUp, CurVec)
+                        CurVec = self.rotateVector(CurVec, horizAxis, -self.distToAngle(ydist))
                         #  self.CurVec = self.rotateVector(self.CurVec, self.getHeadHorizontalVec(), self.distToAngle(ydist))
 
 
@@ -259,7 +265,7 @@ class client:
                         intersections = [0, 0, 0, 0, 0]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
-                            segCheck = self.segmentPlane(self.planes[x], CurVec, self.getHeadLoc())
+                            segCheck = self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
                             if segCheck == 1:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                                 diagVec = intersections[x] - self.planes[x][2]
