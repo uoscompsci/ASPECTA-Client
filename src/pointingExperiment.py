@@ -184,7 +184,6 @@ class client:
         rayDistanceProp = N / D
         self.intersect = rayOrigin + rayDistanceProp * rayVector
         if rayDistanceProp >= 0:
-            # print "Intersect = " + str(self.intersect)
             return 1
         else:
             # print "Ray facing away from surface"
@@ -211,7 +210,6 @@ class client:
         M0 = self.M(axis, theta)
         v = self.normalizeVec(v)
         out = numpy.dot(M0, v)
-        #print "Tested angle = " + str(self.radToDeg(self.testAngleBetweenVectors(self.normalizeVec(v), self.normalizeVec(out))))
         return out
 
     def distToAngle(self, dist):
@@ -241,7 +239,11 @@ class client:
 
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
+        headUp = self.normalizeVec(self.getHeadVerticalVec())
         CurVec = self.getHeadForwardVec()
+        #CurIntersect = None
+        #for x in range(0, len(self.planes)):
+        #    CurIntersect = self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -250,24 +252,20 @@ class client:
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
                     if (not (xdist == 0 and ydist == 0)):
+                        #print "CurVec before = " + str(CurVec)
+                        #CurVec = CurIntersect-self.getHeadLoc()
+                        #print "CurVec after = " + str(CurVec)
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
-                        headUp = self.normalizeVec(self.getHeadVerticalVec())
                         CurVec = self.rotateVector(CurVec, headUp, self.distToAngle(xdist))
                         horizAxis = numpy.cross(headUp, CurVec)
                         CurVec = self.rotateVector(CurVec, horizAxis, -self.distToAngle(ydist))
-                        #  self.CurVec = self.rotateVector(self.CurVec, self.getHeadHorizontalVec(), self.distToAngle(ydist))
-
-
-
-
-                        # Loop through planes and find intersections on curvec
-
                         intersections = [0, 0, 0, 0, 0]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
                             segCheck = self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
                             if segCheck == 1:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
+                                #CurIntersect = intersections[x]
                                 diagVec = intersections[x] - self.planes[x][2]
                                 hVec = self.planes[x][3] - self.planes[x][2]
                                 vVec = self.planes[x][5] - self.planes[x][2]
