@@ -240,10 +240,9 @@ class client:
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
         headUp = self.normalizeVec(self.getHeadVerticalVec())
-        CurVec = self.getHeadForwardVec()
-        #CurIntersect = None
-        #for x in range(0, len(self.planes)):
-        #    CurIntersect = self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
+        changeVert = 0
+        changeHoriz = 0
+        forVec = self.getHeadForwardVec()
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -252,20 +251,18 @@ class client:
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
                     if (not (xdist == 0 and ydist == 0)):
-                        #print "CurVec before = " + str(CurVec)
-                        #CurVec = CurIntersect-self.getHeadLoc()
-                        #print "CurVec after = " + str(CurVec)
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
-                        CurVec = self.rotateVector(CurVec, headUp, self.distToAngle(xdist))
-                        horizAxis = numpy.cross(headUp, CurVec)
-                        CurVec = self.rotateVector(CurVec, horizAxis, -self.distToAngle(ydist))
+                        changeHoriz += self.distToAngle(xdist)
+                        curVec = self.rotateVector(forVec, headUp, changeHoriz)
+                        horizAxis = numpy.cross(headUp, curVec)
+                        changeVert += -self.distToAngle(ydist)
+                        curVec = self.rotateVector(curVec, horizAxis, changeVert)
                         intersections = [0, 0, 0, 0, 0]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
-                            segCheck = self.segmentPlane(self.planes[x], self.getHeadLoc(), CurVec)
+                            segCheck = self.segmentPlane(self.planes[x], self.getHeadLoc(), curVec)
                             if segCheck == 1:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
-                                #CurIntersect = intersections[x]
                                 diagVec = intersections[x] - self.planes[x][2]
                                 hVec = self.planes[x][3] - self.planes[x][2]
                                 vVec = self.planes[x][5] - self.planes[x][2]
