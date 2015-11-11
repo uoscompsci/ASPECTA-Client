@@ -195,7 +195,7 @@ class client:
     def M(self, axis, theta):
         return scipy.linalg.expm3(numpy.cross(numpy.eye(3), axis / scipy.linalg.norm(axis) * theta))
 
-    def testAngleBetweenVectors(self, v1, v2):
+    def angleBetweenVectors(self, v1, v2):
         return math.acos(v1.dot(v2)/(sqrt(pow(v1[0],2) + pow(v1[1],2) + pow(v1[2],2))*sqrt(pow(v2[0],2) + pow(v2[1],2) + pow(v2[2],2))))
 
     def radToDeg(self, radians):
@@ -237,6 +237,11 @@ class client:
     def normalizeVec(self, vec):
         return vec/scipy.linalg.norm(vec)
 
+    def projectOntoPlane(self, vec, plane):
+        d = vec.dot(plane) / scipy.linalg.norm(plane)
+        p = d * self.normalizeVec(plane)
+        return vec - p
+
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
         headUp = self.normalizeVec(self.getHeadVerticalVec())
@@ -251,6 +256,8 @@ class client:
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
                     if (not (xdist == 0 and ydist == 0)):
+                        headUp = self.normalizeVec(self.getHeadVerticalVec())
+                        forVec = self.getHeadForwardVec()
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
                         changeHoriz += self.distToAngle(xdist)
                         curVec = self.rotateVector(forVec, headUp, changeHoriz)
