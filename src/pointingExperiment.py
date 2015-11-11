@@ -269,10 +269,21 @@ class client:
                         intersectVec = oldIntersect - lastHeadLoc  # Gets the vector that now points from the head to cursor
                         longitudeVec = self.projectOntoPlane(intersectVec, headUp)  # Projects the vector onto the horizonal plane
                         changeHoriz = self.angleBetweenVectors(longitudeVec, forVec)  # Gets horizontal component of angle to cursor
-                        # TODO Figure out if angle is positive or negative
-                        lattitudeVec = self.projectOntoPlane(intersectVec, self.getHeadHorizontalVec())  # Projects the vector onto the vertical plane
+
+                        #  Figure out if angle is positive or negative and update as appropriate
+                        cross = cross(forVec, longitudeVec)
+                        if headUp.dot(cross) < 0:
+                            changeHoriz = -changeHoriz
+
+                        horizVec = self.getHeadHorizontalVec()
+                        lattitudeVec = self.projectOntoPlane(intersectVec, horizVec)  # Projects the vector onto the vertical plane
                         changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
-                        # TODO Figure out if angle is positive or negative
+
+                        #  Figure out if angle is positive or negative and update as appropriate
+                        cross = cross(forVec, lattitudeVec)
+                        if horizVec.dot(cross) < 0:
+                            changeVert = -changeVert
+
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                         changeHoriz += self.distToAngle(xdist)  # Updates the horizontal angle according to mouse movement readings
                         curVec = self.rotateVector(forVec, headUp, changeHoriz)  # Rotates the vector about the vertical axis by the horizontal angle
