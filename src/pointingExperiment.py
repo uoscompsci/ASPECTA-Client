@@ -216,18 +216,18 @@ class client:
         return dist*0.1
 
     def getHeadVerticalVec(self):
-        data = self.getTrackerData()[0] #TODO MAKE 1
+        data = self.getTrackerData()[0]  #TODO MAKE 1
         a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
         b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
         normal = numpy.cross(a, b)
         return scipy.array([normal[0], normal[1], normal[2]])
 
     def getHeadForwardVec(self):
-        data = self.getTrackerData()[0]#TODO MAKE 1
+        data = self.getTrackerData()[0]  #TODO MAKE 1
         return scipy.array([data[1][0], data[1][1], data[1][2]])
 
     def getHeadLoc(self):
-        data = self.getTrackerData()[0]#TODO MAKE 1
+        data = self.getTrackerData()[0]  #TODO MAKE 1
         return scipy.array([data[0][0], data[0][1], data[0][2]])
 
     def getHeadHorizontalVec(self):
@@ -248,6 +248,8 @@ class client:
         changeVert = 0
         changeHoriz = 0
         forVec = self.getHeadForwardVec()
+        curVec = forVec
+        lastHeadLoc = self.getHeadLoc()
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -256,18 +258,31 @@ class client:
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
                     if (not (xdist == 0 and ydist == 0)):
-                        headUp = self.normalizeVec(self.getHeadVerticalVec())
-                        forVec = self.getHeadForwardVec()
-                        pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
-                        changeHoriz += self.distToAngle(xdist)
-                        curVec = self.rotateVector(forVec, headUp, changeHoriz)
-                        horizAxis = numpy.cross(headUp, curVec)
-                        changeVert += -self.distToAngle(ydist)
-                        curVec = self.rotateVector(curVec, horizAxis, changeVert)
+                        for x in range(0, len(self.planes)):  # Finds where the last intersect point was
+                            segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
+                            if(segCheck == 1):
+                                break
+                        oldIntersect = self.intersect  # Saves the last intersect point
+                        forVec = self.getHeadForwardVec()  # Gets the head forward vector
+                        headUp = self.normalizeVec(self.getHeadVerticalVec())  # Gets the head upward vector
+                        lastHeadLoc = self.getHeadLoc()  # From now on the current head location is used
+                        intersectVec = oldIntersect - lastHeadLoc  # Gets the vector that now points from the head to cursor
+                        longitudeVec = self.projectOntoPlane(intersectVec, headUp)  # Projects the vector onto the horizonal plane
+                        changeHoriz = self.angleBetweenVectors(longitudeVec, forVec)  # Gets horizontal component of angle to cursor
+                        # TODO Figure out if angle is positive or negative
+                        lattitudeVec = self.projectOntoPlane(intersectVec, self.getHeadHorizontalVec())  # Projects the vector onto the vertical plane
+                        changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
+                        # TODO Figure out if angle is positive or negative
+                        pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
+                        changeHoriz += self.distToAngle(xdist)  # Updates the horizontal angle according to mouse movement readings
+                        curVec = self.rotateVector(forVec, headUp, changeHoriz)  # Rotates the vector about the vertical axis by the horizontal angle
+                        horizAxis = numpy.cross(headUp, curVec)  # Gets the new horizontal axis
+                        changeVert += -self.distToAngle(ydist)  # Updates the horizontal angle according to mouse movement readings
+                        curVec = self.rotateVector(curVec, horizAxis, changeVert)  # Rotates the vector about the horizontal axis by the vertical angle
                         intersections = [0, 0, 0, 0, 0]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
-                            segCheck = self.segmentPlane(self.planes[x], self.getHeadLoc(), curVec)
+                            segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if segCheck == 1:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                                 diagVec = intersections[x] - self.planes[x][2]
