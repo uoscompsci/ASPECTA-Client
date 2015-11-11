@@ -271,7 +271,7 @@ class client:
                         changeHoriz = self.angleBetweenVectors(longitudeVec, forVec)  # Gets horizontal component of angle to cursor
 
                         #  Figure out if angle is positive or negative and update as appropriate
-                        cross = cross(forVec, longitudeVec)
+                        cross = numpy.cross(forVec, longitudeVec)
                         if headUp.dot(cross) < 0:
                             changeHoriz = -changeHoriz
 
@@ -280,7 +280,7 @@ class client:
                         changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
 
                         #  Figure out if angle is positive or negative and update as appropriate
-                        cross = cross(forVec, lattitudeVec)
+                        cross = numpy.cross(forVec, lattitudeVec)
                         if horizVec.dot(cross) < 0:
                             changeVert = -changeVert
 
