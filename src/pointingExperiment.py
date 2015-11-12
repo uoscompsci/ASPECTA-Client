@@ -281,7 +281,7 @@ class client:
 
                         horizVec = self.getHeadHorizontalVec()
                         lattitudeVec = self.projectOntoPlane(intersectVec, horizVec)  # Projects the vector onto the vertical plane
-                        changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
+                        changeVert = self.radToDeg(self.angleBetweenVectors(lattitudeVec, forVec))  # Gets vertical component of angle to cursor
 
                         #  Figure out if angle is positive or negative and update as appropriate
                         cross = numpy.cross(forVec, lattitudeVec)
