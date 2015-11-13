@@ -220,18 +220,18 @@ class client:
         a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
         b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
         normal = numpy.cross(a, b)
-        return scipy.array([normal[0], normal[1], normal[2]])
+        return self.normalizeVec(scipy.array([normal[0], normal[1], normal[2]]))
 
     def getHeadForwardVec(self):
         data = self.getTrackerData()[0]  #TODO MAKE 1
-        return scipy.array([data[1][0], data[1][1], data[1][2]])
+        return self.normalizeVec(scipy.array([data[1][0], data[1][1], data[1][2]]))
 
     def getHeadLoc(self):
         data = self.getTrackerData()[0]  #TODO MAKE 1
         return scipy.array([data[0][0], data[0][1], data[0][2]])
 
     def getHeadHorizontalVec(self):
-        return numpy.cross(self.getHeadVerticalVec(), self.getHeadForwardVec())
+        return self.normalizeVec(numpy.cross(self.getHeadVerticalVec(), self.getHeadForwardVec()))
 
     # Returns vector after setting magnitude to 1
     def normalizeVec(self, vec):
@@ -242,9 +242,44 @@ class client:
         p = d * self.normalizeVec(plane)
         return vec - p
 
+    def getRotationFromVectors(self, oldIntersectVec, forVec, upVec, horizVec):
+        longitudeVec = self.projectOntoPlane(oldIntersectVec, upVec)  # Projects the vector onto the horizontal plane
+        changeHoriz = self.angleBetweenVectors(longitudeVec, forVec)  # Gets horizontal component of angle to cursor
+
+        #  Figure out if angle is positive or negative and update as appropriate
+        cross = scipy.cross(forVec, longitudeVec)
+        if upVec.dot(cross) < 0:
+            changeHoriz = -changeHoriz
+
+        lattitudeVec = self.projectOntoPlane(oldIntersectVec, horizVec)  # Projects the vector onto the vertical plane
+        changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
+
+        #  Figure out if angle is positive or negative and update as appropriate
+        cross = scipy.cross(forVec, lattitudeVec)
+        if horizVec.dot(cross) < 0:
+            changeVert = -changeVert
+
+        return changeHoriz, changeVert
+
+    def rotateForwardVectorByMouse(self, xDist, yDist, changeHoriz, changeVert, forVec, headUp):
+        changeHoriz += self.distToAngle(xDist)  # Updates the horizontal angle according to mouse movement readings
+        curVec = self.rotateVector(forVec, headUp, changeHoriz)  # Rotates the vector about the vertical axis by the horizontal angle
+        horizAxis = numpy.cross(headUp, curVec)  # Gets the new horizontal axis
+        changeVert += -self.distToAngle(yDist)  # Updates the horizontal angle according to mouse movement readings
+        curVec = self.rotateVector(curVec, horizAxis, changeVert)  # Rotates the vector about the horizontal axis by the vertical angle
+        return curVec
+
+    def getNewVec(self, oldIntersectVec, xdist, ydist):
+        forVec = self.getHeadForwardVec()
+        upVec = self.getHeadVerticalVec()
+        horizVec = self.getHeadHorizontalVec()
+        changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, forVec, upVec, horizVec)
+        curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, forVec, upVec)
+        return curVec
+
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
-        headUp = self.normalizeVec(self.getHeadVerticalVec())
+        headUp = self.getHeadVerticalVec()
         changeVert = 0
         changeHoriz = 0
         forVec = self.getHeadForwardVec()
@@ -263,33 +298,10 @@ class client:
                             if(segCheck == 1):
                                 break
                         oldIntersect = self.intersect  # Saves the last intersect point
-                        forVec = self.getHeadForwardVec()  # Gets the head forward vector
-                        headUp = self.normalizeVec(self.getHeadVerticalVec())  # Gets the head upward vector
                         lastHeadLoc = self.getHeadLoc()  # From now on the current head location is used
-                        intersectVec = oldIntersect - lastHeadLoc  # Gets the vector that now points from the head to cursor
-                        longitudeVec = self.projectOntoPlane(intersectVec, headUp)  # Projects the vector onto the horizonal plane
-                        changeHoriz = self.angleBetweenVectors(longitudeVec, forVec)  # Gets horizontal component of angle to cursor
-
-                        #  Figure out if angle is positive or negative and update as appropriate
-                        cross = cross(forVec, longitudeVec)
-                        if headUp.dot(cross) < 0:
-                            changeHoriz = -changeHoriz
-
-                        horizVec = self.getHeadHorizontalVec()
-                        lattitudeVec = self.projectOntoPlane(intersectVec, horizVec)  # Projects the vector onto the vertical plane
-                        changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
-
-                        #  Figure out if angle is positive or negative and update as appropriate
-                        cross = cross(forVec, lattitudeVec)
-                        if horizVec.dot(cross) < 0:
-                            changeVert = -changeVert
-
+                        oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
-                        changeHoriz += self.distToAngle(xdist)  # Updates the horizontal angle according to mouse movement readings
-                        curVec = self.rotateVector(forVec, headUp, changeHoriz)  # Rotates the vector about the vertical axis by the horizontal angle
-                        horizAxis = numpy.cross(headUp, curVec)  # Gets the new horizontal axis
-                        changeVert += -self.distToAngle(ydist)  # Updates the horizontal angle according to mouse movement readings
-                        curVec = self.rotateVector(curVec, horizAxis, changeVert)  # Rotates the vector about the horizontal axis by the vertical angle
+                        curVec = self.getNewVec(oldIntersectVec, xdist, ydist)
                         intersections = [0, 0, 0, 0, 0]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
