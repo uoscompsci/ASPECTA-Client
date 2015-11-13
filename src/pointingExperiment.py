@@ -283,11 +283,7 @@ class client:
 
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
-        headUp = self.getHeadVerticalVec()
-        changeVert = 0
-        changeHoriz = 0
-        forVec = self.getHeadForwardVec()
-        curVec = forVec
+        curVec = self.getHeadForwardVec()
         lastHeadLoc = self.getHeadLoc()
         while (self.quit == False):
             time.sleep(1.0 / 60)
