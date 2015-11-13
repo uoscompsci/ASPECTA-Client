@@ -215,8 +215,10 @@ class client:
     def distToAngle(self, dist):
         return dist*0.1
 
-    def getHeadVerticalVec(self):
+    def getHeadAxes(self):
         data = self.getTrackerData()[0]  #TODO MAKE 1
+        headLoc = scipy.array([data[0][0], data[0][1], data[0][2]])
+        forwardVec = self.normalizeVec(scipy.array([data[1][0], data[1][1], data[1][2]]))
         a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
         b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
         normal = numpy.cross(a, b)
@@ -224,26 +226,17 @@ class client:
             normal[0] = -normal[0]
             normal[1] = -normal[1]
             normal[2] = -normal[2]
-        return self.normalizeVec(scipy.array([normal[0], normal[1], normal[2]]))
-
-    def getHeadForwardVec(self):
-        data = self.getTrackerData()[0]  #TODO MAKE 1
-        return self.normalizeVec(scipy.array([data[1][0], data[1][1], data[1][2]]))
-
-    def getHeadLoc(self):
-        data = self.getTrackerData()[0]  #TODO MAKE 1
-        return scipy.array([data[0][0], data[0][1], data[0][2]])
-
-    def getHeadHorizontalVec(self):
-        return self.normalizeVec(numpy.cross(self.getHeadVerticalVec(), self.getHeadForwardVec()))
+        upwardVec = self.normalizeVec(scipy.array([normal[0], normal[1], normal[2]]))
+        horizontalVec = self.normalizeVec(numpy.cross(upwardVec, forwardVec))
+        return headLoc, forwardVec, upwardVec, horizontalVec
 
     # Returns vector after setting magnitude to 1
     def normalizeVec(self, vec):
         return vec/scipy.linalg.norm(vec)
 
-    def projectOntoPlane(self, vec, plane):
-        d = vec.dot(plane) / scipy.linalg.norm(plane)
-        p = d * self.normalizeVec(plane)
+    def projectOntoPlane(self, vec, planeNormal):
+        d = vec.dot(planeNormal) / scipy.linalg.norm(planeNormal)
+        p = d * self.normalizeVec(planeNormal)
         return vec - p
 
     def getRotationFromVectors(self, destinationVec, forwardVec, horizontalPlaneNormal, verticalPlaneNormal):
@@ -273,18 +266,16 @@ class client:
         curVec = self.rotateVector(curVec, horizAxis, existingVertRotation)  # Rotates the vector about the horizontal axis by the vertical angle
         return curVec
 
-    def getNewVec(self, oldIntersectVec, xdist, ydist):
-        forVec = self.getHeadForwardVec()
-        upVec = self.getHeadVerticalVec()
-        horizVec = self.getHeadHorizontalVec()
-        changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, forVec, upVec, horizVec)
-        curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, forVec, upVec)
+    def getNewVec(self, axes, oldIntersectVec, xdist, ydist):
+        changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, axes[1], axes[2], axes[3])
+        curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])
         return curVec
 
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
-        curVec = self.getHeadForwardVec()
-        lastHeadLoc = self.getHeadLoc()
+        axes = self.getHeadAxes()
+        curVec = axes[1]
+        lastHeadLoc = axes[0]
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -298,10 +289,11 @@ class client:
                             if(segCheck == 1):
                                 break
                         oldIntersect = self.intersect  # Saves the last intersect point
-                        lastHeadLoc = self.getHeadLoc()  # From now on the current head location is used
+                        axes = self.getHeadAxes()
+                        lastHeadLoc = axes[0]  # From now on the current head location is used
                         oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
-                        curVec = self.getNewVec(oldIntersectVec, xdist, ydist)
+                        curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
                         intersections = [0, 0, 0, 0, 0]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
