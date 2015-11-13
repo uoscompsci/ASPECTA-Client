@@ -220,6 +220,10 @@ class client:
         a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
         b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
         normal = numpy.cross(a, b)
+        if(normal[1]<0):
+            normal[0] = -normal[0]
+            normal[1] = -normal[1]
+            normal[2] = -normal[2]
         return self.normalizeVec(scipy.array([normal[0], normal[1], normal[2]]))
 
     def getHeadForwardVec(self):
