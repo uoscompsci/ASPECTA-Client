@@ -246,31 +246,31 @@ class client:
         p = d * self.normalizeVec(plane)
         return vec - p
 
-    def getRotationFromVectors(self, oldIntersectVec, forVec, upVec, horizVec):
-        longitudeVec = self.projectOntoPlane(oldIntersectVec, upVec)  # Projects the vector onto the horizontal plane
-        changeHoriz = self.angleBetweenVectors(longitudeVec, forVec)  # Gets horizontal component of angle to cursor
+    def getRotationFromVectors(self, destinationVec, forwardVec, horizontalPlaneNormal, verticalPlaneNormal):
+        longitudeVec = self.projectOntoPlane(destinationVec, horizontalPlaneNormal)  # Projects the vector onto the horizontal plane
+        changeHoriz = self.angleBetweenVectors(longitudeVec, forwardVec)  # Gets horizontal component of angle to cursor
 
         #  Figure out if angle is positive or negative and update as appropriate
-        cross = scipy.cross(forVec, longitudeVec)
-        if upVec.dot(cross) < 0:
+        cross = scipy.cross(forwardVec, longitudeVec)
+        if horizontalPlaneNormal.dot(cross) < 0:
             changeHoriz = -changeHoriz
 
-        lattitudeVec = self.projectOntoPlane(oldIntersectVec, horizVec)  # Projects the vector onto the vertical plane
-        changeVert = self.angleBetweenVectors(lattitudeVec, forVec)  # Gets vertical component of angle to cursor
+        lattitudeVec = self.projectOntoPlane(destinationVec, verticalPlaneNormal)  # Projects the vector onto the vertical plane
+        changeVert = self.angleBetweenVectors(lattitudeVec, forwardVec)  # Gets vertical component of angle to cursor
 
         #  Figure out if angle is positive or negative and update as appropriate
-        cross = scipy.cross(forVec, lattitudeVec)
-        if horizVec.dot(cross) < 0:
+        cross = scipy.cross(forwardVec, lattitudeVec)
+        if verticalPlaneNormal.dot(cross) < 0:
             changeVert = -changeVert
 
         return changeHoriz, changeVert
 
-    def rotateForwardVectorByMouse(self, xDist, yDist, changeHoriz, changeVert, forVec, headUp):
-        changeHoriz += self.distToAngle(xDist)  # Updates the horizontal angle according to mouse movement readings
-        curVec = self.rotateVector(forVec, headUp, changeHoriz)  # Rotates the vector about the vertical axis by the horizontal angle
-        horizAxis = numpy.cross(headUp, curVec)  # Gets the new horizontal axis
-        changeVert += -self.distToAngle(yDist)  # Updates the horizontal angle according to mouse movement readings
-        curVec = self.rotateVector(curVec, horizAxis, changeVert)  # Rotates the vector about the horizontal axis by the vertical angle
+    def rotateForwardVectorByMouse(self, mouseXDiff, mouseYDiff, existingHorizRotation, existingVertRotation, forwardVec, upwardVec):
+        existingHorizRotation += self.distToAngle(mouseXDiff)  # Updates the horizontal angle according to mouse movement readings
+        curVec = self.rotateVector(forwardVec, upwardVec, existingHorizRotation)  # Rotates the vector about the vertical axis by the horizontal angle
+        horizAxis = numpy.cross(upwardVec, curVec)  # Gets the new horizontal axis
+        existingVertRotation += -self.distToAngle(mouseYDiff)  # Updates the horizontal angle according to mouse movement readings
+        curVec = self.rotateVector(curVec, horizAxis, existingVertRotation)  # Rotates the vector about the horizontal axis by the vertical angle
         return curVec
 
     def getNewVec(self, oldIntersectVec, xdist, ydist):
