@@ -216,13 +216,13 @@ class client:
         return dist*0.1
 
     def getHeadAxes(self):
-        data = self.getTrackerData()[0]  #TODO MAKE 1
+        data = self.getTrackerData()[0]  #TODO MAKE 1?
         headLoc = scipy.array([data[0][0], data[0][1], data[0][2]])
         forwardVec = self.normalizeVec(scipy.array([data[1][0], data[1][1], data[1][2]]))
         a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
         b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
         normal = numpy.cross(a, b)
-        if(normal[1]<0):
+        if(normal[1]<0): # Ensures vector always point upwards despite symmetry of tracker
             normal[0] = -normal[0]
             normal[1] = -normal[1]
             normal[2] = -normal[2]
@@ -269,6 +269,7 @@ class client:
     def getNewVec(self, axes, oldIntersectVec, xdist, ydist):
         changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, axes[1], axes[2], axes[3])
         curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])
+        #TODO Check positives and negatives in rotations to check for inconsistencies
         return curVec
 
     # Loops until the program is closed and monitors mouse movement
@@ -283,7 +284,7 @@ class client:
                     pos = pygame.mouse.get_pos()
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
-                    if (not (xdist == 0 and ydist == 0)):
+                    if (not (xdist == 0 and ydist == 0)): #TODO Remove this line and see what happens when turning head. Does cursor stay in place? (Test without change first)
                         for x in range(0, len(self.planes)):  # Finds where the last intersect point was
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if(segCheck == 1):
