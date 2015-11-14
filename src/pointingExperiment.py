@@ -196,7 +196,10 @@ class client:
         return scipy.linalg.expm3(numpy.cross(numpy.eye(3), axis / scipy.linalg.norm(axis) * theta))
 
     def angleBetweenVectors(self, v1, v2):
-        return math.acos(v1.dot(v2)/(sqrt(pow(v1[0],2) + pow(v1[1],2) + pow(v1[2],2))*sqrt(pow(v2[0],2) + pow(v2[1],2) + pow(v2[2],2))))
+        temp = v1.dot(v2)/(sqrt(pow(v1[0],2) + pow(v1[1],2) + pow(v1[2],2))*sqrt(pow(v2[0],2) + pow(v2[1],2) + pow(v2[2],2)))
+        if temp > 1.0:  # Stops tiny rounding errors causing value to be slightly above 1.0 from causing problems
+            temp = 1.0
+        return math.acos(temp)
 
     def radToDeg(self, radians):
         return radians*(180/math.pi)
@@ -284,57 +287,58 @@ class client:
                     pos = pygame.mouse.get_pos()
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
-                    if (not (xdist == 0 and ydist == 0)): #TODO Remove this line and see what happens when turning head. Does cursor stay in place? (Test without change first)
-                        for x in range(0, len(self.planes)):  # Finds where the last intersect point was
-                            segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
-                            if(segCheck == 1):
-                                break
-                        oldIntersect = self.intersect  # Saves the last intersect point
-                        axes = self.getHeadAxes()
-                        lastHeadLoc = axes[0]  # From now on the current head location is used
-                        oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
-                        pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
-                        curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
-                        intersections = [0, 0, 0, 0, 0]
-                        mouseLocations = []
-                        for x in range(0, len(self.planes)):
-                            segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
-                            if segCheck == 1:
-                                intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
-                                diagVec = intersections[x] - self.planes[x][2]
-                                hVec = self.planes[x][3] - self.planes[x][2]
-                                vVec = self.planes[x][5] - self.planes[x][2]
-                                hdot = diagVec.dot(hVec)
-                                vdot = diagVec.dot(vVec)
-                                hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
-                                vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
-                                hproj = (hdot / pow(hVecDist, 2)) * hVec
-                                vproj = (vdot / pow(vVecDist, 2)) * vVec
-                                hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
-                                vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
-                                hProp = hProjDist / hVecDist
-                                vProp = vProjDist / vVecDist
-                                hvecangle = scipy.arccos(hdot / (self.length(diagVec) * self.length(hVec)))
-                                hvecangle = numpy.rad2deg(hvecangle)
-                                vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
-                                vvecangle = numpy.rad2deg(vvecangle)
-                                if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
-                                    mouseLocations.append((hProp, vProp, x+1))
-                                else:
-                                    intersections[x] = 0
-                        if len(mouseLocations) > 0:
-                            self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0 - mouseLocations[0][1],
-                                                       "prop", mouseLocations[0][2])
-                            self.sender.showCursor(self.curs[0])
-                            if len(mouseLocations) > 1:
-                                self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
-                                                           "prop", mouseLocations[1][2])
-                                self.sender.showCursor(self.curs[1])
+                    #if (not (xdist == 0 and ydist == 0)): #TODO Remove this line and see what happens when turning head. Does cursor stay in place? (Test without change first)
+                    for x in range(0, len(self.planes)):  # Finds where the last intersect point was
+                        segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
+                        if(segCheck == 1):
+                            break
+                    oldIntersect = self.intersect  # Saves the last intersect point
+                    axes = self.getHeadAxes()
+                    lastHeadLoc = axes[0]  # From now on the current head location is used
+                    oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
+                    pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
+                    curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
+                    intersections = [0, 0, 0, 0, 0]
+                    mouseLocations = []
+                    for x in range(0, len(self.planes)):
+                        segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
+                        if segCheck == 1:
+                            intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
+                            diagVec = intersections[x] - self.planes[x][2]
+                            hVec = self.planes[x][3] - self.planes[x][2]
+                            vVec = self.planes[x][5] - self.planes[x][2]
+                            hdot = diagVec.dot(hVec)
+                            vdot = diagVec.dot(vVec)
+                            hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
+                            vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
+                            hproj = (hdot / pow(hVecDist, 2)) * hVec
+                            vproj = (vdot / pow(vVecDist, 2)) * vVec
+                            hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
+                            vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
+                            hProp = hProjDist / hVecDist
+                            vProp = vProjDist / vVecDist
+                            hvecangle = scipy.arccos(hdot / (self.length(diagVec) * self.length(hVec)))
+                            hvecangle = numpy.rad2deg(hvecangle)
+                            vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
+                            vvecangle = numpy.rad2deg(vvecangle)
+                            if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
+                                mouseLocations.append((hProp, vProp, x+1))
                             else:
-                                self.sender.hideCursor(self.curs[1])
+                                intersections[x] = 0
+                                #---------------
+                    if len(mouseLocations) > 0:
+                        self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0 - mouseLocations[0][1],
+                                                   "prop", mouseLocations[0][2])
+                        self.sender.showCursor(self.curs[0])
+                        if len(mouseLocations) > 1:
+                            self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
+                                                       "prop", mouseLocations[1][2])
+                            self.sender.showCursor(self.curs[1])
                         else:
-                            self.sender.hideCursor(self.curs[0])
                             self.sender.hideCursor(self.curs[1])
+                    else:
+                        self.sender.hideCursor(self.curs[0])
+                        self.sender.hideCursor(self.curs[1])
                 else:
                     intersections = [0, 0, 0, 0, 0]
                     mouseLocations = []
