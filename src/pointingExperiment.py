@@ -253,6 +253,9 @@ class client:
         if horizontalPlaneNormal.dot(cross) < 0:
             changeHoriz = -changeHoriz
 
+        verticalPlaneNormal = self.rotateVector(verticalPlaneNormal, horizontalPlaneNormal, changeHoriz)
+        forwardVec = self.rotateVector(forwardVec, horizontalPlaneNormal, changeHoriz)
+
         lattitudeVec = self.projectOntoPlane(destinationVec, verticalPlaneNormal)  # Projects the vector onto the vertical plane
         changeVert = self.angleBetweenVectors(lattitudeVec, forwardVec)  # Gets vertical component of angle to cursor
 
@@ -274,9 +277,6 @@ class client:
         return curVec
 
     def getNewVec(self, axes, oldIntersectVec, xdist, ydist):
-        print "Should be 90(1) - " + str(self.angleBetweenVectors(axes[1], axes[2]))
-        print "Should be 90(2) - " + str(self.angleBetweenVectors(axes[1], axes[3]))
-        print "Should be 90(3) - " + str(self.angleBetweenVectors(axes[2], axes[3]))
         changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, axes[1], axes[2], axes[3])
         curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])
         #TODO Check positives and negatives in rotations to check for inconsistencies
