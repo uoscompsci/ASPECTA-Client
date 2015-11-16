@@ -196,10 +196,10 @@ class client:
         return scipy.linalg.expm3(numpy.cross(numpy.eye(3), axis / scipy.linalg.norm(axis) * theta))
 
     def angleBetweenVectors(self, v1, v2):
-        temp = v1.dot(v2)/(sqrt(pow(v1[0],2) + pow(v1[1],2) + pow(v1[2],2))*sqrt(pow(v2[0],2) + pow(v2[1],2) + pow(v2[2],2)))
+        temp = v1.dot(v2)/(sqrt(pow(v1[0], 2) + pow(v1[1], 2) + pow(v1[2], 2))*sqrt(pow(v2[0], 2) + pow(v2[1], 2) + pow(v2[2], 2)))
         if temp > 1.0:  # Stops tiny rounding errors causing value to be slightly above 1.0 from causing problems
             temp = 1.0
-        return math.acos(temp)
+        return self.radToDeg(math.acos(temp))
 
     def radToDeg(self, radians):
         return radians*(180/math.pi)
@@ -237,8 +237,9 @@ class client:
     def normalizeVec(self, vec):
         return vec/scipy.linalg.norm(vec)
 
+    #http://www.maplesoft.com/support/help/Maple/view.aspx?path=MathApps%2FProjectionOfVectorOntoPlane
     def projectOntoPlane(self, vec, planeNormal):
-        d = vec.dot(planeNormal) / scipy.linalg.norm(planeNormal)
+        d = vec.dot(planeNormal) / pow(scipy.linalg.norm(planeNormal), 2)
         p = d * self.normalizeVec(planeNormal)
         return vec - p
 
@@ -262,10 +263,12 @@ class client:
         return changeHoriz, changeVert
 
     def rotateForwardVectorByMouse(self, mouseXDiff, mouseYDiff, existingHorizRotation, existingVertRotation, forwardVec, upwardVec):
-        existingHorizRotation += self.distToAngle(mouseXDiff)  # Updates the horizontal angle according to mouse movement readings
+        if mouseXDiff != 0:
+            existingHorizRotation += self.distToAngle(mouseXDiff)  # Updates the horizontal angle according to mouse movement readings
         curVec = self.rotateVector(forwardVec, upwardVec, existingHorizRotation)  # Rotates the vector about the vertical axis by the horizontal angle
         horizAxis = numpy.cross(upwardVec, curVec)  # Gets the new horizontal axis
-        existingVertRotation += -self.distToAngle(mouseYDiff)  # Updates the horizontal angle according to mouse movement readings
+        if mouseYDiff != 0:
+            existingVertRotation += -self.distToAngle(mouseYDiff)  # Updates the horizontal angle according to mouse movement readings
         curVec = self.rotateVector(curVec, horizAxis, existingVertRotation)  # Rotates the vector about the horizontal axis by the vertical angle
         return curVec
 
