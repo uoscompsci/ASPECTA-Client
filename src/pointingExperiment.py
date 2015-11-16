@@ -229,7 +229,8 @@ class client:
             normal[0] = -normal[0]
             normal[1] = -normal[1]
             normal[2] = -normal[2]
-        upwardVec = self.normalizeVec(scipy.array([normal[0], normal[1], normal[2]]))
+        preUp = scipy.array([normal[0], normal[1], normal[2]])
+        upwardVec = self.normalizeVec(self.projectOntoPlane(preUp,forwardVec))
         horizontalVec = self.normalizeVec(numpy.cross(upwardVec, forwardVec))
         return headLoc, forwardVec, upwardVec, horizontalVec
 
@@ -273,6 +274,9 @@ class client:
         return curVec
 
     def getNewVec(self, axes, oldIntersectVec, xdist, ydist):
+        print "Should be 90(1) - " + str(self.angleBetweenVectors(axes[1], axes[2]))
+        print "Should be 90(2) - " + str(self.angleBetweenVectors(axes[1], axes[3]))
+        print "Should be 90(3) - " + str(self.angleBetweenVectors(axes[2], axes[3]))
         changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, axes[1], axes[2], axes[3])
         curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])
         #TODO Check positives and negatives in rotations to check for inconsistencies
