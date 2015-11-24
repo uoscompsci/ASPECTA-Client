@@ -17,6 +17,7 @@ class messageSender:
     stripLock = threading.Lock()
     sendlock = threading.Lock()
     loop = True
+    dualProjector = True
     
     def encode_length(self, l):
         l = str(l)
@@ -27,7 +28,8 @@ class messageSender:
     def uploadImage(self, fileParam):
         filename = fileParam.split("/")
         filename = filename[-1]
-        self.sendMessage({'call' : 'set_upload_name', 'filename' : filename})
+        self.sendMessage(1, {'call' : 'set_upload_name', 'filename' : filename})
+        self.sendMessage(2, {'call' : 'set_upload_name', 'filename' : filename})
         time.sleep(0.5)
         s = socket.socket()
         s.connect((self.host,self.port+1))
@@ -75,7 +77,7 @@ class messageSender:
             colortuple[x] = float(colortuple[x])
         return colortuple
         
-    def sendMessage(self, message):
+    def sendMessage(self, projector, message):
         self.sendlock.acquire()
         self.sending+=1
         #print "Sending " + str(self.sending)
@@ -115,31 +117,39 @@ class messageSender:
                 return data
                 
     def quit(self):
-        self.sendMessage({'call' : 'quit'})
+        self.sendMessage(1, {'call' : 'quit'})
+        if self.dualProjector:
+            self.sendMessage(2, {'call' : 'quit'})
         self.loop=False
         
     def quitClientOnly(self):
         self.loop=False
         
     def login(self, username):
-        self.sendMessage({'call' : 'login', 
+        self.sendMessage(1, {'call' : 'login',
                           'username' : str(username)})
+        if self.dualProjector:
+            self.sendMessage(2, {'call' : 'login',
+                              'username' : str(username)})
         
     def setapp(self, appname):
-        self.sendMessage({'call' : 'setapp', 
+        self.sendMessage(1, {'call' : 'setapp',
                           'appname' : str(appname)})
+        if self.dualProjector:
+            self.sendMessage(2, {'call' : 'setapp',
+                        'appname' : str(appname)})
     
-    def newSurface(self):
-        sur = self.sendMessage({'call' : 'new_surface'})
+    def newSurface(self, projector):
+        sur = self.sendMessage(projector, {'call' : 'new_surface'})
         surNo = int(sur["surfaceNo"])
         return surNo
         
-    def newSurfaceWithID(self, ID):
-        return self.sendMessage({'call' : 'new_surface_with_ID', 
+    def newSurfaceWithID(self, projector, ID):
+        return self.sendMessage(projector, {'call' : 'new_surface_with_ID',
                                  'ID' : str(ID)})
     
-    def newCursor(self, surfaceNo, x, y, coorSys):
-        cur = self.sendMessage({'call' : 'new_cursor', 
+    def newCursor(self, projector, surfaceNo, x, y, coorSys):
+        cur = self.sendMessage(projector, {'call' : 'new_cursor',
                                 'surfaceNo' : str(surfaceNo), 
                                 'x' : str(x), 
                                 'y' : str(y),
@@ -147,8 +157,8 @@ class messageSender:
         curNo = int(cur["cursorNo"])
         return curNo
     
-    def newCursorWithID(self, ID, surfaceNo, x, y, coorSys):
-        cur = self.sendMessage({'call' : 'new_cursor_with_ID', 
+    def newCursorWithID(self, projector, ID, surfaceNo, x, y, coorSys):
+        cur = self.sendMessage(projector, {'call' : 'new_cursor_with_ID',
                                 'ID' : str(ID), 
                                 'surfaceNo' : str(surfaceNo), 
                                 'x' : str(x), 
@@ -157,8 +167,8 @@ class messageSender:
         curNo = int(cur["cursorNo"])
         return curNo
     
-    def newCanvas(self, surfaceNo, x, y, width, height, coorSys, name):
-        win = self.sendMessage({'call' : 'new_canvas', 
+    def newCanvas(self, projector, surfaceNo, x, y, width, height, coorSys, name):
+        win = self.sendMessage(projector, {'call' : 'new_canvas',
                                 'surfaceNo' : str(surfaceNo), 
                                 'x' : str(x), 
                                 'y' :  str(y), 
@@ -169,8 +179,8 @@ class messageSender:
         winNo = int(win["canvasNo"])
         return winNo
     
-    def newCanvasWithID(self, ID, surfaceNo, x, y, width, height, coorSys, name):
-        win = self.sendMessage({'call' : 'new_canvas_with_ID', 
+    def newCanvasWithID(self, projector, ID, surfaceNo, x, y, width, height, coorSys, name):
+        win = self.sendMessage(projector, {'call' : 'new_canvas_with_ID',
                                 'ID' : str(ID), 
                                 'surfaceNo' : str(surfaceNo), 
                                 'x' : str(x), 
@@ -182,8 +192,8 @@ class messageSender:
         winNo = int(win["canvasNo"])
         return winNo
     
-    def newCircle(self, canvasNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
-        ele = self.sendMessage({'call' : 'new_circle', 
+    def newCircle(self, projector, canvasNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
+        ele = self.sendMessage(projector, {'call' : 'new_circle',
                                 'canvasNo' :  str(canvasNo), 
                                 'x' : str(x), 
                                 'y' : str(y), 
@@ -196,8 +206,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newCircleWithID(self, ID, canvasNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
-        ele = self.sendMessage({'call' : 'new_circle_with_ID',
+    def newCircleWithID(self, projector, ID, canvasNo, x, y, radius, coorSys, lineCol, lineWidth, fillCol, sides):
+        ele = self.sendMessage(projector, {'call' : 'new_circle_with_ID',
                                 'ID' : str(ID),
                                 'canvasNo' : str(canvasNo),
                                 'x' : str(x),
@@ -211,8 +221,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLine(self, canvasNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
-        ele = self.sendMessage({'call' : 'new_line',
+    def newLine(self, projector, canvasNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
+        ele = self.sendMessage(projector, {'call' : 'new_line',
                                 'canvasNo' : str(canvasNo),
                                 'xStart' : str(xStart),
                                 'yStart' : str(yStart),
@@ -224,8 +234,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLineWithID(self, ID, canvasNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
-        ele = self.sendMessage({'call' : 'new_line_with_ID',
+    def newLineWithID(self, projector, ID, canvasNo, xStart, yStart, xEnd, yEnd, coorSys, color, width):
+        ele = self.sendMessage(projector, {'call' : 'new_line_with_ID',
                                 'ID' : str(ID),
                                 'canvasNo' : str(canvasNo),
                                 'xStart' : str(xStart),
@@ -238,8 +248,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLineStrip(self, canvasNo, x, y, coorSys, color, width):
-        ele = self.sendMessage({'call' : 'new_line_strip', 
+    def newLineStrip(self, projector, canvasNo, x, y, coorSys, color, width):
+        ele = self.sendMessage(projector, {'call' : 'new_line_strip',
                                 'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
@@ -249,8 +259,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newLineStripWithID(self, ID, canvasNo, x, y, coorSys, color, width):
-        ele = self.sendMessage({'call' : 'new_line_strip_with_ID',
+    def newLineStripWithID(self, projector, ID, canvasNo, x, y, coorSys, color, width):
+        ele = self.sendMessage(projector, {'call' : 'new_line_strip_with_ID',
                                 'ID' : str(ID), 
                                 'canvasNo' : str(canvasNo),
                                 'x' : str(x),
@@ -261,8 +271,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newPolygon(self, canvasNo, x, y, coorSys, lineColor, lineWidth, fillColor):
-        ele = self.sendMessage({'call' : 'new_polygon',
+    def newPolygon(self, projector, canvasNo, x, y, coorSys, lineColor, lineWidth, fillColor):
+        ele = self.sendMessage(projector, {'call' : 'new_polygon',
                                 'canvasNo' : str(canvasNo),
                                 'x' : str(x),
                                 'y' : str(y),
@@ -273,8 +283,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newPolygonWithID(self, ID, canvasNo, x, y, coorSys, lineColor, lineWidth, fillColor):
-        ele = self.sendMessage({'call' : 'new_polygon_with_ID',
+    def newPolygonWithID(self, projector, ID, canvasNo, x, y, coorSys, lineColor, lineWidth, fillColor):
+        ele = self.sendMessage(projector, {'call' : 'new_polygon_with_ID',
                                 'ID' : str(ID),
                                 'canvasNo' : str(canvasNo),
                                 'x' : str(x),
@@ -286,11 +296,11 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newTexRectangle(self, canvasNo, x, y, width, height, coorSys, filename):
+    def newTexRectangle(self, projector, canvasNo, x, y, width, height, coorSys, filename):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
-            ele = self.sendMessage({'call' : 'new_texrectangle',
+            ele = self.sendMessage(projector, {'call' : 'new_texrectangle',
                                     'canvasNo' : str(canvasNo),
                                     'x' : str(x),
                                     'y' : str(y),
@@ -302,11 +312,11 @@ class messageSender:
             eleNo = int(ele["elementNo"])
             return eleNo
     
-    def newTexRectangleWithID(self, ID, canvasNo, x, y, width, height, coorSys, filename):
+    def newTexRectangleWithID(self, projector, ID, canvasNo, x, y, width, height, coorSys, filename):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
-            ele = self.sendMessage({'call' : 'new_texrectangle_with_ID',
+            ele = self.sendMessage(projector, {'call' : 'new_texrectangle_with_ID',
                                     'ID' : str(ID),
                                     'canvasNo' : str(canvasNo),
                                     'x' : str(x),
@@ -319,8 +329,8 @@ class messageSender:
             eleNo = int(ele["elementNo"])
             return eleNo
     
-    def newRectangle(self, canvasNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
-        ele = self.sendMessage({'call' : 'new_rectangle',
+    def newRectangle(self, projector, canvasNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
+        ele = self.sendMessage(projector, {'call' : 'new_rectangle',
                                 'canvasNo' : str(canvasNo), 
                                 'x' : str(x),
                                 'y' : str(y),
@@ -333,8 +343,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newRectangleWithID(self, ID, canvasNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
-        ele = self.sendMessage({'call' : 'new_rectangle_with_ID',
+    def newRectangleWithID(self, projector, ID, canvasNo, x, y, width, height, coorSys, lineColor, lineWidth, fillColor):
+        ele = self.sendMessage(projector, {'call' : 'new_rectangle_with_ID',
                                 'ID' : str(ID),
                                 'canvasNo' : str(canvasNo), 
                                 'x' : str(x),
@@ -348,8 +358,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newText(self, canvasNo, text, x, y, coorSys, ptSize, font, color):
-        ele = self.sendMessage({'call' : 'new_text',
+    def newText(self, projector, canvasNo, text, x, y, coorSys, ptSize, font, color):
+        ele = self.sendMessage(projector, {'call' : 'new_text',
                                 'canvasNo' : str(canvasNo),
                                 'text' : text,
                                 'x' : str(x),
@@ -361,8 +371,8 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def newTextWithID(self, ID, canvasNo, text, x, y, coorSys, ptSize, font, color):
-        ele = self.sendMessage({'call' : 'new_text_with_ID',
+    def newTextWithID(self, projector, ID, canvasNo, text, x, y, coorSys, ptSize, font, color):
+        ele = self.sendMessage(projector, {'call' : 'new_text_with_ID',
                                 'ID' : str(ID),
                                 'canvasNo' : str(canvasNo),
                                 'text' : text,
@@ -375,56 +385,56 @@ class messageSender:
         eleNo = int(ele["elementNo"])
         return eleNo
     
-    def subscribeToSurface(self, surfaceNo):
-        self.sendMessage({'call' : 'subscribe_to_surface',
+    def subscribeToSurface(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'subscribe_to_surface',
                           'surfaceNo' : str(surfaceNo)})
     
-    def getSurfaceID(self, surfaceNo):
-        ID = self.sendMessage({'call' : 'get_surface_ID',
+    def getSurfaceID(self, projector, surfaceNo):
+        ID = self.sendMessage(projector, {'call' : 'get_surface_ID',
                                'surfaceNo' : str(surfaceNo)})
         return ID["ID"]
     
-    def setSurfaceID(self, surfaceNo, ID):
-        self.sendMessage({'call' : 'set_surface_ID',
+    def setSurfaceID(self, projector, surfaceNo, ID):
+        self.sendMessage(projector, {'call' : 'set_surface_ID',
                           'surfaceNo' : str(surfaceNo),
                           'ID' : str(ID)})
     
-    def getSurfaceOwner(self, surfaceNo):
-        owner = self.sendMessage({'call' : 'get_surface_owner',
+    def getSurfaceOwner(self, projector, surfaceNo):
+        owner = self.sendMessage(projector, {'call' : 'get_surface_owner',
                                   'surfaceNo' : str(surfaceNo)})
         return owner["owner"]
         
-    def getSurfaceAppDetails(self, surfaceNo):
-        details = self.sendMessage({'call' : 'get_surface_app_details',
+    def getSurfaceAppDetails(self, projector, surfaceNo):
+        details = self.sendMessage(projector, {'call' : 'get_surface_app_details',
                                     'surfaceNo' : str(surfaceNo)})
         return (details["app"],details["instance"])
         
-    def getSurfacesByID(self, ID):
-        surfaces = self.sendMessage({'call' : 'get_surfaces_by_ID',
+    def getSurfacesByID(self, projector, ID):
+        surfaces = self.sendMessage(projector, {'call' : 'get_surfaces_by_ID',
                                     'ID' : str(ID)})
         surfacelist = []
         for x in range(0,int(surfaces["count"])):
             surfacelist.append(int(surfaces[x]))
         return surfacelist
         
-    def getSurfacesByOwner(self, owner):
-        surfaces = self.sendMessage({'call' : 'get_surfaces_by_owner',
+    def getSurfacesByOwner(self, projector, owner):
+        surfaces = self.sendMessage(projector, {'call' : 'get_surfaces_by_owner',
                                      'owner' : str(owner)})
         surfacelist = []
         for x in range(0,int(surfaces["count"])):
             surfacelist.append(int(surfaces[x]))
         return surfacelist
         
-    def getSurfacesByAppName(self, name):
-        surfaces = self.sendMessage({'call' : 'get_surfaces_by_app_name',
+    def getSurfacesByAppName(self, projector, name):
+        surfaces = self.sendMessage(projector, {'call' : 'get_surfaces_by_app_name',
                                      'name' : str(name)})
         surfacelist = []
         for x in range(0,int(surfaces["count"])):
             surfacelist.append(int(surfaces[x]))
         return surfacelist
         
-    def getSurfacesByAppDetails(self, name, instance):
-        surfaces = self.sendMessage({'call' : 'get_surfaces_by_app_details',
+    def getSurfacesByAppDetails(self, projector, name, instance):
+        surfaces = self.sendMessage(projector, {'call' : 'get_surfaces_by_app_details',
                                      'name' : str(name),
                                      'number' : str(instance)})
         surfacelist = []
@@ -432,15 +442,15 @@ class messageSender:
             surfacelist.append(int(surfaces[x]))
         return surfacelist
         
-    def becomeSurfaceAdmin(self, surfaceNo):
-        self.sendMessage({'call' : 'become_surface_admin',
+    def becomeSurfaceAdmin(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'become_surface_admin',
                           'surfaceNo' : str(surfaceNo)})
         
-    def stopBeingSurfaceAdmin(self, surfaceNo):
-        self.sendMessage({'call' : 'stop_being_surface_admin',
+    def stopBeingSurfaceAdmin(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'stop_being_surface_admin',
                           'surfaceNo' : str(surfaceNo)})
         
-    def setSurfaceEdges(self, surfaceNo, topPoints, bottomPoints, leftPoints, rightPoints):
+    def setSurfaceEdges(self, projector, surfaceNo, topPoints, bottomPoints, leftPoints, rightPoints):
         topString = str(topPoints[0][0]) + ":" + str(topPoints[0][1])
         bottomString = str(bottomPoints[0][0]) + ":" + str(bottomPoints[0][1])
         leftString = str(leftPoints[0][0]) + ":" + str(leftPoints[0][1])
@@ -453,23 +463,23 @@ class messageSender:
             leftString += (";" + str(leftPoints[x][0]) + ":" + str(leftPoints[x][1]))
         for x in range(1,len(rightPoints)):
             rightString += (";" + str(rightPoints[x][0]) + ":" + str(rightPoints[x][1]))
-        self.sendMessage({'call' : 'set_surface_edges',
+        self.sendMessage(projector, {'call' : 'set_surface_edges',
                           'surfaceNo' : str(surfaceNo),
                           'topString' : topString,
                           'bottomString' : bottomString,
                           'leftString' : leftString,
                           'rightString' : rightString})
         
-    def undefineSurface(self, surfaceNo):
-        self.sendMessage({'call' : 'undefine_surface',
+    def undefineSurface(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'undefine_surface',
                           'surfaceNo' : str(surfaceNo)})
         
-    def saveDefinedSurfaces(self, filename):
-        self.sendMessage({'call' : 'save_defined_surfaces',
+    def saveDefinedSurfaces(self, projector, filename):
+        self.sendMessage(projector, {'call' : 'save_defined_surfaces',
                           'fileName' : str(filename)})
         
-    def loadDefinedSurfaces(self, filename):
-        count = self.sendMessage({'call' : 'load_defined_surfaces',
+    def loadDefinedSurfaces(self, projector, filename):
+        count = self.sendMessage(projector, {'call' : 'load_defined_surfaces',
                                   'fileName' : str(filename)})
         surfaces = count["layouts"].split("%")
         surfaceslist = []
@@ -502,156 +512,156 @@ class messageSender:
         else:
             return (int(count["count"]),surfaceslist,[], realSizes)
         
-    def getSavedLayouts(self):
-        layouts = self.sendMessage({'call' : 'get_saved_layouts'})
+    def getSavedLayouts(self, projector):
+        layouts = self.sendMessage(projector, {'call' : 'get_saved_layouts'})
         layoutlist = []
         for x in range(0,int(layouts['count'])):
             layoutlist.append(layouts[str(x)])
         return layoutlist
     
-    def getSavedImages(self):
-        images = self.sendMessage({'call' : 'get_saved_images'})
+    def getSavedImages(self, projector):
+        images = self.sendMessage(projector, {'call' : 'get_saved_images'})
         imagelist = []
         for x in range(0,int(images['count'])):
             imagelist.append(images[str(x)])
         return imagelist
     
-    def setSurfacePixelHeight(self,surfaceNo,height):
-        self.sendMessage({'call' : 'set_surface_pixel_height',
+    def setSurfacePixelHeight(self, projector, surfaceNo, height):
+        self.sendMessage(projector, {'call' : 'set_surface_pixel_height',
                           'surfaceNo' : str(surfaceNo),
                           'height' : str(height)})
         
-    def setSurfacePixelWidth(self,surfaceNo,width):
-        self.sendMessage({'call' : 'set_surface_pixel_width',
+    def setSurfacePixelWidth(self, projector, surfaceNo, width):
+        self.sendMessage(projector, {'call' : 'set_surface_pixel_width',
                           'surfaceNo' : str(surfaceNo),
                           'width' : str(width)})
         
-    def getSurfacePixelHeight(self,surfaceNo):
-        height = self.sendMessage({'call' : 'get_surface_pixel_height',
+    def getSurfacePixelHeight(self, projector, surfaceNo):
+        height = self.sendMessage(projector, {'call' : 'get_surface_pixel_height',
                                    'surfaceNo' : str(surfaceNo)})
         return height["height"]
         
-    def getSurfacePixelWidth(self,surfaceNo):
-        width = self.sendMessage({'call' : 'get_surface_pixel_width',
+    def getSurfacePixelWidth(self, projector, surfaceNo):
+        width = self.sendMessage(projector, {'call' : 'get_surface_pixel_width',
                                   'surfaceNo' : str(surfaceNo)})
         return width["width"]
     
-    def setSurfaceRealHeight(self,surfaceNo,height):
-        self.sendMessage({'call' : 'set_surface_real_height',
+    def setSurfaceRealHeight(self, projector, surfaceNo, height):
+        self.sendMessage(projector, {'call' : 'set_surface_real_height',
                           'surfaceNo' : str(surfaceNo),
                           'height' : str(height)})
         
-    def setSurfaceRealWidth(self,surfaceNo,width):
-        self.sendMessage({'call' : 'set_surface_real_width',
+    def setSurfaceRealWidth(self, projector, surfaceNo, width):
+        self.sendMessage(projector, {'call' : 'set_surface_real_width',
                           'surfaceNo' : str(surfaceNo),
                           'width' : str(width)})
         
-    def getSurfaceRealHeight(self,surfaceNo):
-        height = self.sendMessage({'call' : 'get_surface_real_height',
+    def getSurfaceRealHeight(self, projector, surfaceNo):
+        height = self.sendMessage(projector, {'call' : 'get_surface_real_height',
                                    'surfaceNo' : str(surfaceNo)})
         return height["height"]
         
-    def getSurfaceRealWidth(self,surfaceNo):
-        width = self.sendMessage({'call' : 'get_surface_real_width',
+    def getSurfaceRealWidth(self, projector, surfaceNo):
+        width = self.sendMessage(projector, {'call' : 'get_surface_real_width',
                                   'surfaceNo' : str(surfaceNo)})
         return width["width"]
     
-    def clearSurface(self,surfaceNo):
-        self.sendMessage({'call' : 'clear_surface',
+    def clearSurface(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'clear_surface',
                           'surfaceNo' : str(surfaceNo)})
     
-    def deleteLayout(self, name):
-        self.sendMessage({'call' : 'delete_layout',
+    def deleteLayout(self, projector, name):
+        self.sendMessage(projector, {'call' : 'delete_layout',
                           'name' : name})
         
-    def deleteImage(self, filename):
-        self.sendMessage({'call' : 'delete_image',
+    def deleteImage(self, projector, filename):
+        self.sendMessage(projector, {'call' : 'delete_image',
                           'filename' : filename})
         
-    def rotateSurfaceTo0(self, surfaceNo):
-        self.sendMessage({'call' : 'rotate_surface_to_0',
+    def rotateSurfaceTo0(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'rotate_surface_to_0',
                           'surfaceNo' : str(surfaceNo)})
     
-    def rotateSurfaceTo90(self, surfaceNo):
-        self.sendMessage({'call' : 'rotate_surface_to_90',
+    def rotateSurfaceTo90(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'rotate_surface_to_90',
                           'surfaceNo' : str(surfaceNo)})
     
-    def rotateSurfaceTo180(self, surfaceNo):
-        self.sendMessage({'call' : 'rotate_surface_to_180',
+    def rotateSurfaceTo180(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'rotate_surface_to_180',
                           'surfaceNo' : str(surfaceNo)})
     
-    def rotateSurfaceTo270(self, surfaceNo):
-        self.sendMessage({'call' : 'rotate_surface_to_270',
+    def rotateSurfaceTo270(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'rotate_surface_to_270',
                           'surfaceNo' : str(surfaceNo)})
     
-    def mirrorSurface(self, surfaceNo):
-        self.sendMessage({'call' : 'mirror_surface',
+    def mirrorSurface(self, projector, surfaceNo):
+        self.sendMessage(projector, {'call' : 'mirror_surface',
                           'surfaceNo' : str(surfaceNo)})
         
-    def connectSurfaces(self, surfaceNo1, side1, surfaceNo2, side2):
-        self.sendMessage({'call' : 'connect_surfaces',
+    def connectSurfaces(self, projector, surfaceNo1, side1, surfaceNo2, side2):
+        self.sendMessage(projector, {'call' : 'connect_surfaces',
                           'surfaceNo1' : str(surfaceNo1),
                           'side1' : side1,
                           'surfaceNo2' : str(surfaceNo2),
                           'side2' : side2})
     
-    def disconnectSurfaces(self, surfaceNo1, side1, surfaceNo2, side2):
-        self.sendMessage({'call' : 'disconnect_surfaces',
+    def disconnectSurfaces(self, projector, surfaceNo1, side1, surfaceNo2, side2):
+        self.sendMessage(projector, {'call' : 'disconnect_surfaces',
                           'surfaceNo1' : str(surfaceNo1),
                           'side1' : side1,
                           'surfaceNo2' : str(surfaceNo2),
                           'side2' : side2})
         
-    def subscribeToCanvas(self, canvasNo):
-        self.sendMessage({'call' : 'subscribe_to_canvas',
+    def subscribeToCanvas(self, projector, canvasNo):
+        self.sendMessage(projector, {'call' : 'subscribe_to_canvas',
                           'canvasNo' : str(canvasNo)})
         
-    def getCanvasID(self, canvasNo):
-        ID = self.sendMessage({'call' : 'get_canvas_ID',
+    def getCanvasID(self, projector, canvasNo):
+        ID = self.sendMessage(projector, {'call' : 'get_canvas_ID',
                                'canvasNo' : str(canvasNo)})
         return ID["ID"]
     
-    def setCanvasID(self, canvasNo, ID):
-        self.sendMessage({'call' : 'set_canvas_ID',
+    def setCanvasID(self, projector, canvasNo, ID):
+        self.sendMessage(projector, {'call' : 'set_canvas_ID',
                           'canvasNo' : str(canvasNo),
                           'ID' : str(ID)})
     
-    def getCanvasOwner(self, canvasNo):
-        owner = self.sendMessage({'call' : 'get_canvas_owner',
+    def getCanvasOwner(self, projector, canvasNo):
+        owner = self.sendMessage(projector, {'call' : 'get_canvas_owner',
                                   'canvasNo' : str(canvasNo)})
         return owner["owner"]
         
-    def getCanvasAppDetails(self, canvasNo):
-        details = self.sendMessage({'call' : 'get_canvas_app_details',
+    def getCanvasAppDetails(self, projector, canvasNo):
+        details = self.sendMessage(projector, {'call' : 'get_canvas_app_details',
                                     'canvasNo' : str(canvasNo)})
         return (details["app"],details["instance"])
         
-    def getCanvasesByID(self, ID):
-        canvases = self.sendMessage({'call' : 'get_canvases_by_ID',
+    def getCanvasesByID(self, projector, ID):
+        canvases = self.sendMessage(projector, {'call' : 'get_canvases_by_ID',
                                     'ID' : str(ID)})
         canvaslist = []
         for x in range(0,int(canvases["count"])):
             canvaslist.append(int(canvases[x]))
         return canvaslist
         
-    def getCanvasesByOwner(self, owner):
-        canvases = self.sendMessage({'call' : 'get_canvases_by_owner',
+    def getCanvasesByOwner(self, projector, owner):
+        canvases = self.sendMessage(projector, {'call' : 'get_canvases_by_owner',
                                     'owner' : str(owner)})
         canvaslist = []
         for x in range(0,int(canvases["count"])):
             canvaslist.append(int(canvases[x]))
         return canvaslist
         
-    def getCanvasesByAppName(self, name):
-        canvases = self.sendMessage({'call' : 'get_canvases_by_app_name',
+    def getCanvasesByAppName(self, projector, name):
+        canvases = self.sendMessage(projector, {'call' : 'get_canvases_by_app_name',
                                     'name' : str(name)})
         canvaslist = []
         for x in range(0,int(canvases["count"])):
             canvaslist.append(int(canvases[x]))
         return canvaslist
         
-    def getCanvasesByAppDetails(self, name, instance):
-        canvases = self.sendMessage({'call' : 'get_canvases_by_app_details',
+    def getCanvasesByAppDetails(self, projector, name, instance):
+        canvases = self.sendMessage(projector, {'call' : 'get_canvases_by_app_details',
                                     'name' : str(name),
                                     'number' : str(instance)})
         canvaslist = []
@@ -659,64 +669,64 @@ class messageSender:
             canvaslist.append(int(canvases[x]))
         return canvaslist
         
-    def becomeCanvasAdmin(self, canvasNo):
-        self.sendMessage({'call' : 'become_canvas_admin',
+    def becomeCanvasAdmin(self, projector, canvasNo):
+        self.sendMessage(projector, {'call' : 'become_canvas_admin',
                           'canvasNo' : str(canvasNo)})
         
-    def stopBeingCanvasAdmin(self, canvasNo):
-        self.sendMessage({'call' : 'stop_being_canvas_admin', 
+    def stopBeingCanvasAdmin(self, projector, canvasNo):
+        self.sendMessage(projector, {'call' : 'stop_being_canvas_admin',
                           'canvasNo' : str(canvasNo)})
         
-    def subscribeToElement(self, elementNo):
-        self.sendMessage({'call' : 'subscribe_to_element',
+    def subscribeToElement(self, projector, elementNo):
+        self.sendMessage(projector, {'call' : 'subscribe_to_element',
                           'elementNo' : str(elementNo)})
         
-    def getElementID(self, elementNo):
-        ID = self.sendMessage({'call' : 'get_element_ID', 
+    def getElementID(self, projector, elementNo):
+        ID = self.sendMessage(projector, {'call' : 'get_element_ID',
                                'elementNo' : str(elementNo)})
         return ID["ID"]
     
-    def setElementID(self, elementNo, ID):
-        self.sendMessage({'call' : 'set_element_ID',
+    def setElementID(self, projector, elementNo, ID):
+        self.sendMessage(projector, {'call' : 'set_element_ID',
                           'elementNo' : str(elementNo),
                           'ID' : str(ID)})
     
-    def getElementOwner(self, elementNo):
-        owner = self.sendMessage({'call' : 'get_element_owner',
+    def getElementOwner(self, projector, elementNo):
+        owner = self.sendMessage(projector, {'call' : 'get_element_owner',
                                   'elementNo' : str(elementNo)})
         return owner["owner"]
         
-    def getElementAppDetails(self, surfaceNo):
-        details = self.sendMessage({'call' : 'get_element_app_details',
+    def getElementAppDetails(self, projector, surfaceNo):
+        details = self.sendMessage(projector, {'call' : 'get_element_app_details',
                                     'surfaceNo' : str(surfaceNo)})
         return (details["app"],details["instance"])
         
-    def getElementsByID(self, ID):
-        elements = self.sendMessage({'call' : 'get_elements_by_ID',
+    def getElementsByID(self, projector, ID):
+        elements = self.sendMessage(projector, {'call' : 'get_elements_by_ID',
                                      'ID' : str(ID)})
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
         return elementlist
         
-    def getElementsByOwner(self, owner):
-        elements = self.sendMessage({'call' : 'get_elements_by_owner',
+    def getElementsByOwner(self, projector, owner):
+        elements = self.sendMessage(projector, {'call' : 'get_elements_by_owner',
                                      'owner' : str(owner)})
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
         return elementlist
         
-    def getElementsByAppName(self, name):
-        elements = self.sendMessage({'call' : 'get_elements_by_app_name',
+    def getElementsByAppName(self, projector, name):
+        elements = self.sendMessage(projector, {'call' : 'get_elements_by_app_name',
                                      'name' : str(name)})
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
         return elementlist
         
-    def getElementsByAppDetails(self, name, instance):
-        elements = self.sendMessage({'call' : 'get_elements_by_app_details',
+    def getElementsByAppDetails(self, projector, name, instance):
+        elements = self.sendMessage(projector, {'call' : 'get_elements_by_app_details',
                                      'name' : str(name),
                                      'number' : str(instance)})
         elementlist = []
@@ -724,271 +734,271 @@ class messageSender:
             elementlist.append(int(elements[x]))
         return elementlist
     
-    def getElementsOnCanvas(self, canvasNo):
-        elements = self.sendMessage({'call' : 'get_elements_on_canvas',
+    def getElementsOnCanvas(self, projector, canvasNo):
+        elements = self.sendMessage(projector, {'call' : 'get_elements_on_canvas',
                                      'canvasNo' : str(canvasNo)})
         elementlist = []
         for x in range(0,int(elements["count"])):
             elementlist.append(int(elements[x]))
         return elementlist
         
-    def becomeElementAdmin(self, elementNo):
-        self.sendMessage({'call' : 'become_element_admin',
+    def becomeElementAdmin(self, projector, elementNo):
+        self.sendMessage(projector, {'call' : 'become_element_admin',
                          'elementNo' : str(elementNo)})
         
-    def stopBeingElementAdmin(self, elementNo):
-        self.sendMessage({'call' : 'stop_being_element_admin',
+    def stopBeingElementAdmin(self, projector, elementNo):
+        self.sendMessage(projector, {'call' : 'stop_being_element_admin',
                           'elementNo' : str(elementNo)})
     
-    def shiftCursor(self, cursorNo, xDistance, yDistance):
-        self.sendMessage({'call' : 'move_cursor',
+    def shiftCursor(self, projector, cursorNo, xDistance, yDistance):
+        self.sendMessage(projector, {'call' : 'move_cursor',
                           'cursorNo' : str(cursorNo),
                           'xDist' : str(xDistance),
                           'yDist' : str(yDistance)})
         
-    def testShiftCursor(self, cursorNo, xDistance, yDistance):
-        loc = self.sendMessage({'call' : 'test_move_cursor',
+    def testShiftCursor(self, projector, cursorNo, xDistance, yDistance):
+        loc = self.sendMessage(projector, {'call' : 'test_move_cursor',
                                 'cursorNo' : str(cursorNo),
                                 'xDist' : str(xDistance),
                                 'yDist' : str(yDistance)})
         return [loc["x"],loc["y"]]
     
-    def relocateCursor(self, cursorNo, x, y, coorSys, surfaceNo):
-        self.sendMessage({'call' : 'relocate_cursor',
+    def relocateCursor(self, projector, cursorNo, x, y, coorSys, surfaceNo):
+        self.sendMessage(projector, {'call' : 'relocate_cursor',
                           'cursorNo' : str(cursorNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
                           'surfaceNo' : str(surfaceNo)})
     
-    def getCursorPosition(self, cursorNo):
-        loc = self.sendMessage({'call' : 'get_cursor_pos',
+    def getCursorPosition(self, projector, cursorNo):
+        loc = self.sendMessage(projector, {'call' : 'get_cursor_pos',
                                 'cursorNo' : str(cursorNo)})
         return [loc["x"],loc["y"]]
     
-    def rotateCursorClockwise(self, cursorNo, degrees):
-        self.sendMessage({'call' : 'rotate_cursor_clockwise',
+    def rotateCursorClockwise(self, projector, cursorNo, degrees):
+        self.sendMessage(projector, {'call' : 'rotate_cursor_clockwise',
                           'cursorNo' : str(cursorNo),
                           'degrees' : str(degrees)})
 
-    def rotateCursorAnticlockwise(self, cursorNo, degrees):
-        self.sendMessage({'call' : 'rotate_cursor_anticlockwise',
+    def rotateCursorAnticlockwise(self, projector, cursorNo, degrees):
+        self.sendMessage(projector, {'call' : 'rotate_cursor_anticlockwise',
                           'cursorNo' : str(cursorNo),
                           'degrees' : str(degrees)})
     
-    def getCursorRotation(self, cursorNo):
-        rotation = self.sendMessage({'call' : 'get_cursor_rotation',
+    def getCursorRotation(self, projector, cursorNo):
+        rotation = self.sendMessage(projector, {'call' : 'get_cursor_rotation',
                                      'cursorNo' : str(cursorNo)})
         return rotation["rotation"]
     
-    def getCursorMode(self, cursorNo):
-        mode = self.sendMessage({'call' : 'get_cursor_mode',
+    def getCursorMode(self, projector, cursorNo):
+        mode = self.sendMessage(projector, {'call' : 'get_cursor_mode',
                                  'cursorNo' : str(cursorNo)})
         return mode["mode"]
     
-    def setCursorDefaultMode(self, cursorNo):
-        self.sendMessage({'call' : 'set_cursor_default_mode',
+    def setCursorDefaultMode(self, projector, cursorNo):
+        self.sendMessage(projector, {'call' : 'set_cursor_default_mode',
                           'cursorNo' : str(cursorNo)})
         
-    def setCursorWallMode(self, cursorNo):
-        self.sendMessage({'call' : 'set_cursor_wall_mode',
+    def setCursorWallMode(self, projector, cursorNo):
+        self.sendMessage(projector, {'call' : 'set_cursor_wall_mode',
                           'cursorNo' : str(cursorNo)})
         
-    def setCursorBlockMode(self, cursorNo):
-        self.sendMessage({'call' : 'set_cursor_block_mode',
+    def setCursorBlockMode(self, projector, cursorNo):
+        self.sendMessage(projector, {'call' : 'set_cursor_block_mode',
                           'cursorNo' : str(cursorNo)})
         
-    def setCursorScreenMode(self, cursorNo):
-        self.sendMessage({'call' : 'set_cursor_screen_mode',
+    def setCursorScreenMode(self, projector, cursorNo):
+        self.sendMessage(projector, {'call' : 'set_cursor_screen_mode',
                           'cursorNo' : str(cursorNo)})
         
-    def showCursor(self, cursorNo):
-        self.sendMessage({'call' : 'show_cursor',
+    def showCursor(self, projector, cursorNo):
+        self.sendMessage(projector, {'call' : 'show_cursor',
                           'cursorNo' : str(cursorNo)})
     
-    def hideCursor(self, cursorNo):
-        self.sendMessage({'call' : 'hide_cursor',
+    def hideCursor(self, projector, cursorNo):
+        self.sendMessage(projector, {'call' : 'hide_cursor',
                           'cursorNo' : str(cursorNo)})
 
-    def getCursorsSurface(self, cursorNo):
-        surfaceNo = self.sendMessage({'call' : 'get_cursors_surface',
+    def getCursorsSurface(self, projector, cursorNo):
+        surfaceNo = self.sendMessage(projector, {'call' : 'get_cursors_surface',
                                       'cursorNo' : str(cursorNo)})
         return surfaceNo["surfaceNo"]
     
-    def isCursorVisible(self, cursorNo):
-        visibility = self.sendMessage({'call' : 'isCursorVisible',
+    def isCursorVisible(self, projector, cursorNo):
+        visibility = self.sendMessage(projector, {'call' : 'isCursorVisible',
                                        'cursorNo' : str(cursorNo)})
         return visibility["visibility"]
     
-    def shiftCanvas(self, canvasNo, xDistance, yDistance, coorSys):
-        self.sendMessage({'call' : 'move_canvas',
+    def shiftCanvas(self, projector, canvasNo, xDistance, yDistance, coorSys):
+        self.sendMessage(projector, {'call' : 'move_canvas',
                           'canvasNo' : str(canvasNo),
                           'xDist' : str(xDistance),
                           'yDist' : str(yDistance),
                           'coorSys' : str(coorSys)})
         
-    def relocateCanvas(self, canvasNo, x, y, coorSys, surfaceNo):
-        self.sendMessage({'call' : 'relocate_canvas',
+    def relocateCanvas(self, projector, canvasNo, x, y, coorSys, surfaceNo):
+        self.sendMessage(projector, {'call' : 'relocate_canvas',
                           'canvasNo' : str(canvasNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
                           'surfaceNo' : str(surfaceNo)})
         
-    def setCanvasWidth(self, canvasNo, width, coorSys):
-        self.sendMessage({'call' : 'set_canvas_width',
+    def setCanvasWidth(self, projector, canvasNo, width, coorSys):
+        self.sendMessage(projector, {'call' : 'set_canvas_width',
                           'canvasNo' : str(canvasNo),
                           'width' : str(width),
                           'coorSys' : str(coorSys)})
         
-    def setCanvasHeight(self, canvasNo, height, coorSys):
-        self.sendMessage({'call' : 'set_canvas_height',
+    def setCanvasHeight(self, projector, canvasNo, height, coorSys):
+        self.sendMessage(projector, {'call' : 'set_canvas_height',
                           'canvasNo' : str(canvasNo),
                           'height' : str(height),
                           'coorSys' : str(coorSys)})
         
-    def getCanvasPosition(self, canvasNo):
-        loc = self.sendMessage({'call' : 'get_canvas_pos',
+    def getCanvasPosition(self, projector, canvasNo):
+        loc = self.sendMessage(projector, {'call' : 'get_canvas_pos',
                                 'canvasNo' : str(canvasNo)})
         return [loc["x"],loc["y"]]
         
-    def getCanvasWidth(self, canvasNo):
-        width = self.sendMessage({'call' : 'get_canvas_width',
+    def getCanvasWidth(self, projector, canvasNo):
+        width = self.sendMessage(projector, {'call' : 'get_canvas_width',
                                   'canvasNo' : str(canvasNo)})
         return width["width"]
         
-    def getCanvasHeight(self, canvasNo):
-        height = self.sendMessage({'call' : 'get_canvas_height',
+    def getCanvasHeight(self, projector, canvasNo):
+        height = self.sendMessage(projector, {'call' : 'get_canvas_height',
                                    'canvasNo' : str(canvasNo)})
         return height["height"]
         
-    def stretchCanvasDown(self, canvasNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_canvas_down',
+    def stretchCanvasDown(self, projector, canvasNo, distance, coorSys):
+        self.sendMessage(projector, {'call' : 'stretch_canvas_down',
                           'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def stretchCanvasUp(self, canvasNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_canvas_up',
+    def stretchCanvasUp(self, projector, canvasNo, distance, coorSys):
+        self.sendMessage(projector, {'call' : 'stretch_canvas_up',
                           'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def stretchCanvasLeft(self, canvasNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_canvas_left',
+    def stretchCanvasLeft(self, projector, canvasNo, distance, coorSys):
+        self.sendMessage(projector, {'call' : 'stretch_canvas_left',
                           'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def stretchCanvasRight(self, canvasNo, distance, coorSys):
-        self.sendMessage({'call' : 'stretch_canvas_right',
+    def stretchCanvasRight(self, projector, canvasNo, distance, coorSys):
+        self.sendMessage(projector, {'call' : 'stretch_canvas_right',
                           'canvasNo' : str(canvasNo),
                           'distance' : str(distance),
                           'coorSys' : str(coorSys)})
         
-    def setCanvasName(self, canvasNo, name):
-        self.sendMessage({'call' : 'set_canvas_name',
+    def setCanvasName(self, projector, canvasNo, name):
+        self.sendMessage(projector, {'call' : 'set_canvas_name',
                           'canvasNo' : str(canvasNo),
                           'name' : name})
         
-    def getCanvasName(self, canvasNo):
-        name = self.sendMessage({'call' : 'get_canvas_name',
+    def getCanvasName(self, projector, canvasNo):
+        name = self.sendMessage(projector, {'call' : 'get_canvas_name',
                                  'canvasNo' : str(canvasNo)})
         return name["name"]
 
-    def getCanvasSurface(self, canvasNo):
-        surfaceNo = self.sendMessage({'call' : 'get_canvas_surface',
+    def getCanvasSurface(self, projector, canvasNo):
+        surfaceNo = self.sendMessage(projector, {'call' : 'get_canvas_surface',
                                       'canvasNo' : str(canvasNo)})
         return surfaceNo["surfaceNo"]
     
-    def shiftCircle(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_circle',
+    def shiftCircle(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_circle',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocateCircle(self, elementNo, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'relocate_circle', 
+    def relocateCircle(self, projector, elementNo, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'relocate_circle',
                           'elementNo' : elementNo, 
                           'x' : x, 
                           'y' : y, 
                           'coorSys' : coorSys,
                           'canvasNo' : canvasNo})
         
-    def getCirclePosition(self, elementNo):
-        loc = self.sendMessage({'call' : 'get_circle_pos',
+    def getCirclePosition(self, projector, elementNo):
+        loc = self.sendMessage(projector, {'call' : 'get_circle_pos',
                                     'elementNo' : str(elementNo)})
         return [loc["x"],loc["y"]]
     
-    def getElementType(self, elementNo):
-        typeName = self.sendMessage({'call' : 'get_element_type',
+    def getElementType(self, projector, elementNo):
+        typeName = self.sendMessage(projector, {'call' : 'get_element_type',
                                  'elementNo' : str(elementNo)})
         return typeName["type"]
 
-    def getElementsCanvas(self, elementNo):
-        canvasNo = self.sendMessage({'call' : 'get_elements_canvas',
+    def getElementsCanvas(self, projector, elementNo):
+        canvasNo = self.sendMessage(projector, {'call' : 'get_elements_canvas',
                                      'elementNo' : str(elementNo)})
         return canvasNo["canvasNo"]
     
-    def setCircleLineColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_circle_line_color',
+    def setCircleLineColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_circle_line_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def setCircleLineWidth(self, elementNo, width):
-        self.sendMessage({'call' : 'set_circle_line_width',
+    def setCircleLineWidth(self, projector, elementNo, width):
+        self.sendMessage(projector, {'call' : 'set_circle_line_width',
                           'elementNo' : str(elementNo),
                           'width' : str(width)})
         
-    def setCircleFillColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_circle_fill_color',
+    def setCircleFillColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_circle_fill_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
 
-    def getCircleLineColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_circle_line_color',
+    def getCircleLineColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_circle_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
         
-    def getCircleLineWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_circle_line_width',
+    def getCircleLineWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_circle_line_width',
                                  'elementNo' : str(elementNo)})
         return width["width"]
         
-    def getCircleFillColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_circle_fill_color',
+    def getCircleFillColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_circle_fill_color',
                                                  'elementNo' : str(elementNo)})["color"])
     
-    def setCircleRadius(self, elementNo, radius, coorSys):
-        self.sendMessage({'call' : 'set_circle_radius',
+    def setCircleRadius(self, projector, elementNo, radius, coorSys):
+        self.sendMessage(projector, {'call' : 'set_circle_radius',
                           'elementNo' : str(elementNo),
                           'radius' : str(radius),
                           'coorSys' : str(coorSys)})
         
-    def getCircleRadius(self, elementNo):
-        radius = self.sendMessage({'call' : 'get_circle_radius',
+    def getCircleRadius(self, projector, elementNo):
+        radius = self.sendMessage(projector, {'call' : 'get_circle_radius',
                                    'elementNo' : str(elementNo)})
         return radius["radius"]
     
-    def setCircleSides(self, elementNo, sides):
-        self.sendMessage({'call' : 'set_circle_sides',
+    def setCircleSides(self, projector, elementNo, sides):
+        self.sendMessage(projector, {'call' : 'set_circle_sides',
                           'elementNo' : str(elementNo),
                           'sides' : str(sides)})
         
-    def getCircleSides(self, elementNo):
-        sides = self.sendMessage({'call' : 'get_circle_sides',
+    def getCircleSides(self, projector, elementNo):
+        sides = self.sendMessage(projector, {'call' : 'get_circle_sides',
                                   'elementNo' : str(elementNo)})
         return sides["sides"]
     
-    def shiftLine(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_line',
+    def shiftLine(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_line',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocateLine(self, elementNo, refPoint, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'relocate_line',
+    def relocateLine(self, projector, elementNo, refPoint, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'relocate_line',
                           'elementNo' : str(elementNo),
                           'refPoint' : str(refPoint),
                           'x' : str(x),
@@ -996,79 +1006,79 @@ class messageSender:
                           'coorSys' : str(coorSys),
                           'canvasNo' : str(canvasNo)})
     
-    def getLineStart(self, elementNo):
-        loc = self.sendMessage({'call' : 'get_line_start',
+    def getLineStart(self, projector, elementNo):
+        loc = self.sendMessage(projector, {'call' : 'get_line_start',
                                 'elementNo' : str(elementNo)})
         return [loc["x"],loc["y"]]
     
-    def getLineEnd(self, elementNo):
-        loc = self.sendMessage({'call' : 'get_line_end',
+    def getLineEnd(self, projector, elementNo):
+        loc = self.sendMessage(projector, {'call' : 'get_line_end',
                                 'elementNo' : str(elementNo)})
         return [loc["x"],loc["y"]]
     
-    def setLineStart(self, elementNo, x, y, coorSys):
-        self.sendMessage({'call' : 'relocate_line_start',
+    def setLineStart(self, projector, elementNo, x, y, coorSys):
+        self.sendMessage(projector, {'call' : 'relocate_line_start',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys)})
     
-    def setLineEnd(self, elementNo, x, y, coorSys):
-        self.sendMessage({'call' : 'relocate_line_end',
+    def setLineEnd(self, projector, elementNo, x, y, coorSys):
+        self.sendMessage(projector, {'call' : 'relocate_line_end',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys)})
     
-    def setLineColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_line_color',
+    def setLineColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_line_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def getLineColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_line_color',
+    def getLineColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
     
-    def setLineWidth(self, elementNo, width):
-        self.sendMessage({'call' : 'set_line_width',
+    def setLineWidth(self, projector, elementNo, width):
+        self.sendMessage(projector, {'call' : 'set_line_width',
                           'elementNo' : str(elementNo),
                           'width' : str(width)})
         
-    def getLineWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_line_width',
+    def getLineWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_line_width',
                                   'elementNo' : str(elementNo)})
         return width["width"]
     
-    def addLineStripPoint(self, elementNo, x, y, coorSys):
-        self.sendMessage({'call' : 'add_line_strip_point',
+    def addLineStripPoint(self, projector, elementNo, x, y, coorSys):
+        self.sendMessage(projector, {'call' : 'add_line_strip_point',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : coorSys})
         
-    def addLineStripPointAt(self, elementNo, x, y, coorSys, index):
-        self.sendMessage({'call' : 'add_line_strip_point_at',
+    def addLineStripPointAt(self, projector, elementNo, x, y, coorSys, index):
+        self.sendMessage(projector, {'call' : 'add_line_strip_point_at',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : coorSys,
                           'index' : str(index)})
         
-    def getLineStripPoint(self, elementNo, pointNo):
-        loc = self.sendMessage({'call' : 'get_line_strip_point',
+    def getLineStripPoint(self, projector, elementNo, pointNo):
+        loc = self.sendMessage(projector, {'call' : 'get_line_strip_point',
                                 'elementNo' : str(elementNo),
                                 'index' : str(pointNo)})
         return [loc["x"],loc["y"]]
         
-    def shiftLineStrip(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_line_strip',
+    def shiftLineStrip(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_line_strip',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocateLineStrip(self, elementNo, refPoint, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'relocate_line_strip',
+    def relocateLineStrip(self, projector, elementNo, refPoint, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'relocate_line_strip',
                           'elementNo' : str(elementNo),
                           'refPoint' : str(refPoint),
                           'x' : str(x),
@@ -1076,68 +1086,68 @@ class messageSender:
                           'coorSys' : str(coorSys),
                           'canvasNo' : str(canvasNo)})
     
-    def moveLineStripPoint(self, elementNo, pointNo, x, y, coorSys):
-        self.sendMessage({'call' : 'relocate_line_strip_point',
+    def moveLineStripPoint(self, projector, elementNo, pointNo, x, y, coorSys):
+        self.sendMessage(projector, {'call' : 'relocate_line_strip_point',
                           'elementNo' : str(elementNo),
                           'pointNo' : str(pointNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : coorSys})
         
-    def getLineStripColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_line_strip_color',
+    def getLineStripColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_line_strip_color',
                                                  'elementNo' : str(elementNo)})["color"])
         
-    def setLineStripColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_line_strip_color',
+    def setLineStripColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_line_strip_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def setLineStripWidth(self, elementNo, width):
-        self.sendMessage({'call' : 'set_line_strip_width',
+    def setLineStripWidth(self, projector, elementNo, width):
+        self.sendMessage(projector, {'call' : 'set_line_strip_width',
                           'elementNo' : str(elementNo),
                           'width' : str(width)})
         
-    def getLineStripWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_line_strip_width',
+    def getLineStripWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_line_strip_width',
                                   'elementNo' : str(elementNo)})
         return width["width"]
         
-    def getLineStripPointCount(self, elementNo):
-        count = self.sendMessage({'call' : 'get_line_strip_point_count',
+    def getLineStripPointCount(self, projector, elementNo):
+        count = self.sendMessage(projector, {'call' : 'get_line_strip_point_count',
                                   'elementNo' : str(elementNo)})
         return count["count"]
     
-    def setLineStripContent(self, elementNo, content):
+    def setLineStripContent(self, projector, elementNo, content):
         converted = str(content[0][0]) + ":" + str(content[0][1])
         for y in range(0,len(content)):
             converted += ";" + str(content[y][0]) + ":" + str(content[y][1])
-        self.sendMessage({'call' : 'set_line_strip_content', 
+        self.sendMessage(projector, {'call' : 'set_line_strip_content',
                           'elementNo' : str(elementNo), 
                           'content' : converted})
     
-    def addPolygonPoint(self, elementNo, x, y, coorSys):
-        self.sendMessage({'call' : 'add_polygon_point',
+    def addPolygonPoint(self, projector, elementNo, x, y, coorSys):
+        self.sendMessage(projector, {'call' : 'add_polygon_point',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys)})
         
-    def getPolygonPoint(self, elementNo, pointNo):
-        loc = self.sendMessage({'call' : 'get_polygon_point',
+    def getPolygonPoint(self, projector, elementNo, pointNo):
+        loc = self.sendMessage(projector, {'call' : 'get_polygon_point',
                                 'elementNo' : str(elementNo),
                                 'index' : str(pointNo)})
         return (loc["x"],loc["y"])
     
-    def shiftPolygon(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_polygon',
+    def shiftPolygon(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_polygon',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def relocatePolygon(self, elementNo, refPoint, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'relocate_polygon',
+    def relocatePolygon(self, projector, elementNo, refPoint, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'relocate_polygon',
                           'elementNo' : str(elementNo),
                           'refPoint' : str(refPoint),
                           'x' : str(x),
@@ -1145,312 +1155,312 @@ class messageSender:
                           'coorSys' : str(coorSys),
                           'canvasNo' : str(canvasNo)})
     
-    def movePolygonPoint(self, elementNo, pointNo, x, y, coorSys):
-        self.sendMessage({'call' : 'relocate_polygon_point',
+    def movePolygonPoint(self, projector, elementNo, pointNo, x, y, coorSys):
+        self.sendMessage(projector, {'call' : 'relocate_polygon_point',
                           'elementNo' : str(elementNo),
                           'index' : str(pointNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys)})
         
-    def getPolygonFillColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_polygon_fill_color',
+    def getPolygonFillColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_polygon_fill_color',
                                                  'elementNo' : str(elementNo)})["color"])
     
-    def setPolygonFillColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_polygon_fill_color',
+    def setPolygonFillColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_polygon_fill_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def getPolygonLineColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_polygon_line_color',
+    def getPolygonLineColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_polygon_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
         
-    def getPolygonLineWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_polygon_line_width',
+    def getPolygonLineWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_polygon_line_width',
                                  'elementNo' : str(elementNo)})
         return width["width"]
     
-    def setPolygonLineColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_polygon_line_color',
+    def setPolygonLineColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_polygon_line_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def setPolygonLineWidth(self, elementNo, width):
-        self.sendMessage({'call' : 'set_polygon_line_width',
+    def setPolygonLineWidth(self, projector, elementNo, width):
+        self.sendMessage(projector, {'call' : 'set_polygon_line_width',
                           'elementNo' : str(elementNo),
                           'width' : str(width)})
         
-    def getPolygonPointCount(self, elementNo):
-        count = self.sendMessage({'call' : 'get_polygon_point_count',
+    def getPolygonPointCount(self, projector, elementNo):
+        count = self.sendMessage(projector, {'call' : 'get_polygon_point_count',
                                   'elementNo' : str(elementNo)})
         return count["count"]
     
-    def relocateRectangle(self, elementNo, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'set_rectangle_top_left',
+    def relocateRectangle(self, projector, elementNo, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'set_rectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
                           'canvasNo' : str(canvasNo)})
         
-    def shiftRectangle(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_rectangle',
+    def shiftRectangle(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_rectangle',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def getRectangleTopLeft(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_rectangle_top_left',
+    def getRectangleTopLeft(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_rectangle_top_left',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getRectangleTopRight(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_rectangle_top_right',
+    def getRectangleTopRight(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_rectangle_top_right',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getRectangleBottomRight(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_rectangle_bottom_right',
+    def getRectangleBottomRight(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_rectangle_bottom_right',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getRectangleBottomLeft(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_rectangle_bottom_left',
+    def getRectangleBottomLeft(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_rectangle_bottom_left',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def setRectangleWidth(self, elementNo, width, coorSys):
-        self.sendMessage({'call' : 'set_rectangle_width',
+    def setRectangleWidth(self, projector, elementNo, width, coorSys):
+        self.sendMessage(projector, {'call' : 'set_rectangle_width',
                          'elementNo' : str(elementNo),
                          'width' : str(width),
                          'coorSys' : str(coorSys)})
         
-    def getRectangleWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_rectangle_width',
+    def getRectangleWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_rectangle_width',
                                   'elementNo' : str(elementNo)})
         return float(width["width"])
         
-    def setRectangleHeight(self, elementNo, height, coorSys):
-        self.sendMessage({'call' : 'set_rectangle_height',
+    def setRectangleHeight(self, projector, elementNo, height, coorSys):
+        self.sendMessage(projector, {'call' : 'set_rectangle_height',
                           'elementNo' : str(elementNo),
                           'height' : str(height),
                           'coorSys' : str(coorSys)})
         
-    def getRectangleHeight(self, elementNo):
-        height = self.sendMessage({'call' : 'get_rectangle_height',
+    def getRectangleHeight(self, projector, elementNo):
+        height = self.sendMessage(projector, {'call' : 'get_rectangle_height',
                                    'elementNo' : str(elementNo)})
         return float(height["height"])
     
-    def setRectangleFillColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_rectangle_fill_color',
+    def setRectangleFillColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_rectangle_fill_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def getRectangleFillColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_rectangle_fill_color',
+    def getRectangleFillColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_rectangle_fill_color',
                                                  'elementNo' : str(elementNo)})["color"])
     
-    def setRectangleLineColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_rectangle_line_color',
+    def setRectangleLineColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_rectangle_line_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def setRectangleLineWidth(self, elementNo, width):
-        self.sendMessage({'call' : 'set_rectangle_line_width',
+    def setRectangleLineWidth(self, projector, elementNo, width):
+        self.sendMessage(projector, {'call' : 'set_rectangle_line_width',
                           'elementNo' : str(elementNo),
                           'width' : str(width)})
         
-    def getRectangleLineColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_rectangle_line_color',
+    def getRectangleLineColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_rectangle_line_color',
                                                  'elementNo' : str(elementNo)})["color"])
         
-    def getRectangleLineWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_rectangle_line_width',
+    def getRectangleLineWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_rectangle_line_width',
                                  'elementNo' : str(elementNo)})
         return width["width"]
     
-    def relocateTexRectangle(self, elementNo, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'set_texrectangle_top_left',
+    def relocateTexRectangle(self, projector, elementNo, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'set_texrectangle_top_left',
                           'elementNo' : str(elementNo),
                           'x' : str(x),
                           'y' : str(y),
                           'coorSys' : str(coorSys),
                           'canvasNo' : str(canvasNo)})
         
-    def shiftTexRectangle(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_texrectangle',
+    def shiftTexRectangle(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_texrectangle',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def getTexRectangleTopLeft(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_texrectangle_top_left',
+    def getTexRectangleTopLeft(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_texrectangle_top_left',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getTexRectangleTopRight(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_texrectangle_top_right',
+    def getTexRectangleTopRight(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_texrectangle_top_right',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getTexRectangleBottomRight(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_texrectangle_bottom_right',
+    def getTexRectangleBottomRight(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_texrectangle_bottom_right',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getTexRectangleBottomLeft(self, elementNo):
-        pos = self.sendMessage({'call' : 'get_texrectangle_bottom_left',
+    def getTexRectangleBottomLeft(self, projector, elementNo):
+        pos = self.sendMessage(projector, {'call' : 'get_texrectangle_bottom_left',
                                 'elementNo' : str(elementNo)})
         return (float(pos["x"]),float(pos["y"]))
     
-    def getTexRectangleTexture(self, elementNo):
-        tex = self.sendMessage({'call' : 'get_texrectangle_texture',
+    def getTexRectangleTexture(self, projector, elementNo):
+        tex = self.sendMessage(projector, {'call' : 'get_texrectangle_texture',
                                 'elementNo' : str(elementNo)})
         return tex["texture"]
     
-    def setTexRectangleTexture(self, elementNo, filename):
+    def setTexRectangleTexture(self, projector, elementNo, filename):
         extension = filename.split(".")[-1]
         with open(filename, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
-            self.sendMessage({'call' : 'set_texrectangle_texture',
+            self.sendMessage(projector, {'call' : 'set_texrectangle_texture',
                               'elementNo' : str(elementNo),
                               'textureData' : encoded_string,
                               'extension' : extension})
     
-    def setTexRectangleWidth(self, elementNo, width, coorSys):
-        self.sendMessage({'call' : 'set_texrectangle_width',
+    def setTexRectangleWidth(self, projector, elementNo, width, coorSys):
+        self.sendMessage(projector, {'call' : 'set_texrectangle_width',
                           'elementNo' : str(elementNo),
                           'width' : str(width),
                           'coorSys' : str(coorSys)})
         
-    def getTexRectangleWidth(self, elementNo):
-        width = self.sendMessage({'call' : 'get_texrectangle_width',
+    def getTexRectangleWidth(self, projector, elementNo):
+        width = self.sendMessage(projector, {'call' : 'get_texrectangle_width',
                                   'elementNo' : str(elementNo)})
         return float(width["width"])
         
-    def setTexRectangleHeight(self, elementNo, height, coorSys):
-        self.sendMessage({'call' : 'set_texrectangle_height',
+    def setTexRectangleHeight(self, projector, elementNo, height, coorSys):
+        self.sendMessage(projector, {'call' : 'set_texrectangle_height',
                           'elementNo' : str(elementNo),
                           'height' : str(height),
                           'coorSys' : str(coorSys)})
         
-    def getTexRectangleHeight(self, elementNo):
-        height = self.sendMessage({'call' : 'get_texrectangle_height',
+    def getTexRectangleHeight(self, projector, elementNo):
+        height = self.sendMessage(projector, {'call' : 'get_texrectangle_height',
                                    'elementNo' : str(elementNo)})
         return float(height["height"])
     
-    def setText(self, elementNo, text):
-        self.sendMessage({'call' : 'set_text',
+    def setText(self, projector, elementNo, text):
+        self.sendMessage(projector, {'call' : 'set_text',
                           'elementNo' : str(elementNo),
                           'text' : text})
         
-    def getText(self, elementNo):
-        text = self.sendMessage({'call' : 'get_text',
+    def getText(self, projector, elementNo):
+        text = self.sendMessage(projector, {'call' : 'get_text',
                                  'elementNo' : str(elementNo)})
         return text["text"]
     
-    def relocateText(self, elementNo, x, y, coorSys, canvasNo):
-        self.sendMessage({'call' : 'relocate_text',
+    def relocateText(self, projector, elementNo, x, y, coorSys, canvasNo):
+        self.sendMessage(projector, {'call' : 'relocate_text',
                           'elementNo' : elementNo,
                           'x' : x, 
                           'y' : y, 
                           'coorSys' : coorSys,
                           'canvasNo' : canvasNo})
         
-    def shiftText(self, elementNo, xDist, yDist, coorSys):
-        self.sendMessage({'call' : 'shift_text',
+    def shiftText(self, projector, elementNo, xDist, yDist, coorSys):
+        self.sendMessage(projector, {'call' : 'shift_text',
                           'elementNo' : str(elementNo),
                           'xDist' : str(xDist),
                           'yDist' : str(yDist),
                           'coorSys' : str(coorSys)})
         
-    def getTextPosition(self, elementNo):
-        loc = self.sendMessage({'call' : 'get_text_pos',
+    def getTextPosition(self, projector, elementNo):
+        loc = self.sendMessage(projector, {'call' : 'get_text_pos',
                                 'elementNo' : str(elementNo)})
         return [loc["x"],loc["y"]]
     
-    def getTextWidth(self, text, font, pointSize):
-        width = self.sendMessage({'call' : 'get_text_width',
+    def getTextWidth(self, projector, text, font, pointSize):
+        width = self.sendMessage(projector, {'call' : 'get_text_width',
                           'text' : str(text),
                           'pt' : str(pointSize),
                           'font' : str(font)})
         return float(width['width'])
     
-    def getTextHeight(self, text, font, pointSize):
-        height = self.sendMessage({'call' : 'get_text_height',
+    def getTextHeight(self, projector, text, font, pointSize):
+        height = self.sendMessage(projector, {'call' : 'get_text_height',
                           'text' : str(text),
                           'pt' : str(pointSize),
                           'font' : str(font)})
         return float(height['height'])
     
-    def getTextLineHeight(self, font, pointSize):
-        height = self.sendMessage({'call' : 'get_text_line_height',
+    def getTextLineHeight(self, projector, font, pointSize):
+        height = self.sendMessage(projector, {'call' : 'get_text_line_height',
                           'pt' : str(pointSize),
                           'font' : str(font)})
         return float(height['height'])
     
-    def getTextDescenderHeight(self, font, pointSize):
-        height = self.sendMessage({'call' : 'get_text_descender_height',
+    def getTextDescenderHeight(self, projector, font, pointSize):
+        height = self.sendMessage(projector, {'call' : 'get_text_descender_height',
                           'pt' : str(pointSize),
                           'font' : str(font)})
         return float(height['height'])
         
-    def setPointSize(self, elementNo, pointSize):
-        self.sendMessage({'call' : 'set_text_point_size',
+    def setPointSize(self, projector, elementNo, pointSize):
+        self.sendMessage(projector, {'call' : 'set_text_point_size',
                           'elementNo' : str(elementNo),
                           'pt' : str(pointSize)})
         
-    def getPointSize(self, elementNo):
-        size = self.sendMessage({'call' : 'get_text_point_size',
+    def getPointSize(self, projector, elementNo):
+        size = self.sendMessage(projector, {'call' : 'get_text_point_size',
                                  'elementNo' : str(elementNo)})
         return size["size"]
     
-    def getFont(self, elementNo):
-        font = self.sendMessage({'call' : 'get_text_font',
+    def getFont(self, projector, elementNo):
+        font = self.sendMessage(projector, {'call' : 'get_text_font',
                                  'elementNo' : str(elementNo)})
         return font["font"]
     
-    def setFont(self, elementNo, font):
-        self.sendMessage({'call' : 'set_text_font',
+    def setFont(self, projector, elementNo, font):
+        self.sendMessage(projector, {'call' : 'set_text_font',
                           'elementNo' : str(elementNo),
                           'font' : font})
         
-    def setTextColor(self, elementNo, color):
-        self.sendMessage({'call' : 'set_text_color',
+    def setTextColor(self, projector, elementNo, color):
+        self.sendMessage(projector, {'call' : 'set_text_color',
                           'elementNo' : str(elementNo),
                           'color' : self.colorString(color[0], color[1], color[2], color[3])})
         
-    def getTextColor(self, elementNo):
-        return self.colorTuple(self.sendMessage({'call' : 'get_text_color',
+    def getTextColor(self, projector, elementNo):
+        return self.colorTuple(self.sendMessage(projector, {'call' : 'get_text_color',
                                                  'elementNo' : str(elementNo)})["color"])
            
-    def showElement(self, elementNo):
-        self.sendMessage({'call' : 'show_element',
+    def showElement(self, projector, elementNo):
+        self.sendMessage(projector, {'call' : 'show_element',
                          'elementNo' : str(elementNo)})
         
-    def hideElement(self, elementNo):
-        self.sendMessage({'call' : 'hide_element',
+    def hideElement(self, projector, elementNo):
+        self.sendMessage(projector, {'call' : 'hide_element',
                           'elementNo' : str(elementNo)})
         
-    def checkElementVisibility(self, elementNo):
-        visibility = self.sendMessage({'call' : 'check_element_visibility',
+    def checkElementVisibility(self, projector, elementNo):
+        visibility = self.sendMessage(projector, {'call' : 'check_element_visibility',
                                        'elementNo' : str(elementNo)})
         return visibility["visible"]
         
-    def hideSetupSurface(self):
-        self.sendMessage({'call' : 'hide_setup_surface'})
+    def hideSetupSurface(self, projector):
+        self.sendMessage(projector, {'call' : 'hide_setup_surface'})
         
-    def showSetupSurface(self):
-        self.sendMessage({'call' : 'show_setup_surface'})
+    def showSetupSurface(self, projector):
+        self.sendMessage(projector, {'call' : 'show_setup_surface'})
         
-    def getSetupSurfaceVisibility(self):
-        return self.sendMessage({'call' : 'get_setup_surface_visibility'})
+    def getSetupSurfaceVisibility(self, projector):
+        return self.sendMessage(projector, {'call' : 'get_setup_surface_visibility'})
         
-    def getClickedElements(self, surfaceNo, x, y):
-        elements = self.sendMessage({'call' : 'get_clicked_elements',
+    def getClickedElements(self, projector, surfaceNo, x, y):
+        elements = self.sendMessage(projector, {'call' : 'get_clicked_elements',
                                      'surfaceNo' : str(surfaceNo),
                                      'x' : str(x),
                                      'y' : str(y)})
@@ -1459,7 +1469,7 @@ class messageSender:
             elementlist.append(int(elements[x]))
         return elementlist
     
-    def removeElement(self, elementNo, canvasNo):
-        self.sendMessage({'call' : 'remove_element',
+    def removeElement(self, projector, elementNo, canvasNo):
+        self.sendMessage(projector, {'call' : 'remove_element',
                           'elementNo' : str(elementNo),
                           'canvasNo' : str(canvasNo)})
