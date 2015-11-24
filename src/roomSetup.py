@@ -1017,8 +1017,6 @@ class Client:
                     loc = self.sender.getCursorPosition(self.controlCur)
                     if len(self.dragging) != 0:
                         for x in range(0, len(self.dragging)):
-                            print str(len(self.dragging))
-                            print str(x)
                             self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), "pix", 1)
                             for y in range(0, len(self.bezierUpdates)):
                                 try:
