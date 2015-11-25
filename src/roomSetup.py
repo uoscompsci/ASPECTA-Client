@@ -1122,7 +1122,7 @@ class Client:
                             self.update_rectangle(x[0])
 
     def update_rectangle(self, surface_rectangle_number):
-        top = self.sender.getCirclePosition(self.PROJECTORself.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][0])[1]
+        top = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][0])[1]
         bottom = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][1])[1]
         left = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][2])[0]
         right = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][3])[0]
@@ -1620,7 +1620,7 @@ class Client:
 
         self.sender.hideCursor(self.PROJECTOR, self.mainCur)
 
-        self.warpedSurf[0] = self.sender.newSurface(1)
+        self.warpedSurf[0] = self.sender.newSurface(self.PROJECTOR)
         self.canvas = self.sender.newCanvas(self.PROJECTOR, self.warpedSurf[0], 0, 512, 512, 512, "pix", "Bob")
         self.surfCur[0] = self.sender.newCursor(self.PROJECTOR, self.warpedSurf[0], 512 / 2, 512 / 2, "pix")
         self.sender.hideCursor(self.PROJECTOR, self.surfCur[0])
@@ -1680,7 +1680,7 @@ class Client:
         self.aspect_stretch_circles[0] = surface_aspect_stretch_circles
         self.surfCanvases[0] = self.canvas
 
-        self.warpedSurf[1] = self.sender.newSurface(1)
+        self.warpedSurf[1] = self.sender.newSurface(self.PROJECTOR)
         self.canvas = self.sender.newCanvas(self.PROJECTOR, self.warpedSurf[1], 0, 512, 512, 512, "pix", "Bob")
         self.surfCur[1] = self.sender.newCursor(self.PROJECTOR, self.warpedSurf[1], 512 / 2, 512 / 2, "pix")
         self.sender.hideCursor(self.PROJECTOR, self.surfCur[1])
