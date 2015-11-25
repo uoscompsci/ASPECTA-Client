@@ -12,6 +12,7 @@ import tkMessageBox
 
 
 class Client:
+    PROJECTOR = 1
     ppe = None
     cornerdrag = False
     quit = False
@@ -134,7 +135,7 @@ class Client:
             for x in list(reversed(range(0, count))):
                 circle = circles[2 * x + 1]
                 circles.pop(2 * x + 1)
-                self.sender.removeElement(circle, 1)
+                self.sender.removeElement(self.PROJECTOR, circle, 1)
             if side == "top":
                 self.bezierUpdates[surface][0] = True
             elif side == "bottom":
@@ -150,12 +151,12 @@ class Client:
         if count < 17:  # Restrict to a maximum of 15 waypoints per side
             insert = []
             for x in range(1, count):
-                point1 = self.sender.getCirclePosition(circles[x - 1])
-                point2 = self.sender.getCirclePosition(circles[x])
+                point1 = self.sender.getCirclePosition(self.PROJECTOR, circles[x - 1])
+                point2 = self.sender.getCirclePosition(self.PROJECTOR, circles[x])
                 midpoint = self.get_midpoints((point1[0], point1[1]), (point2[0], point2[1]))
                 insert.append(midpoint)
             for x in reversed(range(0, len(insert))):
-                ele = self.sender.newCircle(1, insert[x][0], int(insert[x][1]), 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1),
+                ele = self.sender.newCircle(self.PROJECTOR, 1, insert[x][0], int(insert[x][1]), 7, "pix", (1, 0, 0, 0), 1, (0, 1, 0, 1),
                                             10)
                 self.hideable.append(ele)
                 circles.insert(x + 1, ele)
@@ -181,27 +182,27 @@ class Client:
         elif side == "right":
             circles = self.rightCircles[surface]
         for x in range(0, len(circles)):
-            pos = self.sender.getCirclePosition(circles[x])
+            pos = self.sender.getCirclePosition(self.PROJECTOR, circles[x])
             points.append((pos[0], pos[1]))
         calc = BezierCalc()
         if side == "top":
             curve = calc.getCurvePoints(points, self.ppe)
-            self.sender.setLineStripContent(self.topbz[surface], curve)
+            self.sender.setLineStripContent(self.PROJECTOR, self.topbz[surface], curve)
             self.connection_update_check(surface, "tl")
             self.connection_update_check(surface, "tr")
         elif side == "bottom":
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
-            self.sender.setLineStripContent(self.bottombz[surface], curve)
+            self.sender.setLineStripContent(self.PROJECTOR, self.bottombz[surface], curve)
             self.connection_update_check(surface, "bl")
             self.connection_update_check(surface, "br")
         elif side == "left":
             curve = calc.getCurvePoints(list(reversed(points)), self.ppe)
-            self.sender.setLineStripContent(self.leftbz[surface], curve)
+            self.sender.setLineStripContent(self.PROJECTOR, self.leftbz[surface], curve)
             self.connection_update_check(surface, "tl")
             self.connection_update_check(surface, "bl")
         elif side == "right":
             curve = calc.getCurvePoints(points, self.ppe)
-            self.sender.setLineStripContent(self.rightbz[surface], curve)
+            self.sender.setLineStripContent(self.PROJECTOR, self.rightbz[surface], curve)
             self.connection_update_check(surface, "tr")
             self.connection_update_check(surface, "br")
 
@@ -221,19 +222,19 @@ class Client:
     def update_mesh(self, surface):
         top_points = []
         for x in range(0, len(self.topCircles[surface])):
-            top_points.append(self.sender.getCirclePosition(self.topCircles[surface][x]))
+            top_points.append(self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[surface][x]))
         bottom_points = []
         for x in range(0, len(self.bottomCircles[surface])):
             bottom_points.append(
-                self.sender.getCirclePosition(self.bottomCircles[surface][len(self.bottomCircles[surface]) - 1 - x]))
+                self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[surface][len(self.bottomCircles[surface]) - 1 - x]))
         left_points = []
         for x in range(0, len(self.leftCircles[surface])):
-            left_points.append(self.sender.getCirclePosition(self.leftCircles[surface][x]))
+            left_points.append(self.sender.getCirclePosition(self.PROJECTOR, self.leftCircles[surface][x]))
         right_points = []
         for x in range(0, len(self.rightCircles[surface])):
             right_points.append(
-                self.sender.getCirclePosition(self.rightCircles[surface][len(self.rightCircles[surface]) - 1 - x]))
-        self.sender.setSurfaceEdges(self.warpedSurf[surface], top_points, bottom_points, left_points, right_points)
+                self.sender.getCirclePosition(self.PROJECTOR, self.rightCircles[surface][len(self.rightCircles[surface]) - 1 - x]))
+        self.sender.setSurfaceEdges(self.PROJECTOR, self.warpedSurf[surface], top_points, bottom_points, left_points, right_points)
 
     # Creates a visible line to indicate a connection between two corners of different surfaces or removes it if it exists. If appropriate sides are connected
     def create_connection_line(self, start, end, visualize_only):
@@ -243,37 +244,37 @@ class Client:
                 if (start[0] == self.connections[x][0][0] and start[1] == self.connections[x][0][1] and end[0] ==
                         self.connections[x][1][0] and end[1] == self.connections[x][1][1]):
                     found = True
-                    self.sender.removeElement(self.connections[x][2], 1)
+                    self.sender.removeElement(self.PROJECTOR, self.connections[x][2], 1)
                     self.connections.pop(x)
                 elif (end[0] == self.connections[x][0][0] and end[1] == self.connections[x][0][1] and start[0] ==
                         self.connections[x][1][0] and start[1] == self.connections[x][1][1]):
                     found = True
-                    self.sender.removeElement(self.connections[x][2], 1)
+                    self.sender.removeElement(self.PROJECTOR, self.connections[x][2], 1)
                     self.connections.pop(x)
         if not found:
             start_location = None
             if start[1] == "tl":
-                start_location = self.sender.getCirclePosition(self.topCircles[start[0]][0])
+                start_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[start[0]][0])
             elif start[1] == "tr":
                 topend = len(self.topCircles[start[0]]) - 1
-                start_location = self.sender.getCirclePosition(self.topCircles[start[0]][topend])
+                start_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[start[0]][topend])
             elif start[1] == "br":
-                start_location = self.sender.getCirclePosition(self.bottomCircles[start[0]][0])
+                start_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[start[0]][0])
             elif start[1] == "bl":
                 botend = len(self.bottomCircles[start[0]]) - 1
-                start_location = self.sender.getCirclePosition(self.bottomCircles[start[0]][botend])
+                start_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[start[0]][botend])
             end_location = None
             if end[1] == "tl":
-                end_location = self.sender.getCirclePosition(self.topCircles[end[0]][0])
+                end_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[end[0]][0])
             elif end[1] == "tr":
                 topend = len(self.topCircles[end[0]]) - 1
-                end_location = self.sender.getCirclePosition(self.topCircles[end[0]][topend])
+                end_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[end[0]][topend])
             elif end[1] == "br":
-                end_location = self.sender.getCirclePosition(self.bottomCircles[end[0]][0])
+                end_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[end[0]][0])
             elif end[1] == "bl":
                 botend = len(self.bottomCircles[end[0]]) - 1
-                end_location = self.sender.getCirclePosition(self.bottomCircles[end[0]][botend])
-            ele = self.sender.newLine(1, start_location[0], start_location[1], end_location[0], end_location[1], "pix",
+                end_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[end[0]][botend])
+            ele = self.sender.newLine(self.PROJECTOR, 1, start_location[0], start_location[1], end_location[0], end_location[1], "pix",
                                       (1, 0, 0, 1), 3)
             self.connections.append([(start[0], start[1]), (end[0], end[1]), ele])
         if not visualize_only:
@@ -284,72 +285,72 @@ class Client:
                     if (self.connections[x][1][0] == end[0] and self.connections[x][1][1] == self.cornerAdj[end[1]][0][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                         self.cornerAdj[end[1]][0][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                            self.cornerAdj[end[1]][0][1])
                     if (self.connections[x][1][0] == end[0] and self.connections[x][1][1] == self.cornerAdj[end[1]][1][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                         self.cornerAdj[end[1]][1][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                            self.cornerAdj[end[1]][1][1])
                 elif (self.connections[x][1][0] == start[0] and self.connections[x][1][1] ==
                         self.cornerAdj[start[1]][0][0]):
                     if (self.connections[x][0][0] == end[0] and self.connections[x][0][1] == self.cornerAdj[end[1]][0][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                         self.cornerAdj[end[1]][0][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                            self.cornerAdj[end[1]][0][1])
                     if (self.connections[x][0][0] == end[0] and self.connections[x][0][1] == self.cornerAdj[end[1]][1][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                         self.cornerAdj[end[1]][1][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][0][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][0][1], end[0],
                                                            self.cornerAdj[end[1]][1][1])
                 if (self.connections[x][0][0] == start[0] and self.connections[x][0][1] == self.cornerAdj[start[1]][1][
                         0]):
                     if (self.connections[x][1][0] == end[0] and self.connections[x][1][1] == self.cornerAdj[end[1]][0][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                         self.cornerAdj[end[1]][0][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                            self.cornerAdj[end[1]][0][1])
                     if (self.connections[x][1][0] == end[0] and self.connections[x][1][1] == self.cornerAdj[end[1]][1][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                         self.cornerAdj[end[1]][1][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                            self.cornerAdj[end[1]][1][1])
                 elif (self.connections[x][1][0] == start[0] and self.connections[x][1][1] ==
                         self.cornerAdj[start[1]][1][0]):
                     if (self.connections[x][0][0] == end[0] and self.connections[x][0][1] == self.cornerAdj[end[1]][0][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                         self.cornerAdj[end[1]][0][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                            self.cornerAdj[end[1]][0][1])
                     if (self.connections[x][0][0] == end[0] and self.connections[x][0][1] == self.cornerAdj[end[1]][1][
                             0]):
                         if not found:
-                            self.sender.connectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.connectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                         self.cornerAdj[end[1]][1][1])
                         else:
-                            self.sender.disconnectSurfaces(start[0], self.cornerAdj[start[1]][1][1], end[0],
+                            self.sender.disconnectSurfaces(self.PROJECTOR, start[0], self.cornerAdj[start[1]][1][1], end[0],
                                                            self.cornerAdj[end[1]][1][1])
 
     # Checks whether a point movement should alter an existing visualised connection line
@@ -359,43 +360,43 @@ class Client:
                     0] == surface and self.connections[x][1][1] == corner):
                 start_location = None
                 if self.connections[x][0][1] == "tl":
-                    start_location = self.sender.getCirclePosition(self.topCircles[self.connections[x][0][0]][0])
+                    start_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[self.connections[x][0][0]][0])
                 elif self.connections[x][0][1] == "tr":
                     topend = len(self.topCircles[self.connections[x][0][0]]) - 1
-                    start_location = self.sender.getCirclePosition(self.topCircles[self.connections[x][0][0]][topend])
+                    start_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[self.connections[x][0][0]][topend])
                 elif self.connections[x][0][1] == "br":
-                    start_location = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][0][0]][0])
+                    start_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[self.connections[x][0][0]][0])
                 elif self.connections[x][0][1] == "bl":
                     botend = len(self.bottomCircles[self.connections[x][0][0]]) - 1
-                    start_location = self.sender.getCirclePosition(
+                    start_location = self.sender.getCirclePosition(self.PROJECTOR,
                         self.bottomCircles[self.connections[x][0][0]][botend])
                 end_location = None
                 if self.connections[x][1][1] == "tl":
-                    end_location = self.sender.getCirclePosition(self.topCircles[self.connections[x][1][0]][0])
+                    end_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[self.connections[x][1][0]][0])
                 elif self.connections[x][1][1] == "tr":
                     topend = len(self.topCircles[self.connections[x][1][0]]) - 1
-                    end_location = self.sender.getCirclePosition(self.topCircles[self.connections[x][1][0]][topend])
+                    end_location = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[self.connections[x][1][0]][topend])
                 elif self.connections[x][1][1] == "br":
-                    end_location = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][1][0]][0])
+                    end_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[self.connections[x][1][0]][0])
                 elif self.connections[x][1][1] == "bl":
                     botend = len(self.bottomCircles[self.connections[x][1][0]]) - 1
-                    end_location = self.sender.getCirclePosition(self.bottomCircles[self.connections[x][1][0]][botend])
-                self.sender.setLineStart(self.connections[x][2], start_location[0], start_location[1])
-                self.sender.setLineEnd(self.connections[x][2], end_location[0], end_location[1])
+                    end_location = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[self.connections[x][1][0]][botend])
+                self.sender.setLineStart(self.PROJECTOR, 1, self.connections[x][2], start_location[0], start_location[1])
+                self.sender.setLineEnd(self.PROJECTOR, 1, self.connections[x][2], end_location[0], end_location[1])
 
     def increment_digit(self, element_number):
-        value = int(self.sender.getText(element_number))
+        value = int(self.sender.getText(self.PROJECTOR, element_number))
         if value < 9:
-            self.sender.setText(element_number, str(value + 1))
+            self.sender.setText(self.PROJECTOR, element_number, str(value + 1))
         else:
-            self.sender.setText(element_number, str(0))
+            self.sender.setText(self.PROJECTOR, element_number, str(0))
 
     def decrement_digit(self, element_number):
-        value = int(self.sender.getText(element_number))
+        value = int(self.sender.getText(self.PROJECTOR, element_number))
         if value > 0:
-            self.sender.setText(element_number, str(value - 1))
+            self.sender.setText(self.PROJECTOR, element_number, str(value - 1))
         else:
-            self.sender.setText(element_number, str(9))
+            self.sender.setText(self.PROJECTOR, element_number, str(9))
 
     # Checks for mouse button and keyboard
     def get_input(self, get_point):
@@ -412,11 +413,11 @@ class Client:
                     # Runs if the mouse wheel is being rolled upwards
                     if event.button == 4:
                         if self.controlCur == self.mainCur:
-                            self.sender.rotateCursorClockwise(self.mainCur,
+                            self.sender.rotateCursorClockwise(self.PROJECTOR, self.mainCur,
                                                               10)  # Tells the server to rotate the cursor clockwise
                         else:
                             if self.surfControlMode == "meas":
-                                pos = self.sender.getCursorPosition(self.controlCur)
+                                pos = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                 if pos[1] >= 512 - 75:
                                     if pos[0] > (512 / 2 - 80):
                                         if pos[0] < (512 / 2 - 50):
@@ -440,11 +441,11 @@ class Client:
                     # Runs if the mouse wheel is being rolled downwards
                     elif event.button == 5:
                         if self.controlCur == self.mainCur:
-                            self.sender.rotateCursorAnticlockwise(self.mainCur,
+                            self.sender.rotateCursorAnticlockwise(self.PROJECTOR, self.mainCur,
                                                                   10)  # Tells the server to rotate the cursor anticlockwise
                         else:
                             if self.surfControlMode == "meas":
-                                pos = self.sender.getCursorPosition(self.controlCur)
+                                pos = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                 if 512 - 75 <= pos[1] <= 512:
                                     if pos[0] > (512 / 2 - 80):
                                         if pos[0] < (512 / 2 - 50):
@@ -473,47 +474,47 @@ class Client:
                         self.right_click_time = datetime.datetime.now()  # Saves the current time so that when the button is released click duration can be checked
                         # Runs if the default cursor mode is active
                         if self.cursorMode == "default":
-                            loc = self.sender.getCursorPosition(self.controlCur)
+                            loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                             if self.controlCur == self.mainCur:
                                 self.rightDragging = []
                                 # Checks whether a corner point has been clicked and if so starts defining a connection
                                 for z in range(0, len(self.topCircles)):
                                     hit = False
-                                    point = self.sender.getCirclePosition(self.topCircles[z][0])
-                                    radius = self.sender.getCircleRadius(self.topCircles[z][0])
+                                    point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[z][0])
+                                    radius = self.sender.getCircleRadius(self.PROJECTOR, self.topCircles[z][0])
                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                         self.rightDragging.append((self.topCircles[z][0], "tl", z))
                                         hit = True
                                     end = len(self.topCircles[z]) - 1
-                                    point = self.sender.getCirclePosition(self.topCircles[z][end])
-                                    radius = self.sender.getCircleRadius(self.topCircles[z][end])
+                                    point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[z][end])
+                                    radius = self.sender.getCircleRadius(self.PROJECTOR, self.topCircles[z][end])
                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                         self.rightDragging.append((self.topCircles[z][end], "tr", z))
                                         hit = True
-                                    point = self.sender.getCirclePosition(self.bottomCircles[z][0])
-                                    radius = self.sender.getCircleRadius(self.bottomCircles[z][0])
+                                    point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[z][0])
+                                    radius = self.sender.getCircleRadius(self.PROJECTOR, self.bottomCircles[z][0])
                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                         self.rightDragging.append((self.bottomCircles[z][0], "br", z))
                                         hit = True
                                     end = len(self.bottomCircles[z]) - 1
-                                    point = self.sender.getCirclePosition(self.bottomCircles[z][end])
-                                    radius = self.sender.getCircleRadius(self.bottomCircles[z][end])
+                                    point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[z][end])
+                                    radius = self.sender.getCircleRadius(self.PROJECTOR, self.bottomCircles[z][end])
                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                         self.rightDragging.append((self.bottomCircles[z][end], "bl", z))
                                         hit = True
                                     if hit:
-                                        cirpos = self.sender.getCirclePosition(self.rightDragging[0][0])
-                                        self.symbolicDrag[0] = self.sender.newLine(1, cirpos[0], cirpos[1], loc[0],
+                                        cirpos = self.sender.getCirclePosition(self.PROJECTOR, self.rightDragging[0][0])
+                                        self.symbolicDrag[0] = self.sender.newLine(self.PROJECTOR, 1, cirpos[0], cirpos[1], loc[0],
                                                                                    loc[1], "pix", (1, 0, 0, 1), 3)
-                                        self.symbolicDrag[1] = self.sender.newCircle(1, loc[0], loc[1], 10, "pix",
+                                        self.symbolicDrag[1] = self.sender.newCircle(self.PROJECTOR, 1, loc[0], loc[1], 10, "pix",
                                                                                      (1, 0, 0, 0), 1, (1, 0, 0, 1), 10)
                     elif event.button == 1:
                         self.lClickTime = datetime.datetime.now()  # Saves the current time so that when the button is released click duration can be checked
                         if self.controlCur == self.mainCur:
                             # If the user is trying to create a corner point it is defined then returned
                             if get_point:
-                                loc = self.sender.getCursorPosition(self.controlCur)
-                                ele = self.sender.newCircle(1, loc[0], loc[1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1),
+                                loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
+                                ele = self.sender.newCircle(self.PROJECTOR, 1, loc[0], loc[1], 10, "pix", (1, 0, 0, 0), 1, (1, 1, 0, 1),
                                                             10)
                                 self.hideable.append(ele)
                                 return loc, ele
@@ -521,12 +522,12 @@ class Client:
                             else:
                                 # Runs if the default cursor mode is active
                                 if self.cursorMode == "default":
-                                    loc = self.sender.getCursorPosition(self.controlCur)
+                                    loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                     self.dragging = []
                                     self.cornerdrag = False
                                     for z in range(0, len(self.topCircles)):
                                         for x in range(0, len(self.topCircles[z])):
-                                            point = self.sender.getCirclePosition(self.topCircles[z][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[z][x])
                                             if x == 0 or x == (len(self.topCircles[z]) - 1):
                                                 radius = 10
                                             else:
@@ -537,7 +538,7 @@ class Client:
                                                 if x == 0 or x == (len(self.topCircles[z]) - 1):
                                                     self.cornerdrag = True
                                         for x in range(0, len(self.bottomCircles[z])):
-                                            point = self.sender.getCirclePosition(self.bottomCircles[z][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[z][x])
                                             if x == 0 or x == (len(self.bottomCircles[z]) - 1):
                                                 radius = 10
                                             else:
@@ -548,7 +549,7 @@ class Client:
                                                 if x == 0 or x == (len(self.bottomCircles[z]) - 1):
                                                     self.cornerdrag = True
                                         for x in range(0, len(self.leftCircles[z])):
-                                            point = self.sender.getCirclePosition(self.leftCircles[z][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.leftCircles[z][x])
                                             if x == 0 or x == (len(self.leftCircles[z]) - 1):
                                                 radius = 10
                                             else:
@@ -559,7 +560,7 @@ class Client:
                                                 if x == 0 or x == (len(self.leftCircles[z]) - 1):
                                                     self.cornerdrag = True
                                         for x in range(0, len(self.rightCircles[z])):
-                                            point = self.sender.getCirclePosition(self.rightCircles[z][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.rightCircles[z][x])
                                             if x == 0 or x == (len(self.rightCircles[z]) - 1):
                                                 radius = 10
                                             else:
@@ -571,7 +572,7 @@ class Client:
                                                     self.cornerdrag = True
                         else:
                             if self.surfControlMode == "aspect":
-                                loc = self.sender.getCursorPosition(self.controlCur)
+                                loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                 self.stretching = []
                                 p = 0
                                 if self.controlCur == self.surfCur[0]:
@@ -583,8 +584,8 @@ class Client:
                                 elif self.controlCur == self.surfCur[3]:
                                     p = 3
                                 for q in range(len(self.aspect_stretch_circles[p])):
-                                    point = self.sender.getCirclePosition(self.aspect_stretch_circles[p][q])
-                                    radius = self.sender.getCircleRadius(self.aspect_stretch_circles[p][q])
+                                    point = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[p][q])
+                                    radius = self.sender.getCircleRadius(self.PROJECTOR, self.aspect_stretch_circles[p][q])
                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                         self.stretching.append((p, q))
                 elif event.type == pygame.MOUSEBUTTONUP:
@@ -598,29 +599,29 @@ class Client:
                             if self.controlCur == self.mainCur:
                                 # Runs if the default cursor mode is active
                                 if self.cursorMode == "default":
-                                    loc = self.sender.getCursorPosition(self.controlCur)
+                                    loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                     for w in range(0, len(self.topCircles)):
                                         # If a waypoint has been clicked, the side it was part of is split so that there are twice as many waypoints
                                         for x in range(1, len(self.topCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.topCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 self.split_side(self.topCircles[w], "top", w)
                                                 self.update_mesh(w)
                                         for x in range(1, len(self.bottomCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 self.split_side(self.bottomCircles[w], "bottom", w)
                                                 self.update_mesh(w)
                                         for x in range(1, len(self.leftCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.leftCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.leftCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 self.split_side(self.leftCircles[w], "left", w)
                                                 self.update_mesh(w)
                                         for x in range(1, len(self.rightCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.rightCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.rightCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 self.split_side(self.rightCircles[w], "right", w)
@@ -629,128 +630,128 @@ class Client:
                                         if not get_point:
                                             if not self.dontFlip[w]:
                                                 flipped = False
-                                                point = self.sender.getCirclePosition(self.topCircles[w][0])
+                                                point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[w][0])
                                                 radius = 10
                                                 if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                     if self.orientation[w] != 0:
                                                         if not self.mirrored[w]:
-                                                            self.sender.rotateSurfaceTo0(w + 1)
+                                                            self.sender.rotateSurfaceTo0(self.PROJECTOR, w + 1)
                                                         else:
-                                                            self.sender.rotateSurfaceTo270(w + 1)
+                                                            self.sender.rotateSurfaceTo270(self.PROJECTOR, w + 1)
                                                         self.orientation[w] = 0
                                                     else:
                                                         if not self.mirrored[w]:
-                                                            self.sender.rotateSurfaceTo270(w + 1)
-                                                            self.sender.mirrorSurface(w + 1)
+                                                            self.sender.rotateSurfaceTo270(self.PROJECTOR, w + 1)
+                                                            self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                             self.mirrored[w] = True
                                                         else:
-                                                            self.sender.rotateSurfaceTo0(w + 1)
-                                                            self.sender.mirrorSurface(w + 1)
+                                                            self.sender.rotateSurfaceTo0(self.PROJECTOR, w + 1)
+                                                            self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                             self.mirrored[w] = False
                                                     flipped = True
                                                 if not flipped:
-                                                    point = self.sender.getCirclePosition(
+                                                    point = self.sender.getCirclePosition(self.PROJECTOR,
                                                         self.topCircles[w][len(self.topCircles[w]) - 1])
                                                     radius = 10
                                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                         if self.orientation[w] != 1:
                                                             if not self.mirrored[w]:
-                                                                self.sender.rotateSurfaceTo90(w + 1)
+                                                                self.sender.rotateSurfaceTo90(self.PROJECTOR, w + 1)
                                                             else:
-                                                                self.sender.rotateSurfaceTo0(w + 1)
+                                                                self.sender.rotateSurfaceTo0(self.PROJECTOR, w + 1)
                                                             self.orientation[w] = 1
                                                         else:
                                                             if not self.mirrored[w]:
-                                                                self.sender.rotateSurfaceTo0(w + 1)
-                                                                self.sender.mirrorSurface(w + 1)
+                                                                self.sender.rotateSurfaceTo0(self.PROJECTOR, w + 1)
+                                                                self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                                 self.mirrored[w] = True
                                                             else:
-                                                                self.sender.rotateSurfaceTo90(w + 1)
-                                                                self.sender.mirrorSurface(w + 1)
+                                                                self.sender.rotateSurfaceTo90(self.PROJECTOR, w + 1)
+                                                                self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                                 self.mirrored[w] = False
                                                         flipped = True
                                                 if not flipped:
-                                                    point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+                                                    point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[w][0])
                                                     radius = 10
                                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                         if self.orientation[w] != 2:
                                                             if not self.mirrored[w]:
-                                                                self.sender.rotateSurfaceTo180(w + 1)
+                                                                self.sender.rotateSurfaceTo180(self.PROJECTOR, w + 1)
                                                             else:
-                                                                self.sender.rotateSurfaceTo90(w + 1)
+                                                                self.sender.rotateSurfaceTo90(self.PROJECTOR, w + 1)
                                                             self.orientation[w] = 2
                                                         else:
                                                             if not self.mirrored[w]:
-                                                                self.sender.rotateSurfaceTo90(w + 1)
-                                                                self.sender.mirrorSurface(w + 1)
+                                                                self.sender.rotateSurfaceTo90(self.PROJECTOR, w + 1)
+                                                                self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                                 self.mirrored[w] = True
                                                             else:
-                                                                self.sender.rotateSurfaceTo180(w + 1)
-                                                                self.sender.mirrorSurface(w + 1)
+                                                                self.sender.rotateSurfaceTo180(self.PROJECTOR, w + 1)
+                                                                self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                                 self.mirrored[w] = False
                                                         flipped = True
                                                 if not flipped:
-                                                    point = self.sender.getCirclePosition(
+                                                    point = self.sender.getCirclePosition(self.PROJECTOR,
                                                         self.bottomCircles[w][len(self.bottomCircles[w]) - 1])
                                                     radius = 10
                                                     if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                         if self.orientation[w] != 3:
                                                             if not self.mirrored[w]:
-                                                                self.sender.rotateSurfaceTo270(w + 1)
+                                                                self.sender.rotateSurfaceTo270(self.PROJECTOR, w + 1)
                                                             else:
-                                                                self.sender.rotateSurfaceTo180(w + 1)
+                                                                self.sender.rotateSurfaceTo180(self.PROJECTOR, w + 1)
                                                             self.orientation[w] = 3
                                                         else:
                                                             if not self.mirrored[w]:
-                                                                self.sender.rotateSurfaceTo180(w + 1)
-                                                                self.sender.mirrorSurface(w + 1)
+                                                                self.sender.rotateSurfaceTo180(self.PROJECTOR, w + 1)
+                                                                self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                                 self.mirrored[w] = True
                                                             else:
-                                                                self.sender.rotateSurfaceTo270(w + 1)
-                                                                self.sender.mirrorSurface(w + 1)
+                                                                self.sender.rotateSurfaceTo270(self.PROJECTOR, w + 1)
+                                                                self.sender.mirrorSurface(self.PROJECTOR, w + 1)
                                                                 self.mirrored[w] = False
                                             else:
                                                 self.dontFlip[w] = False
                                             for x in range(0, len(self.centerPoints)):
-                                                point = self.sender.getCirclePosition(self.centerPoints[x])
+                                                point = self.sender.getCirclePosition(self.PROJECTOR, self.centerPoints[x])
                                                 radius = 10
                                                 if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                     self.controlCur = self.surfCur[x]
-                                                    self.sender.hideCursor(self.mainCur)
+                                                    self.sender.hideCursor(self.PROJECTOR, self.mainCur)
                                                     for y in range(0, 4):
                                                         try:
-                                                            self.sender.hideElement(self.centerPoints[y])
+                                                            self.sender.hideElement(self.PROJECTOR, self.centerPoints[y])
                                                         except KeyError, e:
                                                             pass
-                                                    self.sender.showElement(self.centSurfCirc[x])
-                                                    self.sender.setRectangleFillColor(self.real_width_rect[x],
+                                                    self.sender.showElement(self.PROJECTOR, self.centSurfCirc[x])
+                                                    self.sender.setRectangleFillColor(self.PROJECTOR, self.real_width_rect[x],
                                                                                       (1, 0, 0, 1))
-                                                    self.sender.setRectangleFillColor(self.real_height_rect[x],
+                                                    self.sender.setRectangleFillColor(self.PROJECTOR, self.real_height_rect[x],
                                                                                       (1, 0, 0, 1))
-                                                    self.sender.relocateCursor(self.surfCur[x], 512 / 2, 512 / 2, "pix",
+                                                    self.sender.relocateCursor(self.PROJECTOR, self.surfCur[x], 512 / 2, 512 / 2, "pix",
                                                                                self.warpedSurf[x])
-                                                    self.sender.showCursor(self.surfCur[x])
+                                                    self.sender.showCursor(self.PROJECTOR, self.surfCur[x])
                                                     self.surfaceControl = x
                             else:
-                                loc = self.sender.getCursorPosition(self.controlCur)
+                                loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                 x = self.surfaceControl
-                                point = self.sender.getCirclePosition(self.centSurfCirc[x])
+                                point = self.sender.getCirclePosition(self.PROJECTOR, self.centSurfCirc[x])
                                 radius = 25
                                 if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                     for y in range(0, 4):
                                         try:
-                                            self.sender.showElement(self.aspect_stretch_circles[x][y])
+                                            self.sender.showElement(self.PROJECTOR, self.aspect_stretch_circles[x][y])
                                         except KeyError, e:
                                             pass
-                                    self.sender.showElement(self.stretchRects[x])
-                                    self.sender.hideElement(self.centSurfCirc[x])
-                                    self.sender.hideElement(self.real_width_rect[x])
-                                    self.sender.hideElement(self.real_height_rect[x])
+                                    self.sender.showElement(self.PROJECTOR, self.stretchRects[x])
+                                    self.sender.hideElement(self.PROJECTOR, self.centSurfCirc[x])
+                                    self.sender.hideElement(self.PROJECTOR, self.real_width_rect[x])
+                                    self.sender.hideElement(self.PROJECTOR, self.real_height_rect[x])
                                     for z in range(0, 4):
-                                        self.sender.hideElement(self.real_width_counter[x][z])
-                                        self.sender.hideElement(self.real_height_counter[x][z])
-                                    self.sender.hideElement(self.real_width_unit[x])
-                                    self.sender.hideElement(self.real_height_unit[x])
+                                        self.sender.hideElement(self.PROJECTOR, self.real_width_counter[x][z])
+                                        self.sender.hideElement(self.PROJECTOR, self.real_height_counter[x][z])
+                                    self.sender.hideElement(self.PROJECTOR, self.real_width_unit[x])
+                                    self.sender.hideElement(self.PROJECTOR, self.real_height_unit[x])
 
                                     self.surfControlMode = "aspect"
                         if self.controlCur == self.mainCur:
@@ -763,12 +764,12 @@ class Client:
                                         self.update_mesh(int(self.dragSurf))
                         else:
                             if len(self.stretching) > 0:
-                                surface_width = self.sender.getSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]])
-                                surface_height = self.sender.getSurfacePixelHeight(
+                                surface_width = self.sender.getSurfacePixelWidth(self.PROJECTOR, self.warpedSurf[self.stretching[0][0]])
+                                surface_height = self.sender.getSurfacePixelHeight(self.PROJECTOR,
                                     self.warpedSurf[self.stretching[0][0]])
-                                rectangle_width = self.sender.getRectangleWidth(
+                                rectangle_width = self.sender.getRectangleWidth(self.PROJECTOR,
                                     self.stretchRects[self.stretching[0][0]])
-                                rectangle_height = self.sender.getRectangleHeight(
+                                rectangle_height = self.sender.getRectangleHeight(self.PROJECTOR,
                                     self.stretchRects[self.stretching[0][0]])
 
                                 percent_width_rectangle = rectangle_width / surface_width * 100
@@ -776,36 +777,36 @@ class Client:
                                 new_width = 150 / percent_width_rectangle * 100
                                 new_height = 150 / percent_height_rectangle * 100
 
-                                self.sender.setRectangleWidth(self.stretchRects[self.stretching[0][0]], 150, "pix")
-                                self.sender.setRectangleHeight(self.stretchRects[self.stretching[0][0]], 150, "pix")
-                                self.sender.setSurfacePixelWidth(self.warpedSurf[self.stretching[0][0]], int(new_width))
-                                self.sender.setSurfacePixelHeight(self.warpedSurf[self.stretching[0][0]],
+                                self.sender.setRectangleWidth(self.PROJECTOR, self.stretchRects[self.stretching[0][0]], 150, "pix")
+                                self.sender.setRectangleHeight(self.PROJECTOR, self.stretchRects[self.stretching[0][0]], 150, "pix")
+                                self.sender.setSurfacePixelWidth(self.PROJECTOR, self.warpedSurf[self.stretching[0][0]], int(new_width))
+                                self.sender.setSurfacePixelHeight(self.PROJECTOR, self.warpedSurf[self.stretching[0][0]],
                                                                   int(new_height))
-                                self.sender.relocateRectangle(self.stretchRects[self.stretching[0][0]],
+                                self.sender.relocateRectangle(self.PROJECTOR, self.stretchRects[self.stretching[0][0]],
                                                               new_width / 2 - 75, new_height / 2 + 75, "pix",
                                                               self.surfCanvases[
                                                                   self.warpedSurf[self.stretching[0][0]] - 1])
-                                self.sender.relocateCircle(self.aspect_stretch_circles[self.stretching[0][0]][0],
+                                self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][0],
                                                            new_width / 2,
                                                            new_height / 2 + 75, "pix",
                                                            self.surfCanvases[self.stretching[0][0]])
-                                self.sender.relocateCircle(self.aspect_stretch_circles[self.stretching[0][0]][1],
+                                self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][1],
                                                            new_width / 2,
                                                            new_height / 2 - 75, "pix",
                                                            self.surfCanvases[self.stretching[0][0]])
-                                self.sender.relocateCircle(self.aspect_stretch_circles[self.stretching[0][0]][2],
+                                self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][2],
                                                            new_width / 2 - 75, new_height / 2, "pix",
                                                            self.surfCanvases[self.stretching[0][0]])
-                                self.sender.relocateCircle(self.aspect_stretch_circles[self.stretching[0][0]][3],
+                                self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][3],
                                                            new_width / 2 + 75, new_height / 2, "pix",
                                                            self.surfCanvases[self.stretching[0][0]])
-                                self.sender.setCircleRadius(self.aspect_stretch_circles[self.stretching[0][0]][0],
+                                self.sender.setCircleRadius(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][0],
                                                             new_height * 20 / 512, "pix")
-                                self.sender.setCircleRadius(self.aspect_stretch_circles[self.stretching[0][0]][1],
+                                self.sender.setCircleRadius(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][1],
                                                             new_height * 20 / 512, "pix")
-                                self.sender.setCircleRadius(self.aspect_stretch_circles[self.stretching[0][0]][2],
+                                self.sender.setCircleRadius(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][2],
                                                             new_height * 20 / 512, "pix")
-                                self.sender.setCircleRadius(self.aspect_stretch_circles[self.stretching[0][0]][3],
+                                self.sender.setCircleRadius(self.PROJECTOR, self.aspect_stretch_circles[self.stretching[0][0]][3],
                                                             new_height * 20 / 512, "pix")
                             self.stretching = []
                     # Runs if the middle mouse button has been released
@@ -819,7 +820,7 @@ class Client:
                                 self.mouseLock = False
                                 pygame.mouse.set_visible(True)
                                 self.master.focus_force()
-                                self.sender.hideCursor(self.mainCur)
+                                self.sender.hideCursor(self.PROJECTOR, self.mainCur)
                         else:
                             if click_duration < 0.25:
                                 if self.surfControlMode == "meas":
@@ -828,28 +829,28 @@ class Client:
                                         if self.controlCur == self.surfCur[x]:
                                             current = x
                                     self.controlCur = self.mainCur
-                                    self.sender.showCursor(self.mainCur)
+                                    self.sender.showCursor(self.PROJECTOR, self.mainCur)
                                     for x in range(0, 4):
                                         try:
-                                            self.sender.showElement(self.centerPoints[x])
+                                            self.sender.showElement(self.PROJECTOR, self.centerPoints[x])
                                         except KeyError, e:
                                             pass
-                                    self.sender.hideElement(self.centSurfCirc[current])
-                                    self.sender.setRectangleFillColor(self.real_width_rect[current], (1, 1, 1, 1))
-                                    self.sender.setRectangleFillColor(self.real_height_rect[current], (1, 1, 1, 1))
-                                    self.sender.hideCursor(self.surfCur[current])
-                                    stringvaluetop = self.sender.getText(self.real_width_counter[current][0])
-                                    stringvaluetop += self.sender.getText(self.real_width_counter[current][1])
-                                    stringvaluetop += self.sender.getText(self.real_width_counter[current][2])
-                                    stringvaluetop += self.sender.getText(self.real_width_counter[current][3])
+                                    self.sender.hideElement(self.PROJECTOR, self.centSurfCirc[current])
+                                    self.sender.setRectangleFillColor(self.PROJECTOR, self.real_width_rect[current], (1, 1, 1, 1))
+                                    self.sender.setRectangleFillColor(self.PROJECTOR, self.real_height_rect[current], (1, 1, 1, 1))
+                                    self.sender.hideCursor(self.PROJECTOR, self.surfCur[current])
+                                    stringvaluetop = self.sender.getText(self.PROJECTOR, self.real_width_counter[current][0])
+                                    stringvaluetop += self.sender.getText(self.PROJECTOR, self.real_width_counter[current][1])
+                                    stringvaluetop += self.sender.getText(self.PROJECTOR, self.real_width_counter[current][2])
+                                    stringvaluetop += self.sender.getText(self.PROJECTOR, self.real_width_counter[current][3])
                                     valuetop = int(stringvaluetop)
-                                    stringvalueright = self.sender.getText(self.real_height_counter[current][0])
-                                    stringvalueright += self.sender.getText(self.real_height_counter[current][1])
-                                    stringvalueright += self.sender.getText(self.real_height_counter[current][2])
-                                    stringvalueright += self.sender.getText(self.real_height_counter[current][3])
+                                    stringvalueright = self.sender.getText(self.PROJECTOR, self.real_height_counter[current][0])
+                                    stringvalueright += self.sender.getText(self.PROJECTOR, self.real_height_counter[current][1])
+                                    stringvalueright += self.sender.getText(self.PROJECTOR, self.real_height_counter[current][2])
+                                    stringvalueright += self.sender.getText(self.PROJECTOR, self.real_height_counter[current][3])
                                     valueright = int(stringvalueright)
-                                    self.sender.setSurfaceRealWidth(self.warpedSurf[current], valuetop)
-                                    self.sender.setSurfaceRealHeight(self.warpedSurf[current], valueright)
+                                    self.sender.setSurfaceRealWidth(self.PROJECTOR, self.warpedSurf[current], valuetop)
+                                    self.sender.setSurfaceRealHeight(self.PROJECTOR, self.warpedSurf[current], valueright)
                                     # self.sender.hideElement(self.stretchRects[current])
                                 elif self.surfControlMode == "aspect":
                                     current = None
@@ -859,18 +860,18 @@ class Client:
                                     self.surfControlMode = "meas"
                                     for x in range(0, 4):
                                         try:
-                                            self.sender.hideElement(self.aspect_stretch_circles[current][x])
+                                            self.sender.hideElement(self.PROJECTOR, self.aspect_stretch_circles[current][x])
                                         except KeyError, e:
                                             pass
-                                    self.sender.hideElement(self.stretchRects[current])
-                                    self.sender.showElement(self.centSurfCirc[current])
-                                    self.sender.showElement(self.real_width_rect[current])
-                                    self.sender.showElement(self.real_height_rect[current])
+                                    self.sender.hideElement(self.PROJECTOR, self.stretchRects[current])
+                                    self.sender.showElement(self.PROJECTOR, self.centSurfCirc[current])
+                                    self.sender.showElement(self.PROJECTOR, self.real_width_rect[current])
+                                    self.sender.showElement(self.PROJECTOR, self.real_height_rect[current])
                                     for z in range(0, 4):
-                                        self.sender.showElement(self.real_width_counter[current][z])
-                                        self.sender.showElement(self.real_height_counter[current][z])
-                                    self.sender.showElement(self.real_width_unit[current])
-                                    self.sender.showElement(self.real_height_unit[current])
+                                        self.sender.showElement(self.PROJECTOR, self.real_width_counter[current][z])
+                                        self.sender.showElement(self.PROJECTOR, self.real_height_counter[current][z])
+                                    self.sender.showElement(self.PROJECTOR, self.real_width_unit[current])
+                                    self.sender.showElement(self.PROJECTOR, self.real_height_unit[current])
                     # Runs if the right mouse button has been released
                     if event.button == 3:
                         right_click_release_time = datetime.datetime.now()
@@ -883,11 +884,11 @@ class Client:
                             if click_duration < 0.25:
                                 # Runs if the default cursor mode is active
                                 if self.cursorMode == "default":
-                                    loc = self.sender.getCursorPosition(self.controlCur)
+                                    loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                                     # If a waypoint has been clicked, the number of waypoints on the side is halved
                                     for w in range(0, len(self.topCircles)):
                                         for x in range(1, len(self.topCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.topCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 hit = True
@@ -897,7 +898,7 @@ class Client:
                                             self.reduce_side(self.topCircles[w], "top", w)
                                             self.update_mesh(w)
                                         for x in range(1, len(self.bottomCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.bottomCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 hit = True
@@ -907,7 +908,7 @@ class Client:
                                             self.reduce_side(self.bottomCircles[w], "bottom", w)
                                             self.update_mesh(w)
                                         for x in range(1, len(self.leftCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.leftCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.leftCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 hit = True
@@ -917,7 +918,7 @@ class Client:
                                             self.reduce_side(self.leftCircles[w], "left", w)
                                             self.update_mesh(w)
                                         for x in range(1, len(self.rightCircles[w]) - 1):
-                                            point = self.sender.getCirclePosition(self.rightCircles[w][x])
+                                            point = self.sender.getCirclePosition(self.PROJECTOR, self.rightCircles[w][x])
                                             radius = 7
                                             if self.is_hit((point[0], point[1]), (loc[0], loc[1]), radius):
                                                 hit = True
@@ -929,9 +930,9 @@ class Client:
                             drop_location = None
                             # The temporary connection line is deleted after its current end point is recorded
                             if len(self.symbolicDrag) > 0:
-                                drop_location = self.sender.getCirclePosition(self.symbolicDrag[1])
-                                self.sender.removeElement(self.symbolicDrag[0], 1)
-                                self.sender.removeElement(self.symbolicDrag[1], 1)
+                                drop_location = self.sender.getCirclePosition(self.PROJECTOR, self.symbolicDrag[1])
+                                self.sender.removeElement(self.PROJECTOR, self.symbolicDrag[0], 1)
+                                self.sender.removeElement(self.PROJECTOR, self.symbolicDrag[1], 1)
                             # The list of items that were being dragged is scanned
                             for rDragInd in range(0, len(self.rightDragging)):
                                 temp = self.rightDragging[rDragInd]
@@ -940,24 +941,24 @@ class Client:
                                 # If the dragged point was released over another point a connection line is created
                                 for w in range(0, len(self.topCircles)):
                                     if w != surface:
-                                        point = self.sender.getCirclePosition(self.topCircles[w][0])
+                                        point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[w][0])
                                         radius = 10
                                         if self.is_hit((point[0], point[1]), (drop_location[0], drop_location[1]),
                                                        radius):
                                             self.create_connection_line((surface, corner), (w, "tl"), False)
                                         end = len(self.topCircles[w]) - 1
-                                        point = self.sender.getCirclePosition(self.topCircles[w][end])
+                                        point = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[w][end])
                                         radius = 10
                                         if self.is_hit((point[0], point[1]), (drop_location[0], drop_location[1]),
                                                        radius):
                                             self.create_connection_line((surface, corner), (w, "tr"), False)
-                                        point = self.sender.getCirclePosition(self.bottomCircles[w][0])
+                                        point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[w][0])
                                         radius = 10
                                         if self.is_hit((point[0], point[1]), (drop_location[0], drop_location[1]),
                                                        radius):
                                             self.create_connection_line((surface, corner), (w, "br"), False)
                                         end = len(self.bottomCircles[w]) - 1
-                                        point = self.sender.getCirclePosition(self.bottomCircles[w][end])
+                                        point = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[w][end])
                                         radius = 10
                                         if self.is_hit((point[0], point[1]), (drop_location[0], drop_location[1]),
                                                        radius):
@@ -970,10 +971,10 @@ class Client:
                                 if self.cursorMode == "default":
                                     # Switches to wall defining mode and begins definition if there are less than 4 walls, otherwise switches to screen defining mode
                                     if self.surface_count < 4:
-                                        self.sender.setCursorWallMode(self.mainCur)
+                                        self.sender.setCursorWallMode(self.PROJECTOR, self.mainCur)
                                         self.cursorMode = "wall"
                                         self.define_surface()
-                                        if self.sender.getCursorMode(self.mainCur) == "wall":
+                                        if self.sender.getCursorMode(self.PROJECTOR, self.mainCur) == "wall":
                                             self.split_side(self.topCircles[self.surface_count - 1], "top",
                                                             self.surface_count - 1)
                                             self.split_side(self.bottomCircles[self.surface_count - 1], "bottom",
@@ -982,22 +983,22 @@ class Client:
                                                             self.surface_count - 1)
                                             self.split_side(self.rightCircles[self.surface_count - 1], "right",
                                                             self.surface_count - 1)
-                                            self.sender.setCursorDefaultMode(1)
+                                            self.sender.setCursorDefaultMode(self.PROJECTOR, 1)
                                             self.cursorMode = "default"
                                     else:
-                                        self.sender.setCursorScreenMode(self.mainCur)
+                                        self.sender.setCursorScreenMode(self.PROJECTOR, self.mainCur)
                                         self.cursorMode = "screen"
                                 # Runs if the wall defining cursor mode is active and switches to the screen defining mode
                                 elif self.cursorMode == "wall":
-                                    self.sender.setCursorScreenMode(self.mainCur)
+                                    self.sender.setCursorScreenMode(self.PROJECTOR, self.mainCur)
                                     self.cursorMode = "screen"
                                 # Runs if the screen defining cursor mode is active and switches to the blocked area defining mode
                                 elif self.cursorMode == "screen":
-                                    self.sender.setCursorBlockMode(self.mainCur)
+                                    self.sender.setCursorBlockMode(self.PROJECTOR, self.mainCur)
                                     self.cursorMode = "block"
                                 # Runs if the blocked area defining cursor mode is active and switches to the default defining mode
                                 elif self.cursorMode == "block":
-                                    self.sender.setCursorDefaultMode(self.mainCur)
+                                    self.sender.setCursorDefaultMode(self.PROJECTOR, self.mainCur)
                                     self.cursorMode = "default"
         return None
 
@@ -1012,124 +1013,124 @@ class Client:
                 if not (xdist == 0 and ydist == 0):
                     pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])
 
-                    self.sender.shiftCursor(self.controlCur, -xdist, ydist)
+                    self.sender.shiftCursor(self.PROJECTOR, self.controlCur, -xdist, ydist)
 
-                    loc = self.sender.getCursorPosition(self.controlCur)
+                    loc = self.sender.getCursorPosition(self.PROJECTOR, self.controlCur)
                     if len(self.dragging) != 0:
                         for x in range(0, len(self.dragging)):
-                            self.sender.relocateCircle(self.dragging[x], float(loc[0]), float(loc[1]), "pix", 1)
+                            self.sender.relocateCircle(self.PROJECTOR, self.dragging[x], float(loc[0]), float(loc[1]), "pix", 1)
                             for y in range(0, len(self.bezierUpdates)):
                                 try:
                                     if self.topCircles[y].__contains__(self.dragging[x]):
                                         self.bezierUpdates[y][0] = True
                                         if self.cornerdrag:
-                                            tlcoor = self.sender.getCirclePosition(self.topCircles[y][0])
-                                            trcoor = self.sender.getCirclePosition(
+                                            tlcoor = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[y][0])
+                                            trcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.topCircles[y][len(self.topCircles[y]) - 1])
-                                            brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
-                                            blcoor = self.sender.getCirclePosition(
+                                            brcoor = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[y][0])
+                                            blcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.bottomCircles[y][len(self.bottomCircles[y]) - 1])
                                             center = self.line_intersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1],
                                                                             trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-                                            self.sender.relocateCircle(self.centerPoints[y], center[0], center[1],
+                                            self.sender.relocateCircle(self.PROJECTOR, self.centerPoints[y], center[0], center[1],
                                                                        "pix", 1)
                                     if self.bottomCircles[y].__contains__(self.dragging[x]):
                                         self.bezierUpdates[y][1] = True
                                         if self.cornerdrag:
-                                            tlcoor = self.sender.getCirclePosition(self.topCircles[y][0])
-                                            trcoor = self.sender.getCirclePosition(
+                                            tlcoor = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[y][0])
+                                            trcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.topCircles[y][len(self.topCircles[y]) - 1])
-                                            brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
-                                            blcoor = self.sender.getCirclePosition(
+                                            brcoor = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[y][0])
+                                            blcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.bottomCircles[y][len(self.bottomCircles[y]) - 1])
                                             center = self.line_intersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1],
                                                                             trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-                                            self.sender.relocateCircle(self.centerPoints[y], center[0], center[1],
+                                            self.sender.relocateCircle(self.PROJECTOR, self.centerPoints[y], center[0], center[1],
                                                                        "pix", 1)
                                     if self.leftCircles[y].__contains__(self.dragging[x]):
                                         self.bezierUpdates[y][2] = True
                                         if self.cornerdrag:
-                                            tlcoor = self.sender.getCirclePosition(self.topCircles[y][0])
-                                            trcoor = self.sender.getCirclePosition(
+                                            tlcoor = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[y][0])
+                                            trcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.topCircles[y][len(self.topCircles[y]) - 1])
-                                            brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
-                                            blcoor = self.sender.getCirclePosition(
+                                            brcoor = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[y][0])
+                                            blcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.bottomCircles[y][len(self.bottomCircles[y]) - 1])
                                             center = self.line_intersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1],
                                                                             trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-                                            self.sender.relocateCircle(self.centerPoints[y], center[0], center[1],
+                                            self.sender.relocateCircle(self.PROJECTOR, self.centerPoints[y], center[0], center[1],
                                                                        "pix", 1)
                                     if self.rightCircles[y].__contains__(self.dragging[x]):
                                         self.bezierUpdates[y][3] = True
                                         if self.cornerdrag:
-                                            tlcoor = self.sender.getCirclePosition(self.topCircles[y][0])
-                                            trcoor = self.sender.getCirclePosition(
+                                            tlcoor = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[y][0])
+                                            trcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.topCircles[y][len(self.topCircles[y]) - 1])
-                                            brcoor = self.sender.getCirclePosition(self.bottomCircles[y][0])
-                                            blcoor = self.sender.getCirclePosition(
+                                            brcoor = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[y][0])
+                                            blcoor = self.sender.getCirclePosition(self.PROJECTOR,
                                                 self.bottomCircles[y][len(self.bottomCircles[y]) - 1])
                                             center = self.line_intersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1],
                                                                             trcoor[0], trcoor[1], blcoor[0], blcoor[1])
-                                            self.sender.relocateCircle(self.centerPoints[y], center[0], center[1],
+                                            self.sender.relocateCircle(self.PROJECTOR, self.centerPoints[y], center[0], center[1],
                                                                        "pix", 1)
                                 except:
                                     pass
                     if len(self.rightDragging) != 0:
                         try:
-                            self.sender.relocateCircle(self.symbolicDrag[1], float(loc[0]), float(loc[1]), "pix", 1)
-                            self.sender.setLineEnd(self.symbolicDrag[0], float(loc[0]), float(loc[1]))
+                            self.sender.relocateCircle(self.PROJECTOR, self.symbolicDrag[1], float(loc[0]), float(loc[1]), "pix", 1)
+                            self.sender.setLineEnd(self.PROJECTOR, 1, self.symbolicDrag[0], float(loc[0]), float(loc[1]))
                         except:
                             pass
                     if len(self.stretching) != 0:
                         for x in self.stretching:
-                            origpos = self.sender.getCirclePosition(self.aspect_stretch_circles[x[0]][x[1]])
-                            wid = self.sender.getSurfacePixelWidth(self.warpedSurf[x[0]])
-                            hei = self.sender.getSurfacePixelHeight(self.warpedSurf[x[0]])
+                            origpos = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[x[0]][x[1]])
+                            wid = self.sender.getSurfacePixelWidth(self.PROJECTOR, self.warpedSurf[x[0]])
+                            hei = self.sender.getSurfacePixelHeight(self.PROJECTOR, self.warpedSurf[x[0]])
                             if x[1] < 2:
                                 if x[1] == 0 and loc[1] > hei / 2 or x[1] == 1 and loc[1] < hei / 2:
-                                    self.sender.relocateCircle(self.aspect_stretch_circles[x[0]][x[1]],
+                                    self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[x[0]][x[1]],
                                                                float(origpos[0]),
                                                                float(loc[1]), "pix", self.surfCanvases[x[0]])
                                     hdifference = loc[1] - origpos[1]
                                     if x[1] == 0:
-                                        origpos2 = self.sender.getCirclePosition(self.aspect_stretch_circles[x[0]][1])
-                                        self.sender.relocateCircle(self.aspect_stretch_circles[x[0]][1],
+                                        origpos2 = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[x[0]][1])
+                                        self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[x[0]][1],
                                                                    float(origpos[0]),
                                                                    float(origpos2[1]) - hdifference, "pix",
                                                                    self.surfCanvases[x[0]])
                                     else:
-                                        origpos2 = self.sender.getCirclePosition(self.aspect_stretch_circles[x[0]][0])
-                                        self.sender.relocateCircle(self.aspect_stretch_circles[x[0]][0],
+                                        origpos2 = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[x[0]][0])
+                                        self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[x[0]][0],
                                                                    float(origpos[0]),
                                                                    float(origpos2[1]) - hdifference, "pix",
                                                                    self.surfCanvases[x[0]])
                             else:
                                 if x[1] == 2 and loc[0] < wid / 2 or x[1] == 3 and loc[0] > wid / 2:
-                                    self.sender.relocateCircle(self.aspect_stretch_circles[x[0]][x[1]], float(loc[0]),
+                                    self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[x[0]][x[1]], float(loc[0]),
                                                                float(origpos[1]), "pix", self.surfCanvases[x[0]])
                                     vdifference = loc[0] - origpos[0]
                                     if x[1] == 2:
-                                        origpos2 = self.sender.getCirclePosition(self.aspect_stretch_circles[x[0]][3])
-                                        self.sender.relocateCircle(self.aspect_stretch_circles[x[0]][3],
+                                        origpos2 = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[x[0]][3])
+                                        self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[x[0]][3],
                                                                    float(origpos2[0]) - vdifference, float(origpos[1]),
                                                                    "pix", self.surfCanvases[x[0]])
                                     else:
-                                        origpos2 = self.sender.getCirclePosition(self.aspect_stretch_circles[x[0]][2])
-                                        self.sender.relocateCircle(self.aspect_stretch_circles[x[0]][2],
+                                        origpos2 = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[x[0]][2])
+                                        self.sender.relocateCircle(self.PROJECTOR, self.aspect_stretch_circles[x[0]][2],
                                                                    float(origpos2[0]) - vdifference, float(origpos[1]),
                                                                    "pix", self.surfCanvases[x[0]])
                             self.update_rectangle(x[0])
 
     def update_rectangle(self, surface_rectangle_number):
-        top = self.sender.getCirclePosition(self.aspect_stretch_circles[surface_rectangle_number][0])[1]
-        bottom = self.sender.getCirclePosition(self.aspect_stretch_circles[surface_rectangle_number][1])[1]
-        left = self.sender.getCirclePosition(self.aspect_stretch_circles[surface_rectangle_number][2])[0]
-        right = self.sender.getCirclePosition(self.aspect_stretch_circles[surface_rectangle_number][3])[0]
+        top = self.sender.getCirclePosition(self.PROJECTORself.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][0])[1]
+        bottom = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][1])[1]
+        left = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][2])[0]
+        right = self.sender.getCirclePosition(self.PROJECTOR, self.aspect_stretch_circles[surface_rectangle_number][3])[0]
         height = abs(top - bottom)
         width = abs(left - right)
-        self.sender.setRectangleHeight(self.stretchRects[surface_rectangle_number], height, "pix")
-        self.sender.setRectangleWidth(self.stretchRects[surface_rectangle_number], width, "pix")
-        self.sender.relocateRectangle(self.stretchRects[surface_rectangle_number], left, top, "pix",
+        self.sender.setRectangleHeight(self.PROJECTOR, self.stretchRects[surface_rectangle_number], height, "pix")
+        self.sender.setRectangleWidth(self.PROJECTOR, self.stretchRects[surface_rectangle_number], width, "pix")
+        self.sender.relocateRectangle(self.PROJECTOR, self.stretchRects[surface_rectangle_number], left, top, "pix",
                                       self.surfCanvases[surface_rectangle_number])
 
     # Defines all required surfaces according to a layout data structure
@@ -1147,81 +1148,81 @@ class Client:
             y = 0
             for z in range(0, len(layout[x][y])):
                 if z == 0:
-                    self.topbz[self.surface_count] = self.sender.newLineStrip(1, layout[x][y][z][0],
+                    self.topbz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, layout[x][y][z][0],
                                                                               layout[x][y][z][1], "pix",
                                                                               (0, 0.75, 0, 1), 5)
                 else:
-                    self.sender.addLineStripPoint(self.topbz[self.surface_count], layout[x][y][z][0],
+                    self.sender.addLineStripPoint(self.PROJECTOR, self.topbz[self.surface_count], layout[x][y][z][0],
                                                   layout[x][y][z][1], "pix")
                 ele = None
                 if (z == 0) or (z == (len(layout[x][y]) - 1)):
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
                                                 (1, 1, 0, 1), 10)
                 else:
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
                                                 (0, 1, 0, 1), 10)
                 self.topCircles[self.surface_count].append(ele)
             y = 1
             for z in list(reversed(range(0, len(layout[x][y])))):
                 if z == len(layout[x][y]) - 1:
-                    self.bottombz[self.surface_count] = self.sender.newLineStrip(1, layout[x][y][z][0],
+                    self.bottombz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, layout[x][y][z][0],
                                                                                  layout[x][y][z][1], "pix",
                                                                                  (0, 0.75, 0, 1), 5)
                 else:
-                    self.sender.addLineStripPoint(self.bottombz[self.surface_count], layout[x][y][z][0],
+                    self.sender.addLineStripPoint(self.PROJECTOR, self.bottombz[self.surface_count], layout[x][y][z][0],
                                                   layout[x][y][z][1], "pix")
                 ele = None
                 if (z == 0) or (z == (len(layout[x][y]) - 1)):
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
                                                 (1, 1, 0, 1), 10)
                 else:
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
                                                 (0, 1, 0, 1), 10)
                 self.bottomCircles[self.surface_count].append(ele)
             y = 2
             for z in range(0, len(layout[x][y])):
                 if z == 0:
-                    self.leftbz[self.surface_count] = self.sender.newLineStrip(1, layout[x][y][z][0],
+                    self.leftbz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, layout[x][y][z][0],
                                                                                layout[x][y][z][1], "pix",
                                                                                (0, 0.75, 0, 1), 5)
                 else:
-                    self.sender.addLineStripPoint(self.leftbz[self.surface_count], layout[x][y][z][0],
+                    self.sender.addLineStripPoint(self.PROJECTOR, self.leftbz[self.surface_count], layout[x][y][z][0],
                                                   layout[x][y][z][1], "pix")
                 ele = None
                 if (z == 0) or (z == (len(layout[x][y]) - 1)):
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
                                                 (1, 1, 0, 1), 10)
                 else:
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
                                                 (0, 1, 0, 1), 10)
                 self.leftCircles[self.surface_count].append(ele)
             y = 3
             for z in list(reversed(range(0, len(layout[x][y])))):
                 if z == len(layout[x][y]) - 1:
-                    self.rightbz[self.surface_count] = self.sender.newLineStrip(1, layout[x][y][z][0],
+                    self.rightbz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, layout[x][y][z][0],
                                                                                 layout[x][y][z][1], "pix",
                                                                                 (0, 0.75, 0, 1), 5)
                 else:
-                    self.sender.addLineStripPoint(self.rightbz[self.surface_count], layout[x][y][z][0],
+                    self.sender.addLineStripPoint(self.PROJECTOR, self.rightbz[self.surface_count], layout[x][y][z][0],
                                                   layout[x][y][z][1], "pix")
                 ele = None
                 if (z == 0) or (z == (len(layout[x][y]) - 1)):
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 10, "pix", (1, 0, 0, 0), 1,
                                                 (1, 1, 0, 1), 10)
                 else:
-                    ele = self.sender.newCircle(1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
+                    ele = self.sender.newCircle(self.PROJECTOR, 1, layout[x][y][z][0], layout[x][y][z][1], 7, "pix", (1, 0, 0, 0), 1,
                                                 (0, 1, 0, 1), 10)
                 self.rightCircles[self.surface_count].append(ele)
             self.bezierUpdates[self.surface_count] = [True, True, True, True]
-            tlcoor = self.sender.getCirclePosition(self.topCircles[self.surface_count][0])
-            trcoor = self.sender.getCirclePosition(
+            tlcoor = self.sender.getCirclePosition(self.PROJECTOR, self.topCircles[self.surface_count][0])
+            trcoor = self.sender.getCirclePosition(self.PROJECTOR,
                 self.topCircles[self.surface_count][len(self.topCircles[self.surface_count]) - 1])
-            brcoor = self.sender.getCirclePosition(self.bottomCircles[self.surface_count][0])
-            blcoor = self.sender.getCirclePosition(
+            brcoor = self.sender.getCirclePosition(self.PROJECTOR, self.bottomCircles[self.surface_count][0])
+            blcoor = self.sender.getCirclePosition(self.PROJECTOR,
                 self.bottomCircles[self.surface_count][len(self.bottomCircles[self.surface_count]) - 1])
             center = self.line_intersection(tlcoor[0], tlcoor[1], brcoor[0], brcoor[1], trcoor[0], trcoor[1], blcoor[0],
                                             blcoor[1])
-            self.centerPoints[self.surface_count] = self.sender.newCircle(1, center[0], center[1], 10, "pix",
+            self.centerPoints[self.surface_count] = self.sender.newCircle(self.PROJECTOR, 1, center[0], center[1], 10, "pix",
                                                                           (0, 0, 0, 0), 1, (1, 0, 1, 1), 10)
             self.surface_count += 1
             self.dontFlip[self.surface_count - 1] = True
@@ -1252,7 +1253,7 @@ class Client:
             pygame.display.flip()
         if not self.quit and self.cursorMode == "wall":
             self.topCircles[self.surface_count].append(tl[1])
-            self.topbz[self.surface_count] = self.sender.newLineStrip(1, tl[0][0], tl[0][1], "pix", (0, 0.75, 0, 1), 5)
+            self.topbz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, tl[0][0], tl[0][1], "pix", (0, 0.75, 0, 1), 5)
             self.hideable.append(self.topbz[self.surface_count])
 
         while not self.quit and tr is None and self.cursorMode == "wall":
@@ -1266,9 +1267,9 @@ class Client:
             pygame.display.flip()
         if not self.quit and self.cursorMode == "wall":
             self.topCircles[self.surface_count].append(tr[1])
-            self.sender.addLineStripPoint(self.topbz[self.surface_count], tr[0][0], tr[0][1], "pix")
+            self.sender.addLineStripPoint(self.PROJECTOR, self.topbz[self.surface_count], tr[0][0], tr[0][1], "pix")
             self.rightCircles[self.surface_count].append(tr[1])
-            self.rightbz[self.surface_count] = self.sender.newLineStrip(1, tr[0][0], tr[0][1], "pix", (0, 0.75, 0, 1),
+            self.rightbz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, tr[0][0], tr[0][1], "pix", (0, 0.75, 0, 1),
                                                                         5)
             self.hideable.append(self.rightbz[self.surface_count])
 
@@ -1283,9 +1284,9 @@ class Client:
             pygame.display.flip()
         if not self.quit and self.cursorMode == "wall":
             self.rightCircles[self.surface_count].append(br[1])
-            self.sender.addLineStripPoint(self.rightbz[self.surface_count], br[0][0], br[0][1], "pix")
+            self.sender.addLineStripPoint(self.PROJECTOR, self.rightbz[self.surface_count], br[0][0], br[0][1], "pix")
             self.bottomCircles[self.surface_count].append(br[1])
-            self.bottombz[self.surface_count] = self.sender.newLineStrip(1, br[0][0], br[0][1], "pix", (0, 0.75, 0, 1),
+            self.bottombz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, br[0][0], br[0][1], "pix", (0, 0.75, 0, 1),
                                                                          5)
             self.hideable.append(self.bottombz[self.surface_count])
 
@@ -1300,16 +1301,16 @@ class Client:
             pygame.display.flip()
         if not self.quit and self.cursorMode == "wall":
             self.bottomCircles[self.surface_count].append(bl[1])
-            self.sender.addLineStripPoint(self.bottombz[self.surface_count], bl[0][0], bl[0][1], "pix")
+            self.sender.addLineStripPoint(self.PROJECTOR, self.bottombz[self.surface_count], bl[0][0], bl[0][1], "pix")
             self.leftCircles[self.surface_count].append(bl[1])
-            self.leftbz[self.surface_count] = self.sender.newLineStrip(1, bl[0][0], bl[0][1], "pix", (0, 0.75, 0, 1),
+            self.leftbz[self.surface_count] = self.sender.newLineStrip(self.PROJECTOR, 1, bl[0][0], bl[0][1], "pix", (0, 0.75, 0, 1),
                                                                        5)
             self.hideable.append(self.leftbz[self.surface_count])
             self.leftCircles[self.surface_count].append(tl[1])
-            self.sender.addLineStripPoint(self.leftbz[self.surface_count], tl[0][0], tl[0][1], "pix")
+            self.sender.addLineStripPoint(self.PROJECTOR, self.leftbz[self.surface_count], tl[0][0], tl[0][1], "pix")
             center = self.line_intersection(tl[0][0], tl[0][1], br[0][0], br[0][1], tr[0][0], tr[0][1], bl[0][0],
                                             bl[0][1])
-            self.centerPoints[self.surface_count] = self.sender.newCircle(1, center[0], center[1], 10, "pix",
+            self.centerPoints[self.surface_count] = self.sender.newCircle(self.PROJECTOR, 1, center[0], center[1], 10, "pix",
                                                                           (0, 0, 0, 0), 1, (1, 0, 1, 1), 10)
             self.surface_count += 1
             self.dontFlip[self.surface_count - 1] = True
@@ -1317,36 +1318,36 @@ class Client:
             self.orientation.pop(self.surface_count)
             self.mirrored.pop(self.surface_count)
             try:
-                self.sender.removeElement(self.topbz[self.surface_count], 1)
+                self.sender.removeElement(self.PROJECTOR, self.topbz[self.surface_count], 1)
                 self.topbz.pop(self.surface_count)
             except:
                 pass
             try:
-                self.sender.removeElement(self.bottombz[self.surface_count], 1)
+                self.sender.removeElement(self.PROJECTOR, self.bottombz[self.surface_count], 1)
                 self.bottombz.pop(self.surface_count)
             except:
                 pass
             try:
-                self.sender.removeElement(self.leftbz[self.surface_count], 1)
+                self.sender.removeElement(self.PROJECTOR, self.leftbz[self.surface_count], 1)
                 self.leftbz.pop(self.surface_count)
             except:
                 pass
             try:
-                self.sender.removeElement(self.rightbz[self.surface_count], 1)
+                self.sender.removeElement(self.PROJECTOR, self.rightbz[self.surface_count], 1)
                 self.rightbz.pop(self.surface_count)
             except:
                 pass
             for x in range(0, len(self.topCircles[self.surface_count])):
-                self.sender.removeElement(self.topCircles[self.surface_count][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.topCircles[self.surface_count][x], 1)
             self.topCircles.pop(self.surface_count)
             for x in range(0, len(self.bottomCircles[self.surface_count])):
-                self.sender.removeElement(self.bottomCircles[self.surface_count][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.bottomCircles[self.surface_count][x], 1)
             self.bottomCircles.pop(self.surface_count)
             for x in range(0, len(self.leftCircles[self.surface_count])):
-                self.sender.removeElement(self.leftCircles[self.surface_count][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.leftCircles[self.surface_count][x], 1)
             self.leftCircles.pop(self.surface_count)
             for x in range(0, len(self.rightCircles[self.surface_count])):
-                self.sender.removeElement(self.rightCircles[self.surface_count][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.rightCircles[self.surface_count][x], 1)
             self.rightCircles.pop(self.surface_count)
             self.bezierUpdates.pop(self.surface_count)
 
@@ -1372,8 +1373,8 @@ class Client:
             while len(heistring) < 4:
                 heistring = "0" + heistring
             for y in range(0, 4):
-                self.sender.setText(self.real_width_counter[x][y], widstring[y])
-                self.sender.setText(self.real_height_counter[x][y], heistring[y])
+                self.sender.setText(self.PROJECTOR, self.real_width_counter[x][y], widstring[y])
+                self.sender.setText(self.PROJECTOR, self.real_height_counter[x][y], heistring[y])
 
     # topCounter
     # rightCounter
@@ -1382,28 +1383,28 @@ class Client:
         if not self.quit:
             for z in self.topCircles:
                 for x in range(0, len(self.topCircles[z])):
-                    self.sender.removeElement(self.topCircles[z][x], 1)
+                    self.sender.removeElement(self.PROJECTOR, self.topCircles[z][x], 1)
             for z in self.bottomCircles:
                 for x in range(0, len(self.bottomCircles[z])):
-                    self.sender.removeElement(self.bottomCircles[z][x], 1)
+                    self.sender.removeElement(self.PROJECTOR, self.bottomCircles[z][x], 1)
             for z in self.leftCircles:
                 for x in range(0, len(self.leftCircles[z])):
-                    self.sender.removeElement(self.leftCircles[z][x], 1)
+                    self.sender.removeElement(self.PROJECTOR, self.leftCircles[z][x], 1)
             for z in self.rightCircles:
                 for x in range(0, len(self.rightCircles[z])):
-                    self.sender.removeElement(self.rightCircles[z][x], 1)
+                    self.sender.removeElement(self.PROJECTOR, self.rightCircles[z][x], 1)
             for x in self.topbz:
-                self.sender.removeElement(self.topbz[x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.topbz[x], 1)
             for x in self.bottombz:
-                self.sender.removeElement(self.bottombz[x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.bottombz[x], 1)
             for x in self.leftbz:
-                self.sender.removeElement(self.leftbz[x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.leftbz[x], 1)
             for x in self.rightbz:
-                self.sender.removeElement(self.rightbz[x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.rightbz[x], 1)
             for x in range(0, len(self.centerPoints)):
-                self.sender.removeElement(self.centerPoints[x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.centerPoints[x], 1)
             for x in range(0, len(self.warpedSurf)):
-                self.sender.clearSurface(self.warpedSurf[x])
+                self.sender.clearSurface(self.PROJECTOR, self.warpedSurf[x])
 
             self.sender.quitClientOnly()
             time.sleep(0.1)
@@ -1424,7 +1425,7 @@ class Client:
     def lock_mouse(self):
         self.mouseLock = True
         pygame.mouse.set_visible(False)
-        self.sender.showCursor(self.mainCur)
+        self.sender.showCursor(self.PROJECTOR, self.mainCur)
 
     # Requests for the existing layout to be saved to a file
     def save_layout(self):
@@ -1438,8 +1439,8 @@ class Client:
                 confirm = tkMessageBox.askyesno("Overwrite",
                                                 "Overwrite existing \"" + self.saveName.get() + "\" layout?")
             if not hit or confirm:
-                self.sender.saveDefinedSurfaces(self.saveName.get())
-                self.layouts = self.sender.getSavedLayouts()
+                self.sender.saveDefinedSurfaces(self.PROJECTOR, self.saveName.get())
+                self.layouts = self.sender.getSavedLayouts(self.PROJECTOR)
                 self.loadList.delete(0, END)
                 for x in range(0, len(self.layouts)):
                     self.loadList.insert(END, self.layouts[x])
@@ -1450,7 +1451,7 @@ class Client:
     def load_layout(self):
         if len(self.loadList.curselection()) > 0:
             self.clear_visible_layout()
-            count = self.sender.loadDefinedSurfaces(self.loadList.selection_get())
+            count = self.sender.loadDefinedSurfaces(self.PROJECTOR, self.loadList.selection_get())
             self.redefine_surface(count[1])
             self.visualize_connections(count[2])
             self.load_real_measurements(count[3])
@@ -1473,7 +1474,7 @@ class Client:
 
     # Refreshes the layout list by querying the server for an updated list
     def refresh_layouts_button_handler(self):
-        self.layouts = self.sender.getSavedLayouts()
+        self.layouts = self.sender.getSavedLayouts(self.PROJECTOR)
         self.loadList.delete(0, END)
         for x in range(0, len(self.layouts)):
             self.loadList.insert(END, self.layouts[x])
@@ -1482,8 +1483,8 @@ class Client:
     def delete_layout_button_handler(self):
         if len(self.loadList.curselection()) > 0:
             if self.loadList.selection_get() != "DEFAULT":
-                self.sender.deleteLayout(self.loadList.selection_get())
-                self.layouts = self.sender.getSavedLayouts()
+                self.sender.deleteLayout(self.PROJECTOR, self.loadList.selection_get())
+                self.layouts = self.sender.getSavedLayouts(self.PROJECTOR)
                 self.loadList.delete(0, END)
                 for x in range(0, len(self.layouts)):
                     self.loadList.insert(END, self.layouts[x])
@@ -1495,37 +1496,37 @@ class Client:
     # Clear the currently defined layout on both the client and server side
     def clear_visible_layout(self):
         time.sleep(3)
-        self.sender.undefineSurface(self.warpedSurf[0])
-        self.sender.undefineSurface(self.warpedSurf[1])
-        self.sender.undefineSurface(self.warpedSurf[2])
-        self.sender.undefineSurface(self.warpedSurf[3])
+        self.sender.undefineSurface(self.PROJECTOR, self.warpedSurf[0])
+        self.sender.undefineSurface(self.PROJECTOR, self.warpedSurf[1])
+        self.sender.undefineSurface(self.PROJECTOR, self.warpedSurf[2])
+        self.sender.undefineSurface(self.PROJECTOR, self.warpedSurf[3])
         for z in self.topCircles:
             for x in range(0, len(self.topCircles[z])):
-                self.sender.removeElement(self.topCircles[z][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.topCircles[z][x], 1)
         self.topCircles = {}
         for z in self.bottomCircles:
             for x in range(0, len(self.bottomCircles[z])):
-                self.sender.removeElement(self.bottomCircles[z][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.bottomCircles[z][x], 1)
         self.bottomCircles = {}
         for z in self.leftCircles:
             for x in range(0, len(self.leftCircles[z])):
-                self.sender.removeElement(self.leftCircles[z][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.leftCircles[z][x], 1)
         self.leftCircles = {}
         for z in self.rightCircles:
             for x in range(0, len(self.rightCircles[z])):
-                self.sender.removeElement(self.rightCircles[z][x], 1)
+                self.sender.removeElement(self.PROJECTOR, self.rightCircles[z][x], 1)
         self.rightCircles = {}
         for x in self.topbz:
-            self.sender.removeElement(self.topbz[x], 1)
+            self.sender.removeElement(self.PROJECTOR, self.topbz[x], 1)
         self.topbz = {}
         for x in self.bottombz:
-            self.sender.removeElement(self.bottombz[x], 1)
+            self.sender.removeElement(self.PROJECTOR, self.bottombz[x], 1)
         self.bottombz = {}
         for x in self.leftbz:
-            self.sender.removeElement(self.leftbz[x], 1)
+            self.sender.removeElement(self.PROJECTOR, self.leftbz[x], 1)
         self.leftbz = {}
         for x in self.rightbz:
-            self.sender.removeElement(self.rightbz[x], 1)
+            self.sender.removeElement(self.PROJECTOR, self.rightbz[x], 1)
         self.rightbz = {}
         for x in self.mirrored:
             self.mirrored[x] = False
@@ -1533,7 +1534,7 @@ class Client:
             self.orientation[x] = 0
 
         for x in range(0, len(self.centerPoints)):
-            self.sender.removeElement(self.centerPoints[x], 1)
+            self.sender.removeElement(self.PROJECTOR, self.centerPoints[x], 1)
         self.centerPoints = {}
 
         for x in list(reversed(range(0, len(self.connections)))):
@@ -1590,7 +1591,7 @@ class Client:
         layout_scrollbar.config(command=self.loadList.yview)
         layout_scrollbar.pack(side=RIGHT, fill=Y)
         self.loadList.pack(side=LEFT, fill=BOTH, expand=1)
-        layouts = self.sender.getSavedLayouts()
+        layouts = self.sender.getSavedLayouts(self.PROJECTOR)
         index = 0
         for x in range(0, len(layouts)):
             if layouts[x] == "DEFAULT":
@@ -1611,232 +1612,232 @@ class Client:
 
     # Sets up the surfaces which can be defined within the client
     def init_gui(self):
-        self.sender.showSetupSurface()
-        self.sender.newCanvas(0, 0, 1024, 1280, 1024, "pix", "setupCanvas")
-        self.mainCur = self.sender.newCursor(0, 1280 / 2, 1024 / 2, "pix")
+        self.sender.showSetupSurface(self.PROJECTOR)
+        self.sender.newCanvas(self.PROJECTOR, 0, 0, 1024, 1280, 1024, "pix", "setupCanvas")
+        self.mainCur = self.sender.newCursor(self.PROJECTOR, 0, 1280 / 2, 1024 / 2, "pix")
 
         self.controlCur = self.mainCur
 
-        self.sender.hideCursor(self.mainCur)
+        self.sender.hideCursor(self.PROJECTOR, self.mainCur)
 
-        self.warpedSurf[0] = self.sender.newSurface()
-        self.canvas = self.sender.newCanvas(self.warpedSurf[0], 0, 512, 512, 512, "pix", "Bob")
-        self.surfCur[0] = self.sender.newCursor(self.warpedSurf[0], 512 / 2, 512 / 2, "pix")
-        self.sender.hideCursor(self.surfCur[0])
-        self.texRects[0] = self.sender.newTexRectangle(self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
-        self.stretchRects[0] = self.sender.newRectangle(self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
+        self.warpedSurf[0] = self.sender.newSurface(1)
+        self.canvas = self.sender.newCanvas(self.PROJECTOR, self.warpedSurf[0], 0, 512, 512, 512, "pix", "Bob")
+        self.surfCur[0] = self.sender.newCursor(self.PROJECTOR, self.warpedSurf[0], 512 / 2, 512 / 2, "pix")
+        self.sender.hideCursor(self.PROJECTOR, self.surfCur[0])
+        self.texRects[0] = self.sender.newTexRectangle(self.PROJECTOR, self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
+        self.stretchRects[0] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
                                                         (0, 0, 0, 0), 1, (0, 0, 1, 1))
-        self.centSurfCirc[0] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
+        self.centSurfCirc[0] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
                                                      (1, 1, 0, 1), 10)
-        self.sender.hideElement(self.centSurfCirc[0])
-        self.sender.hideElement(self.stretchRects[0])
+        self.sender.hideElement(self.PROJECTOR, self.centSurfCirc[0])
+        self.sender.hideElement(self.PROJECTOR, self.stretchRects[0])
         surface_aspect_stretch_circles = {}
-        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
+        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[0])
-        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[0])
+        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[1])
-        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[1])
+        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[2])
-        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[2])
+        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[3])
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[3])
 
-        self.real_width_rect[0] = self.sender.newRectangle(self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
+        self.real_width_rect[0] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
                                                            0,
                                                            (1, 1, 1, 1))
-        width_digit_1 = self.sender.newText(self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_2 = self.sender.newText(self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_3 = self.sender.newText(self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_4 = self.sender.newText(self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
         self.real_width_counter[0] = (width_digit_1, width_digit_2, width_digit_3, width_digit_4)
-        self.real_width_unit[0] = self.sender.newText(self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
+        self.real_width_unit[0] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
                                                       (0, 0, 0, 1))
 
-        self.real_height_rect[0] = self.sender.newRectangle(self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
+        self.real_height_rect[0] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
                                                             (0, 0, 0, 0), 0, (1, 1, 1, 1))
-        height_digit_1 = self.sender.newText(self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_2 = self.sender.newText(self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_3 = self.sender.newText(self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_4 = self.sender.newText(self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
         self.real_height_counter[0] = (height_digit_1, height_digit_2, height_digit_3, height_digit_4)
-        self.real_height_unit[0] = self.sender.newText(self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
+        self.real_height_unit[0] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
                                                        (0, 0, 0, 1))
         self.aspect_stretch_circles[0] = surface_aspect_stretch_circles
         self.surfCanvases[0] = self.canvas
 
-        self.warpedSurf[1] = self.sender.newSurface()
-        self.canvas = self.sender.newCanvas(self.warpedSurf[1], 0, 512, 512, 512, "pix", "Bob")
-        self.surfCur[1] = self.sender.newCursor(self.warpedSurf[1], 512 / 2, 512 / 2, "pix")
-        self.sender.hideCursor(self.surfCur[1])
-        self.texRects[1] = self.sender.newTexRectangle(self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
-        self.stretchRects[1] = self.sender.newRectangle(self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
+        self.warpedSurf[1] = self.sender.newSurface(1)
+        self.canvas = self.sender.newCanvas(self.PROJECTOR, self.warpedSurf[1], 0, 512, 512, 512, "pix", "Bob")
+        self.surfCur[1] = self.sender.newCursor(self.PROJECTOR, self.warpedSurf[1], 512 / 2, 512 / 2, "pix")
+        self.sender.hideCursor(self.PROJECTOR, self.surfCur[1])
+        self.texRects[1] = self.sender.newTexRectangle(self.PROJECTOR, self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
+        self.stretchRects[1] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
                                                         (0, 0, 0, 0), 1, (0, 0, 1, 1))
-        self.centSurfCirc[1] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
+        self.centSurfCirc[1] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
                                                      (1, 1, 0, 1), 10)
-        self.sender.hideElement(self.centSurfCirc[1])
-        self.sender.hideElement(self.stretchRects[1])
+        self.sender.hideElement(self.PROJECTOR, self.centSurfCirc[1])
+        self.sender.hideElement(self.PROJECTOR, self.stretchRects[1])
         surface_aspect_stretch_circles = {}
-        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
+        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[0])
-        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[0])
+        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[1])
-        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[1])
+        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[2])
-        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[2])
+        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1),
                                                                   10)
-        self.sender.hideElement(surface_aspect_stretch_circles[3])
-        self.real_width_rect[1] = self.sender.newRectangle(self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[3])
+        self.real_width_rect[1] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
                                                            0,
                                                            (1, 1, 1, 1))
-        width_digit_1 = self.sender.newText(self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_2 = self.sender.newText(self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_3 = self.sender.newText(self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_4 = self.sender.newText(self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
         self.real_width_counter[1] = (width_digit_1, width_digit_2, width_digit_3, width_digit_4)
-        self.real_width_unit[1] = self.sender.newText(self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
+        self.real_width_unit[1] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
                                                       (0, 0, 0, 1))
-        self.real_height_rect[1] = self.sender.newRectangle(self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
+        self.real_height_rect[1] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
                                                             (0, 0, 0, 0), 0, (1, 1, 1, 1))
-        height_digit_1 = self.sender.newText(self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_2 = self.sender.newText(self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_3 = self.sender.newText(self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_4 = self.sender.newText(self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
         self.real_height_counter[1] = (height_digit_1, height_digit_2, height_digit_3, height_digit_4)
-        self.real_height_unit[1] = self.sender.newText(self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
+        self.real_height_unit[1] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
                                                        (0, 0, 0, 1))
         self.aspect_stretch_circles[1] = surface_aspect_stretch_circles
         self.surfCanvases[1] = self.canvas
 
-        self.warpedSurf[2] = self.sender.newSurface()
-        self.canvas = self.sender.newCanvas(self.warpedSurf[2], 0, 512, 512, 512, "pix", "Bob")
-        self.surfCur[2] = self.sender.newCursor(self.warpedSurf[2], 512 / 2, 512 / 2, "pix")
-        self.sender.hideCursor(self.surfCur[2])
-        self.texRects[2] = self.sender.newTexRectangle(self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
-        self.stretchRects[2] = self.sender.newRectangle(self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
+        self.warpedSurf[2] = self.sender.newSurface(self.PROJECTOR)
+        self.canvas = self.sender.newCanvas(self.PROJECTOR, self.warpedSurf[2], 0, 512, 512, 512, "pix", "Bob")
+        self.surfCur[2] = self.sender.newCursor(self.PROJECTOR, self.warpedSurf[2], 512 / 2, 512 / 2, "pix")
+        self.sender.hideCursor(self.PROJECTOR, self.surfCur[2])
+        self.texRects[2] = self.sender.newTexRectangle(self.PROJECTOR, self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
+        self.stretchRects[2] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
                                                         (0, 0, 0, 0), 1, (0, 0, 1, 1))
-        self.centSurfCirc[2] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
+        self.centSurfCirc[2] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
                                                      (1, 1, 0, 1), 10)
-        self.sender.hideElement(self.centSurfCirc[2])
-        self.sender.hideElement(self.stretchRects[2])
+        self.sender.hideElement(self.PROJECTOR, self.centSurfCirc[2])
+        self.sender.hideElement(self.PROJECTOR, self.stretchRects[2])
         surface_aspect_stretch_circles = {}
-        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
+        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[0])
-        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[0])
+        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[1])
-        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[1])
+        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[2])
-        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[2])
+        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0),
                                                                   1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[3])
-        self.real_width_rect[2] = self.sender.newRectangle(self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[3])
+        self.real_width_rect[2] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
                                                            0,
                                                            (1, 1, 1, 1))
-        width_digit_1 = self.sender.newText(self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_2 = self.sender.newText(self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_3 = self.sender.newText(self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_4 = self.sender.newText(self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
         self.real_width_counter[2] = (width_digit_1, width_digit_2, width_digit_3, width_digit_4)
-        self.real_width_unit[2] = self.sender.newText(self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
+        self.real_width_unit[2] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
                                                       (0, 0, 0, 1))
-        self.real_height_rect[2] = self.sender.newRectangle(self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
+        self.real_height_rect[2] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
                                                             (0, 0, 0, 0), 0, (1, 1, 1, 1))
-        height_digit_1 = self.sender.newText(self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_2 = self.sender.newText(self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_3 = self.sender.newText(self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_4 = self.sender.newText(self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
         self.real_height_counter[2] = (height_digit_1, height_digit_2, height_digit_3, height_digit_4)
-        self.real_height_unit[2] = self.sender.newText(self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
+        self.real_height_unit[2] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
                                                        (0, 0, 0, 1))
         self.aspect_stretch_circles[2] = surface_aspect_stretch_circles
         self.surfCanvases[2] = self.canvas
 
-        self.warpedSurf[3] = self.sender.newSurface()
-        self.canvas = self.sender.newCanvas(self.warpedSurf[3], 0, 512, 512, 512, "pix", "Bob")
-        self.surfCur[3] = self.sender.newCursor(self.warpedSurf[3], 512 / 2, 512 / 2, "pix")
-        self.sender.hideCursor(self.surfCur[3])
-        self.texRects[3] = self.sender.newTexRectangle(self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
-        self.stretchRects[3] = self.sender.newRectangle(self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
+        self.warpedSurf[3] = self.sender.newSurface(self.PROJECTOR)
+        self.canvas = self.sender.newCanvas(self.PROJECTOR, self.warpedSurf[3], 0, 512, 512, 512, "pix", "Bob")
+        self.surfCur[3] = self.sender.newCursor(self.PROJECTOR, self.warpedSurf[3], 512 / 2, 512 / 2, "pix")
+        self.sender.hideCursor(self.PROJECTOR, self.surfCur[3])
+        self.texRects[3] = self.sender.newTexRectangle(self.PROJECTOR, self.canvas, 0, 512, 512, 512, "pix", "checks.jpg")
+        self.stretchRects[3] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2 + 75, 150, 150, "pix",
                                                         (0, 0, 0, 0), 1, (0, 0, 1, 1))
-        self.centSurfCirc[3] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
+        self.centSurfCirc[3] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2, 25, "pix", (0, 0, 0, 0), 0,
                                                      (1, 1, 0, 1), 10)
-        self.sender.hideElement(self.centSurfCirc[3])
-        self.sender.hideElement(self.stretchRects[3])
+        self.sender.hideElement(self.PROJECTOR, self.centSurfCirc[3])
+        self.sender.hideElement(self.PROJECTOR, self.stretchRects[3])
         surface_aspect_stretch_circles = {}
-        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
+        surface_aspect_stretch_circles[0] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 + 75, 15, "pix",
                                                                   (0, 0, 0, 0), 1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[0])
-        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[0])
+        surface_aspect_stretch_circles[1] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2, 512 / 2 - 75, 15, "pix",
                                                                   (0, 0, 0, 0), 1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[1])
-        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[1])
+        surface_aspect_stretch_circles[2] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 - 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0), 1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[2])
-        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[2])
+        surface_aspect_stretch_circles[3] = self.sender.newCircle(self.PROJECTOR, self.canvas, 512 / 2 + 75, 512 / 2, 15, "pix",
                                                                   (0, 0, 0, 0), 1, (0, 1, 0, 1), 10)
-        self.sender.hideElement(surface_aspect_stretch_circles[3])
-        self.real_width_rect[3] = self.sender.newRectangle(self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
+        self.sender.hideElement(self.PROJECTOR, surface_aspect_stretch_circles[3])
+        self.real_width_rect[3] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 / 2 - 80, 512, 160, 75, "pix", (0, 0, 0, 0),
                                                            0, (1, 1, 1, 1))
-        width_digit_1 = self.sender.newText(self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_2 = self.sender.newText(self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_3 = self.sender.newText(self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
-        width_digit_4 = self.sender.newText(self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 75, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 50, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2 - 25, 460, "pix", 37, "Arial", (0, 0, 0, 1))
+        width_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 / 2, 460, "pix", 37, "Arial", (0, 0, 0, 1))
         self.real_width_counter[3] = (width_digit_1, width_digit_2, width_digit_3, width_digit_4)
-        self.real_width_unit[3] = self.sender.newText(self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
+        self.real_width_unit[3] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 / 2 + 25, 460, "pix", 35, "Arial",
                                                       (0, 0, 0, 1))
 
-        self.real_height_rect[3] = self.sender.newRectangle(self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
+        self.real_height_rect[3] = self.sender.newRectangle(self.PROJECTOR, self.canvas, 512 - 180, 512 / 2 + 30, 180, 60, "pix",
                                                             (0, 0, 0, 0), 0, (1, 1, 1, 1))
-        height_digit_1 = self.sender.newText(self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_1 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 175, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_2 = self.sender.newText(self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_2 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 150, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_3 = self.sender.newText(self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_3 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 125, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
-        height_digit_4 = self.sender.newText(self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
+        height_digit_4 = self.sender.newText(self.PROJECTOR, self.canvas, "0", 512 - 100, 512 / 2 - 13, "pix", 37, "Arial",
                                              (0, 0, 0, 1))
         self.real_height_counter[3] = (height_digit_1, height_digit_2, height_digit_3, height_digit_4)
-        self.real_height_unit[3] = self.sender.newText(self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
+        self.real_height_unit[3] = self.sender.newText(self.PROJECTOR, self.canvas, "cm", 512 - 65, 512 / 2 - 13, "pix", 35, "Arial",
                                                        (0, 0, 0, 1))
         self.aspect_stretch_circles[3] = surface_aspect_stretch_circles
         self.surfCanvases[3] = self.canvas
@@ -1878,7 +1879,7 @@ class Client:
         tk_thread = threading.Thread(target=self.tkinter_thread, args=())  # Creates the display thread
         tk_thread.start()  # Starts the display thread
 
-        self.layouts = self.sender.getSavedLayouts()
+        self.layouts = self.sender.getSavedLayouts(self.PROJECTOR)
         self.init_gui()
 
         self.mouseLock = False
