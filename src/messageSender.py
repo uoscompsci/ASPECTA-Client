@@ -59,7 +59,7 @@ class messageSender:
         self.host = parser.get('connection', 'host')
         self.port = parser.getint('connection', 'port')
         self.host2 = parser.get('connection2', 'host')
-        self.port2 = parser.get('connection2', 'port')
+        self.port2 = parser.getint('connection2', 'port')
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.s.settimeout(2)
@@ -68,9 +68,14 @@ class messageSender:
         self.s2.settimeout(2)
         try:
             self.s.connect((self.host, self.port))
+        except:
+            print 'Unable to connect to server 1'
+            sys.exit()
+        print 'Trying to connect to ' + str(self.host2) + " " + str(self.port2)
+        try:
             self.s2.connect((self.host2, self.port2))
         except:
-            print 'Unable to connect'
+            print 'Unable to connect to server 2'
             sys.exit()
 
         print 'Connected to remote host. Start sending messages'
