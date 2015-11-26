@@ -293,6 +293,7 @@ class client:
                     pos = pygame.mouse.get_pos()
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
+                    intersections = None
                     if (not (xdist == 0 and ydist == 0)):
                         for x in range(0, len(self.planes)):  # Finds where the last intersect point was
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
@@ -304,7 +305,7 @@ class client:
                         oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                         curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
-                        intersections = [0, 0, 0, 0, 0]
+                        intersections = [1, 1, 1, 1]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
@@ -331,21 +332,32 @@ class client:
                                     mouseLocations.append((hProp, vProp, x+1))
                                 else:
                                     intersections[x] = 0
-                    if len(mouseLocations) > 0:
-                        self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0 - mouseLocations[0][1],
-                                                   "prop", mouseLocations[0][2])
-                        self.sender.showCursor(self.curs[0])
-                        if len(mouseLocations) > 1:
-                            self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
-                                                       "prop", mouseLocations[1][2])
-                            self.sender.showCursor(self.curs[1])
-                        else:
-                            self.sender.hideCursor(self.curs[1])
-                    else:
-                        self.sender.hideCursor(self.curs[0])
-                        self.sender.hideCursor(self.curs[1])
+                    if intersections != None:
+                        cursor = 0
+                        if len(mouseLocations) == 1:
+                            self.sender.hideCursor(1, self.curs[1])
+                            self.sender.hideCursor(2, self.curs[3])
+                        if len(mouseLocations) == 0:
+                            self.sender.hideCursor(1, self.curs[0])
+                            self.sender.hideCursor(1, self.curs[1])
+                            self.sender.hideCursor(2, self.curs[2])
+                            self.sender.hideCursor(2, self.curs[3])
+                        for x in range(0, len(intersections)):  # Loop through surfaces
+                            if intersections[0] == 1:  # If there is an intersection on the surface
+                                if self.wall2proj(x) == 1:  # If the wall is on projector 1
+                                    self.sender.relocateCursor(1, self.curs[cursor*2], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
+                                                   "prop", mouseLocations[cursor][2])
+                                    self.sender.showCursor(1, self.curs[cursor*2])
+                                    self.sender.hideCursor(2, self.curs[cursor*2+1])
+                                    cursor += 1
+                                if self.wall2proj(x) == 2: # If the wall is on projector 2
+                                    self.sender.relocateCursor(2, self.curs[cursor*2+1], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
+                                                   "prop", mouseLocations[cursor][2])
+                                    self.sender.showCursor(2, self.curs[cursor*2+1])
+                                    self.sender.hideCursor(1, self.curs[cursor*2])
+                                    cursor += 1
                 else:
-                    intersections = [0, 0, 0, 0, 0]
+                    intersections = [1, 1, 1, 1]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
                         segCheck = self.segmentPlane(self.planes[x], self.getTrackerData()[0][0], self.getTrackerData()[0][1])
@@ -372,25 +384,40 @@ class client:
                                 mouseLocations.append((hProp, vProp, x+1))
                             else:
                                 intersections[x] = 0
-                    if len(mouseLocations) > 0:
-                        self.sender.relocateCursor(self.curs[0], mouseLocations[0][0], 1.0 - mouseLocations[0][1],
-                                                   "prop", mouseLocations[0][2])
-                        self.sender.showCursor(self.curs[0])
-                        if len(mouseLocations) > 1:
-                            self.sender.relocateCursor(self.curs[1], mouseLocations[1][0], 1.0 - mouseLocations[1][1],
-                                                       "prop", mouseLocations[1][2])
-                            self.sender.showCursor(self.curs[1])
-                        else:
-                            self.sender.hideCursor(self.curs[1])
-                    else:
-                        self.sender.hideCursor(self.curs[0])
-                        self.sender.hideCursor(self.curs[1])
+                    if intersections != None:
+                        cursor = 0
+                        if len(mouseLocations) == 1:
+                            self.sender.hideCursor(1, self.curs[1])
+                            self.sender.hideCursor(2, self.curs[3])
+                        if len(mouseLocations) == 0:
+                            self.sender.hideCursor(1, self.curs[0])
+                            self.sender.hideCursor(1, self.curs[1])
+                            self.sender.hideCursor(2, self.curs[2])
+                            self.sender.hideCursor(2, self.curs[3])
+                        for x in range(0, len(intersections)):  # Loop through surfaces
+                            if intersections[0] == 1:  # If there is an intersection on the surface
+                                if self.wall2proj(x) == 1:  # If the wall is on projector 1
+                                    self.sender.relocateCursor(1, self.curs[cursor*2], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
+                                                   "prop", mouseLocations[cursor][2])
+                                    self.sender.showCursor(1, self.curs[cursor*2])
+                                    self.sender.hideCursor(2, self.curs[cursor*2+1])
+                                    cursor += 1
+                                if self.wall2proj(x) == 2: # If the wall is on projector 2
+                                    self.sender.relocateCursor(2, self.curs[cursor*2+1], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
+                                                   "prop", mouseLocations[cursor][2])
+                                    self.sender.showCursor(2, self.curs[cursor*2+1])
+                                    self.sender.hideCursor(1, self.curs[cursor*2])
+                                    cursor += 1
 
     # Locks the mouse so that the server can be controlled
     def LockMouse(self):
         self.mouseLock = True
         pygame.mouse.set_visible(False)
-        self.sender.showCursor(self.curs[0])
+        self.sender.showCursor(1, self.curs[0])
+
+    def wall2proj(self, wall):
+        return self.wall2proj[wall]
+
 
     def serverInit(self):
         CONNECTION_LIST = []
@@ -475,7 +502,7 @@ class client:
                                     hit = True
                         if not hit:
                             foundUnused = True
-                    icon = self.sender.newTexRectangle(self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1,
+                    icon = self.sender.newTexRectangle(1, self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1,
                                                        0.1, "prop", "img/" + str(fileNumber) + ".png")
                     targets.append((xrand, yrand, fileNumber, icon))
                 self.wallTargets[wallNo-1] = targets
@@ -488,22 +515,26 @@ class client:
         targets = self.wallTargets[wallNo-1]
         self.wallTargets[wallNo-1] = []
         for x in range(0, len(targets)):
-            self.sender.removeElement(targets[x][3], self.wallCanvases[wallNo-1])
+            self.sender.removeElement(1, targets[x][3], self.wallCanvases[wallNo-1])
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
         self.wallCanvases = []
-        self.wallCanvases.append(self.sender.newCanvas(1, 0, 1, 1, 1, "prop", "wall1"))
+        self.wallCanvases.append(self.sender.newCanvas(1, 1, 0, 1, 1, 1, "prop", "wall1"))
         self.assignRandomTargets(1, 25)
         '''self.wall2C = self.sender.newCanvas(2, 0, 1, 1, 1, "prop", "wall2")
         self.wall3C = self.sender.newCanvas(3, 0, 1, 1, 1, "prop", "wall3")
         self.wall4C = self.sender.newCanvas(4, 0, 1, 1, 1, "prop", "wall4")
         '''
         self.curs = []
-        self.curs.append(self.sender.newCursor(1, 0.5, 0.5, "prop"))
-        self.sender.hideCursor(self.curs[0])
-        self.curs.append(self.sender.newCursor(1, 0.5, 0.5, "prop"))
-        self.sender.hideCursor(self.curs[1])
+        self.curs.append(self.sender.newCursor(1, 1, 0.5, 0.5, "prop"))
+        self.sender.hideCursor(1, self.curs[0])
+        self.curs.append(self.sender.newCursor(1, 1, 0.5, 0.5, "prop"))
+        self.sender.hideCursor(1, self.curs[1])
+        self.curs.append(self.sender.newCursor(2, 1, 0.5, 0.5, "prop"))
+        self.sender.hideCursor(2, self.curs[0])
+        self.curs.append(self.sender.newCursor(2, 1, 0.5, 0.5, "prop"))
+        self.sender.hideCursor(2, self.curs[1])
 
     def loadWallCoordinates(self, filename):
         with open(filename, 'rb') as csvfile:
@@ -524,6 +555,14 @@ class client:
 
     # The main loop
     def __init__(self):
+        parser = SafeConfigParser()
+        parser.read("config.ini")
+        self.wall2proj = parser.get('RoomSetup', 'wall2proj')
+        self.wall2proj = self.wall2proj.split(";")
+        for x in range(0,len(self.wall2proj)):
+            self.wall2proj[x] = int(self.wall2proj[x])
+
+
         tkinterThread = threading.Thread(target=self.tkinthread, args=())  # Creates the display thread
         tkinterThread.start()  # Starts the display thread
 
