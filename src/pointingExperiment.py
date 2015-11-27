@@ -44,6 +44,7 @@ class client:
     currentTarget = 0
     defaultTarget = True
     mouseTask = True
+    wall2ProjectorSurface = {}
     planes = []
     wallgrids = [[[0, 0, 0, 0, 0],
                   [0, 0, 0, 0, 0],
@@ -329,33 +330,18 @@ class client:
                                 vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                                 vvecangle = numpy.rad2deg(vvecangle)
                                 if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
-                                    mouseLocations.append((hProp, vProp, x+1))
+                                    mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[x+1]))
                                 else:
                                     intersections[x] = 0
-                    if intersections != None:
-                        cursor = 0
-                        if len(mouseLocations) == 1:
-                            self.sender.hideCursor(1, self.curs[1])
-                            self.sender.hideCursor(2, self.curs[3])
-                        if len(mouseLocations) == 0:
-                            self.sender.hideCursor(1, self.curs[0])
-                            self.sender.hideCursor(1, self.curs[1])
-                            self.sender.hideCursor(2, self.curs[2])
-                            self.sender.hideCursor(2, self.curs[3])
-                        for x in range(0, len(intersections)):  # Loop through surfaces
-                            if intersections[0] == 1:  # If there is an intersection on the surface
-                                if self.wall2proj(x) == 1:  # If the wall is on projector 1
-                                    self.sender.relocateCursor(1, self.curs[cursor*2], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
-                                                   "prop", mouseLocations[cursor][2])
-                                    self.sender.showCursor(1, self.curs[cursor*2])
-                                    self.sender.hideCursor(2, self.curs[cursor*2+1])
-                                    cursor += 1
-                                if self.wall2proj(x) == 2: # If the wall is on projector 2
-                                    self.sender.relocateCursor(2, self.curs[cursor*2+1], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
-                                                   "prop", mouseLocations[cursor][2])
-                                    self.sender.showCursor(2, self.curs[cursor*2+1])
-                                    self.sender.hideCursor(1, self.curs[cursor*2])
-                                    cursor += 1
+                        for x in range(0,len(mouseLocations)):
+                            if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
+                                self.sender.hideCursor(2, self.curs[2+x])
+                                self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.sender.showCursor(1, self.curs[0+x])
+                            elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
+                                self.sender.hideCursor(1, self.curs[0+x])
+                                self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.sender.showCursor(2, self.curs[2+x])
                 else:
                     intersections = [1, 1, 1, 1]
                     mouseLocations = []
@@ -381,33 +367,18 @@ class client:
                             vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                             vvecangle = numpy.rad2deg(vvecangle)
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
-                                mouseLocations.append((hProp, vProp, x+1))
+                                mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[x+1]))
                             else:
                                 intersections[x] = 0
-                    if intersections != None:
-                        cursor = 0
-                        if len(mouseLocations) == 1:
-                            self.sender.hideCursor(1, self.curs[1])
-                            self.sender.hideCursor(2, self.curs[3])
-                        if len(mouseLocations) == 0:
-                            self.sender.hideCursor(1, self.curs[0])
-                            self.sender.hideCursor(1, self.curs[1])
-                            self.sender.hideCursor(2, self.curs[2])
-                            self.sender.hideCursor(2, self.curs[3])
-                        for x in range(0, len(intersections)):  # Loop through surfaces
-                            if intersections[0] == 1:  # If there is an intersection on the surface
-                                if self.wall2proj(x) == 1:  # If the wall is on projector 1
-                                    self.sender.relocateCursor(1, self.curs[cursor*2], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
-                                                   "prop", mouseLocations[cursor][2])
-                                    self.sender.showCursor(1, self.curs[cursor*2])
-                                    self.sender.hideCursor(2, self.curs[cursor*2+1])
-                                    cursor += 1
-                                if self.wall2proj(x) == 2: # If the wall is on projector 2
-                                    self.sender.relocateCursor(2, self.curs[cursor*2+1], mouseLocations[cursor][0], 1.0 - mouseLocations[cursor][1],
-                                                   "prop", mouseLocations[cursor][2])
-                                    self.sender.showCursor(2, self.curs[cursor*2+1])
-                                    self.sender.hideCursor(1, self.curs[cursor*2])
-                                    cursor += 1
+                    for x in range(0,len(mouseLocations)):
+                        if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
+                            self.sender.hideCursor(2, self.curs[2+x])
+                            self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.sender.showCursor(1, self.curs[0+x])
+                        elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
+                            self.sender.hideCursor(1, self.curs[0+x])
+                            self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.sender.showCursor(2, self.curs[2+x])
 
     # Locks the mouse so that the server can be controlled
     def LockMouse(self):
@@ -557,11 +528,18 @@ class client:
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
-        self.wall2proj = parser.get('RoomSetup', 'wall2proj')
-        self.wall2proj = self.wall2proj.split(";")
-        for x in range(0,len(self.wall2proj)):
-            self.wall2proj[x] = int(self.wall2proj[x])
-
+        temp = parser.get('RoomSetup', 'wall1Surface')
+        temp = temp.split(";")
+        self.wall2ProjectorSurface[1] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'wall2Surface')
+        temp = temp.split(";")
+        self.wall2ProjectorSurface[2] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'wall3Surface')
+        temp = temp.split(";")
+        self.wall2ProjectorSurface[3] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'wall4Surface')
+        temp = temp.split(";")
+        self.wall2ProjectorSurface[4] = (int(temp[0]), int(temp[1]))
 
         tkinterThread = threading.Thread(target=self.tkinthread, args=())  # Creates the display thread
         tkinterThread.start()  # Starts the display thread
