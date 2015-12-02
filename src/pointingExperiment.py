@@ -160,7 +160,7 @@ class client:
                 headTrackerData[x] = headTrackerData[x].split(",")
                 for y in range(0, len(headTrackerData[x])):
                     try:
-                        pointerTrackerData[x][y] = float(headTrackerData[x][y])
+                        headTrackerData[x][y] = float(headTrackerData[x][y])
                     except:
                         pass
             return pointerTrackerData, headTrackerData
@@ -219,20 +219,71 @@ class client:
     def distToAngle(self, dist):
         return dist*0.1
 
+    def distBetweenPoints(self, point1, point2):
+        return sqrt(pow((point1[0]-point2[0]),2) + pow((point1[1]-point2[1]),2) + pow((point1[2]-point2[2]),2))
+
     def getHeadAxes(self):
-        data = self.getTrackerData()[0]  #TODO MAKE 1?
-        headLoc = scipy.array([data[0][0], data[0][1], data[0][2]])
-        forwardVec = self.normalizeVec(scipy.array([data[1][0], data[1][1], data[1][2]]))
-        a = scipy.array([data[3][0]-data[2][0], data[3][1]-data[2][1], data[3][2]-data[2][2]])
-        b = scipy.array([data[4][0]-data[2][0], data[4][1]-data[2][1], data[4][2]-data[2][2]])
-        normal = numpy.cross(a, b)
-        if(normal[1]<0): # Ensures vector always point upwards despite symmetry of tracker
+        data = self.getTrackerData()[1]
+
+        #Retrieve the points on the trackers and place them in an array
+        point1 = scipy.array([data[0][0], data[0][1], data[0][2]])
+        point2 = scipy.array([data[1][0], data[1][1], data[1][2]])
+        point3 = scipy.array([data[2][0], data[2][1], data[2][2]])
+        points = [point1, point2, point3]
+
+        #Get the indexes of the closest two points in the array
+        minlength = -1
+        minpoint1Index = 0
+        minpoint2Index = 0
+        for x in range(0,len(points)):
+            for y in range(0,len(points)):
+                distance = self.distBetweenPoints(points[x], points[y])
+                if(distance!=0):
+                    if(distance < minlength or minlength == -1):
+                        minlength = distance
+                        minpoint1Index = x
+                        minpoint2Index = y
+
+        #Save the head location as the point directly in the middle of the closest points
+        headLoc = (points[minpoint1Index]+points[minpoint2Index])/2
+
+        #Find the preliminary upward vector to use as a rotation axis to find the forward vector
+        vec1 = points[0]-points[1]
+        vec2 = points[2]-points[1]
+        normal = numpy.cross(vec1, vec2)
+        if(normal[1]<0):
             normal[0] = -normal[0]
             normal[1] = -normal[1]
             normal[2] = -normal[2]
         preUp = scipy.array([normal[0], normal[1], normal[2]])
-        upwardVec = self.normalizeVec(self.projectOntoPlane(preUp,forwardVec))
+
+        #Define the two potential forward vectors
+        forwardVecTest1 = self.rotateVector(points[minpoint2Index]-points[minpoint1Index],preUp,90)
+        forwardVecTest2 = self.rotateVector(points[minpoint2Index]-points[minpoint1Index],preUp,-90)
+
+        #Work out the index of the extra tracker ball
+        extraPointIndex = 0
+        if(minpoint1Index==0 or minpoint2Index==0):
+            extraPointIndex = 1
+            if(minpoint1Index==1 or minpoint2Index==1):
+                extraPointIndex = 2
+
+        #Work out which forward vector is the true one (the one which doesn't point in the direction of the extra ball)
+        forwardVec = forwardVecTest2
+        location1 = headLoc+forwardVecTest1
+        location2 = headLoc+forwardVecTest2
+        distance1 = self.distBetweenPoints(location1, points[extraPointIndex])
+        distance2 = self.distBetweenPoints(location2, points[extraPointIndex])
+        if distance2<distance1:
+            forwardVec = forwardVecTest1
+
+        #Realign the upward vector to ensure it is perpendicular to the forward vector
+        upwardVec = self.normalizeVec(self.projectOntoPlane(preUp, forwardVec))
+
+        #Define the horizontal vector as the cross product of the forward vector and upward vector
         horizontalVec = self.normalizeVec(numpy.cross(upwardVec, forwardVec))
+
+        #Return all the head details
         return headLoc, forwardVec, upwardVec, horizontalVec
 
     # Returns vector after setting magnitude to 1
