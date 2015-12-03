@@ -387,11 +387,11 @@ class client:
                         for x in range(0,len(mouseLocations)):
                             if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
                                 self.sender.hideCursor(2, self.curs[2+x])
-                                self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                                 self.sender.showCursor(1, self.curs[0+x])
                             elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
                                 self.sender.hideCursor(1, self.curs[0+x])
-                                self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                                 self.sender.showCursor(2, self.curs[2+x])
                 else:
                     intersections = [1, 1, 1, 1]
@@ -424,11 +424,11 @@ class client:
                     for x in range(0,len(mouseLocations)):
                         if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
                             self.sender.hideCursor(2, self.curs[2+x])
-                            self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                             self.sender.showCursor(1, self.curs[0+x])
                         elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
                             self.sender.hideCursor(1, self.curs[0+x])
-                            self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                             self.sender.showCursor(2, self.curs[2+x])
 
     # Locks the mouse so that the server can be controlled
