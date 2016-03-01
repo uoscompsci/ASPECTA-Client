@@ -34,6 +34,10 @@ class MyDialog(tkSimpleDialog.Dialog):
 
 class client:
     __slots__ = ['ppe']
+    CANVAS1PROJ = 1
+    CANVAS2PROJ = 1
+    CANVAS3PROJ = 1
+    CANVAS4PROJ = 1
     quit = False
     refreshrate = 0
     mainCur = None
@@ -341,7 +345,7 @@ class client:
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
-                if (self.mouseTask == True):
+                if (self.mouseTask == True): # Runs if it is mouse movement that is to control the cursor (perspective)
                     pos = pygame.mouse.get_pos()
                     xdist = (self.winWidth / 2) - pos[0]
                     ydist = (self.winHeight / 2) - pos[1]
@@ -393,7 +397,7 @@ class client:
                                 self.sender.hideCursor(1, self.curs[0+x])
                                 self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                                 self.sender.showCursor(2, self.curs[2+x])
-                else:
+                else: # Runs if it is pointing that is to control the cursor
                     intersections = [1, 1, 1, 1]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
@@ -486,7 +490,7 @@ class client:
         self.master = Tk()
         d = MyDialog(self.master)
         self.username = d.getResult()
-        self.master.wm_title("Cursor Program GUI")
+        self.master.wm_title("Pointing Experiment GUI")
         self.frame = Frame(self.master)
         self.frame.pack()
         self.slogan = Button(self.frame, text="Control Projected Mouse (Middle Click to Release)",
@@ -494,7 +498,7 @@ class client:
         self.slogan.pack(side=LEFT)
         self.master.mainloop()
 
-    def assignRandomTargets(self, wallNo, noOfTargets):
+    '''def assignRandomTargets(self, wallNo, noOfTargets):
         if 0 < wallNo <= 5:  # Checks that the wall number is valid (between 1 and 5)
             if noOfTargets <= 25:
                 targets = []
@@ -531,23 +535,183 @@ class client:
             else:
                 print "You can't have that many targets"
         else:
-            print "There is no wall " + str(wallNo)
+            print "There is no wall " + str(wallNo)'''
+
+    def drawTarget(self, wallNo, x, y, icon):
+        realX, realY = self.gridCoordToPropCenter(x, y)
+        projector, canvas = self.targetWallToRoom(wallNo)
+        target = self.sender.newTexRectangle(projector, canvas, realX - 0.05, realY + 0.05, 0.1, 0.1, "prop", "img/" + str(icon) + ".png")
+        return target
+
+    def drawLayout(self, layoutNo):
+        dest = self.targets[layoutNo]['target']
+        location = None
+        wallTargets = self.targets[layoutNo]['wall1']
+        for x in range(0, len(wallTargets)):
+            target = wallTargets[x]
+            if int(dest) == int(target[1]):
+                location = target[0]
+            self.drawTarget(0, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
+        wallTargets = self.targets[layoutNo]['wall2']
+        for x in range(0, len(wallTargets)):
+            target = wallTargets[x]
+            if int(dest) == int(target[1]):
+                location = target[0]
+            self.drawTarget(1, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
+        wallTargets = self.targets[layoutNo]['wall3']
+        for x in range(0, len(wallTargets)):
+            target = wallTargets[x]
+            if int(dest) == int(target[1]):
+                location = target[0]
+            self.drawTarget(2, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
+        wallTargets = self.targets[layoutNo]['wall4']
+        for x in range(0, len(wallTargets)):
+            target = wallTargets[x]
+            if int(dest) == int(target[1]):
+                location = target[0]
+            self.drawTarget(3, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
+        wallTargets = self.targets[layoutNo]['ceiling']
+        for x in range(0, len(wallTargets)):
+            target = wallTargets[x]
+            if int(dest) == int(target[1]):
+                location = target[0]
+            self.drawTarget(4, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
+        return (location[0]-1, location[1]-1)
+
+    def isHit(self, mouseCanvas, mouseCoor, targetCanvas, targetLoc):
+        canvasNo = self.wallCanvases(mouseCanvas)[1]
+        projectorNo = self.wallCanvases(mouseCanvas)[0]
+        canvasWidth = self.sender.getCanvasWidth(projectorNo, canvasNo)
+        canvasHeight = self.sender.getCanvasHeight(projectorNo, canvasNo)
+        targetXProp, targetYProp = self.gridCoordToPropCenter(targetLoc[0], targetLoc[1])
+        targetXReal = targetXProp * canvasWidth
+        targetYReal = targetYProp * canvasHeight
+        targetWidth = 0.1 * canvasWidth
+        targetHeight = 0.1 * canvasHeight
+        if mouseCoor[0]>targetXReal and mouseCoor[0]<(targetXReal+targetWidth):
+            if mouseCoor[1]>targetYReal and mouseCoor[1]<(targetYReal+targetHeight):
+                return True
+        return False
+
+    #self.angleBetweenVectors
+    # Give grid coordinates and walls of start and end points to compute rotational distance between edges of start point and end point
+    def getRotationalDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
+        start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
+        headLoc = self.getHeadAxes()[0]
+        startVec = start-headLoc
+        targetVec = target-headLoc
+        return self.angleBetweenVectors(startVec, targetVec)
+
+    #return horizontal and vertical distances separately
+    def getPlanarDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
+        start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
+        # TODO Decide if always take shortest route (avoiding floor as unprojectable). Vertical route accross ceiling may be shoter at times but horizontal more intuitive
+        # TODO Implement
+
+    def getDirectDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
+        start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
+        return self.distBetweenPoints(start, target)
+
+    def getSurfaceWidthRemLeft(self, pointX, pointY, wall):
+        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
+        realEdgeX, realEdgeY = 0, realPointY
+        wallTL = self.planes[wall][0][2]
+        wallTR = self.planes[wall][0][3]
+        wallBL = self.planes[wall][0][5]
+        pointHVec = wallTR - wallTL * realPointX
+        pointVVec = wallBL - wallTL * realPointY
+        edgeHVec = wallTR - wallTL * realEdgeX
+        edgeVVec = wallBL - wallTL * realEdgeY
+        point = wallTL + pointHVec + pointVVec
+        edge = wallTL + edgeHVec + edgeVVec
+        return self.distBetweenPoints(point, edge)
+
+    def getSurfaceWidthRemRight(self, pointX, pointY, wall):
+        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
+        realEdgeX, realEdgeY = 1, realPointY
+        wallTL = self.planes[wall][0][2]
+        wallTR = self.planes[wall][0][3]
+        wallBL = self.planes[wall][0][5]
+        pointHVec = wallTR - wallTL * realPointX
+        pointVVec = wallBL - wallTL * realPointY
+        edgeHVec = wallTR - wallTL * realEdgeX
+        edgeVVec = wallBL - wallTL * realEdgeY
+        point = wallTL + pointHVec + pointVVec
+        edge = wallTL + edgeHVec + edgeVVec
+        return self.distBetweenPoints(point, edge)
+
+    def getSurfaceWidthRemUp(self, pointX, pointY, wall):
+        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
+        realEdgeX, realEdgeY = realPointX, 1 #TODO check if 1 is top
+        wallTL = self.planes[wall][0][2]
+        wallTR = self.planes[wall][0][3]
+        wallBL = self.planes[wall][0][5]
+        pointHVec = wallTR - wallTL * realPointX
+        pointVVec = wallBL - wallTL * realPointY
+        edgeHVec = wallTR - wallTL * realEdgeX
+        edgeVVec = wallBL - wallTL * realEdgeY
+        point = wallTL + pointHVec + pointVVec
+        edge = wallTL + edgeHVec + edgeVVec
+        return self.distBetweenPoints(point, edge)
+
+    def getSurfaceWidthRemDown(self, pointX, pointY, wall):
+        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
+        realEdgeX, realEdgeY = realPointX, 0  #TODO check if 0 is bottom
+        wallTL = self.planes[wall][0][2]
+        wallTR = self.planes[wall][0][3]
+        wallBL = self.planes[wall][0][5]
+        pointHVec = wallTR - wallTL * realPointX
+        pointVVec = wallBL - wallTL * realPointY
+        edgeHVec = wallTR - wallTL * realEdgeX
+        edgeVVec = wallBL - wallTL * realEdgeY
+        point = wallTL + pointHVec + pointVVec
+        edge = wallTL + edgeHVec + edgeVVec
+        return self.distBetweenPoints(point, edge)
+
+
+    # Get the real world locations of the start and target points
+    def getStartAndTargetLocs(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
+        # Gather the proportional coordinates for the start and target points
+        realStartX, realStartY = self.gridCoordToPropCenter(startX, startY)
+        realTargetX, realTargetY = self.gridCoordToPropCenter(targetGridX, targetGridY)
+        # Get the 3D real world coordinates for the top left, bottom right and bottom left of each surface
+        startWallTL = self.planes[startWall][0][2]
+        startWallTR = self.planes[startWall][0][3]
+        startWallBL = self.planes[startWall][0][5]
+        targetWallTL = self.planes[targetWall][0][2]
+        targetWallTR = self.planes[targetWall][0][3]
+        targetWallBL = self.planes[targetWall][0][5]
+        # Calculate the horizontal and vertical vectors that run along the top and left side of the walls and then convert them to the vectors to the start and target.
+        startHVec = startWallTR - startWallTL * realStartX
+        startVVec = startWallBL - startWallTL * realStartY
+        targetHVec = targetWallTR - targetWallTL * realTargetX
+        targetVVec = targetWallBL - targetWallTL * realTargetY
+        # Use the calculated vectors to find the start and target 3D real world coordinates.
+        start = startWallTL+startHVec+startVVec
+        target = targetWallTL+targetHVec+targetVVec
+        return start, target
+
+    def gridCoordToPropCenter(self, x, y):
+        x -= 1
+        y -= 1
+        x = x*2/10.0+0.1
+        y = 1 - (y*2/10/0+0.1)
+        return (x, y)
 
     def removeWallTargets(self, wallNo):
         targets = self.wallTargets[wallNo-1]
         self.wallTargets[wallNo-1] = []
         for x in range(0, len(targets)):
-            self.sender.removeElement(1, targets[x][3], self.wallCanvases[wallNo-1])
+            self.sender.removeElement(self.wallCanvases[wallNo-1][0], targets[x][3], self.wallCanvases[wallNo-1][1])
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
         self.wallCanvases = []
-        self.wallCanvases.append(self.sender.newCanvas(1, 1, 0, 1, 1, 1, "prop", "wall1"))
+        self.wallCanvases.append((self.CANVAS1PROJ, self.sender.newCanvas(self.CANVAS1PROJ, 1, 0, 1, 1, 1, "prop", "wall1")))
         self.assignRandomTargets(1, 25)
-        '''self.wall2C = self.sender.newCanvas(2, 0, 1, 1, 1, "prop", "wall2")
-        self.wall3C = self.sender.newCanvas(3, 0, 1, 1, 1, "prop", "wall3")
-        self.wall4C = self.sender.newCanvas(4, 0, 1, 1, 1, "prop", "wall4")
-        '''
+        self.wallCanvases.append((self.CANVAS2PROJ, self.sender.newCanvas(self.CANVAS2PROJ, 2, 0, 1, 1, 1, "prop", "wall2")))
+        self.wallCanvases.append((self.CANVAS3PROJ, self.sender.newCanvas(self.CANVAS3PROJ, 3, 0, 1, 1, 1, "prop", "wall3")))
+        self.wallCanvases.append((self.CANVAS4PROJ, self.sender.newCanvas(self.CANVAS4PROJ, 4, 0, 1, 1, 1, "prop", "wall4")))
         self.curs = []
         self.curs.append(self.sender.newCursor(1, 1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(1, self.curs[0])
@@ -574,6 +738,15 @@ class client:
             self.planes.append([content[6], content[7], content[8], content[9], content[10], content[11]])
             self.planes.append([content[12], content[13], content[14], content[15], content[16], content[17]])
             self.planes.append([content[18], content[19], content[20], content[21], content[22], content[23]])
+            self.planes.append([content[24], content[25], content[26], content[27], content[28], content[29]])
+
+    def getSurfaceTargets(self, surfaceString):
+        surface = surfaceString.split(";")
+        for x in range(0,len(surface)):
+            surface[x] = surface[x].split(":")
+            temp = surface[x][0].split(",")
+            surface[x][0] = (int(temp[0]),int(temp[1]))
+        return surface
 
     # The main loop
     def __init__(self):
@@ -591,6 +764,26 @@ class client:
         temp = parser.get('RoomSetup', 'wall4Surface')
         temp = temp.split(";")
         self.wall2ProjectorSurface[4] = (int(temp[0]), int(temp[1]))
+
+        targetParser = SafeConfigParser()
+        targetParser.read("targets.ini")
+        self.targets = {}
+        for x in range(1,101):
+            wall1Str = targetParser.get(str(x), 'wall1')
+            wall2Str = targetParser.get(str(x), 'wall2')
+            wall3Str = targetParser.get(str(x), 'wall3')
+            wall4Str = targetParser.get(str(x), 'wall4')
+            ceilingStr = targetParser.get(str(x), 'ceiling')
+            self.targets[x] = {}
+            self.targets[x]['target'] = targetParser.get(str(x), 'target')
+            self.targets[x]['wall1'] = self.getSurfaceTargets(wall1Str)
+            self.targets[x]['wall2'] = self.getSurfaceTargets(wall2Str)
+            self.targets[x]['wall3'] = self.getSurfaceTargets(wall3Str)
+            self.targets[x]['wall4'] = self.getSurfaceTargets(wall4Str)
+            self.targets[x]['ceiling'] = self.getSurfaceTargets(ceilingStr)
+
+        self.drawLayout(1)
+
 
         tkinterThread = threading.Thread(target=self.tkinthread, args=())  # Creates the display thread
         tkinterThread.start()  # Starts the display thread
