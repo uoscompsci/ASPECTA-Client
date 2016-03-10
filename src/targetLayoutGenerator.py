@@ -1,9 +1,9 @@
 from random import *
 
 class generator():
-    NO_TARGETS_WIDE = 4
-    NO_TARGETS_TALL = 4
-    NO_TARGETS_DEEP = 8
+    NO_TARGETS_WIDE = 6
+    NO_TARGETS_TALL = 6
+    NO_TARGETS_DEEP = 12
     TARGET_COUNT_LONG_SURFACE = 8
     TARGET_COUNT_SQUARE_SURFACE = 4
     x = 0
@@ -24,11 +24,11 @@ class generator():
         elif wallType == "longFlip":
             xWidth = self.NO_TARGETS_WIDE
             yWidth = self.NO_TARGETS_DEEP
-        xPick = randint(0, xWidth)
-        yPick = randint(0, yWidth)
+        xPick = randint(1, xWidth)
+        yPick = randint(1, yWidth)
         while (xPick, yPick) in self.usedLocs:
-            xPick = randint(0, xWidth)
-            yPick = randint(0, yWidth)
+            xPick = randint(1, xWidth)
+            yPick = randint(1, yWidth)
         self.x = xPick
         self.y = yPick
         self.usedLocs.append((self.x, self.y))
@@ -46,6 +46,12 @@ class generator():
 
     def buildFile(self):
         fo = open("targets.ini", "wb")
+        fo.write("[configuration]\n")
+        fo.write("NO_TARGETS_WIDE=" + str(self.NO_TARGETS_WIDE) + "\n")
+        fo.write("NO_TARGETS_TALL=" + str(self.NO_TARGETS_TALL) + "\n")
+        fo.write("NO_TARGETS_DEEP=" + str(self.NO_TARGETS_DEEP) + "\n")
+        fo.write("TARGET_COUNT_LONG_SURFACE=" + str(self.TARGET_COUNT_LONG_SURFACE) + "\n")
+        fo.write("TARGET_COUNT_SQUARE_SURFACE=" + str(self.TARGET_COUNT_SQUARE_SURFACE) + "\n\n")
         for w in range(1,101):
             fo.write("[" + str(w) + "]\n")
             fo.write("wallF=")
