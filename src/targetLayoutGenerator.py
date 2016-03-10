@@ -69,7 +69,7 @@ class generator():
             fo.write("wallL=")
             self.getXYandIcon("long")
             fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
-            for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
+            for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("long")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
@@ -78,7 +78,7 @@ class generator():
             fo.write("wallR=")
             self.getXYandIcon("long")
             fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
-            for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
+            for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("long")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
@@ -87,7 +87,7 @@ class generator():
             fo.write("ceiling=")
             self.getXYandIcon("longFlip")
             fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
-            for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
+            for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("longFlip")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
