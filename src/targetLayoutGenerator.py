@@ -39,10 +39,21 @@ class generator():
         self.usedIcons.append(self.icon)
 
     def clearUsedLocs(self):
+        self.checkForDuplicates(self.usedLocs)
         self.usedLocs = []
 
     def clearUsedIcons(self):
+        self.checkForDuplicates(self.usedIcons)
         self.usedIcons = []
+
+    def checkForDuplicates(self, list):
+        seen = set()
+        for x in list:
+            if x in seen:
+                print "ERROR: Duplicate found"
+            seen.add(x)
+        return False
+
 
     def buildFile(self):
         fo = open("targets.ini", "wb")
