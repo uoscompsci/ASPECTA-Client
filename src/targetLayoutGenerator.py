@@ -116,6 +116,10 @@ class generator():
                 fo.write(";")
                 self.getXYandIcon("longFlip")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+            fo.write("\n")
+            iconIndex = randint(0,len(self.usedIcons)-1)
+            icon = self.usedIcons[iconIndex]
+            fo.write("target=" + str(icon))
             fo.write("\n\n")
             self.clearUsedLocs()
             self.clearUsedIcons()
