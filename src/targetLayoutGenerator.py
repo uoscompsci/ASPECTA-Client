@@ -6,6 +6,8 @@ class generator():
     NO_TARGETS_DEEP = 12
     TARGET_COUNT_LONG_SURFACE = 8
     TARGET_COUNT_SQUARE_SURFACE = 4
+    KEY_X = 2
+    KEY_Y = 2
     x = 0
     y = 0
     icon = 0
@@ -62,11 +64,15 @@ class generator():
         fo.write("NO_TARGETS_TALL=" + str(self.NO_TARGETS_TALL) + "\n")
         fo.write("NO_TARGETS_DEEP=" + str(self.NO_TARGETS_DEEP) + "\n")
         fo.write("TARGET_COUNT_LONG_SURFACE=" + str(self.TARGET_COUNT_LONG_SURFACE) + "\n")
-        fo.write("TARGET_COUNT_SQUARE_SURFACE=" + str(self.TARGET_COUNT_SQUARE_SURFACE) + "\n\n")
+        fo.write("TARGET_COUNT_SQUARE_SURFACE=" + str(self.TARGET_COUNT_SQUARE_SURFACE) + "\n")
+        fo.write("KEY_X=" + str(self.KEY_X) + "\n")
+        fo.write("KEY_Y=" + str(self.KEY_Y) + "\n\n")
         for w in range(1,101):
             fo.write("[" + str(w) + "]\n")
             fo.write("wallF=")
             self.getXYandIcon("square")
+            while self.x == self.KEY_X and self.y == self.KEY_Y:
+                self.getXYandIcon("square")
             fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
