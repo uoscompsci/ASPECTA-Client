@@ -64,7 +64,7 @@ class generator():
     def buildFile(self):
         self.availableImages = [f for f in listdir("img/") if isfile(join("img/", f))]
         for x in range(0, len(self.availableImages)):
-            self.availableImages[x] = self.availableImages[x].split(".")[0]
+            self.availableImages[x] = self.availableImages[x]
         self.numberOfImages = len(self.availableImages)
         fo = open("targets.ini", "wb")
         fo.write("[configuration]\n")
