@@ -77,6 +77,8 @@ class generator():
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("square")
+                while self.x == self.KEY_X and self.y == self.KEY_Y:
+                    self.getXYandIcon("square")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
             fo.write("\n")
             self.clearUsedLocs()
