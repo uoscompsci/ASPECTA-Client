@@ -1,4 +1,6 @@
 from random import *
+from os import listdir
+from os.path import isfile, join
 
 class generator():
     NO_TARGETS_WIDE = 6
@@ -13,6 +15,8 @@ class generator():
     icon = 0
     usedLocs = []
     usedIcons = []
+    numberOfImages = 0
+    availableImages = []
 
     def getXYandIcon(self, wallType):
         xWidth = 0
@@ -34,9 +38,9 @@ class generator():
         self.x = xPick
         self.y = yPick
         self.usedLocs.append((self.x, self.y))
-        iconPick = randint(7, 144)
+        iconPick = self.availableImages[randint(0, self.numberOfImages-1)]
         while iconPick in self.usedIcons:
-            iconPick = randint(7, 144)
+            iconPick = self.availableImages[randint(0, self.numberOfImages-1)]
         self.icon = iconPick
         self.usedIcons.append(self.icon)
 
@@ -58,6 +62,10 @@ class generator():
 
 
     def buildFile(self):
+        self.availableImages = [f for f in listdir("img/") if isfile(join("img/", f))]
+        for x in range(0, len(self.availableImages)):
+            self.availableImages[x] = self.availableImages[x].split(".")[0]
+        self.numberOfImages = len(self.availableImages)
         fo = open("targets.ini", "wb")
         fo.write("[configuration]\n")
         fo.write("NO_TARGETS_WIDE=" + str(self.NO_TARGETS_WIDE) + "\n")
@@ -73,49 +81,49 @@ class generator():
             self.getXYandIcon("square")
             while self.x == self.KEY_X and self.y == self.KEY_Y:
                 self.getXYandIcon("square")
-            fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("square")
                 while self.x == self.KEY_X and self.y == self.KEY_Y:
                     self.getXYandIcon("square")
-                fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallB=")
             self.getXYandIcon("square")
-            fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("square")
-                fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallL=")
             self.getXYandIcon("long")
-            fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("long")
-                fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallR=")
             self.getXYandIcon("long")
-            fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("long")
-                fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("ceiling=")
             self.getXYandIcon("longFlip")
-            fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
                 self.getXYandIcon("longFlip")
-                fo.write(str(self.x) + "," + str(self.y) + ":" + str(self.icon))
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             iconIndex = randint(0,len(self.usedIcons)-1)
             icon = self.usedIcons[iconIndex]
