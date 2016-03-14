@@ -977,7 +977,7 @@ class Targets:
             print "ERROR: Invalid wall name - \"" + wall + "\""
         return location
 
-    def getDistractorIconImage(self, layout, wall, targetNo):
+    def getDistractorIcon(self, layout, wall, targetNo):
         icon = None
         if wall.lower() == "front":
             icon = self.targets[layout]['wallF'][targetNo][1]
