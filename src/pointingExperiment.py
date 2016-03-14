@@ -604,9 +604,59 @@ class client:
 
     #return horizontal and vertical distances separately
     def getPlanarDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
-        start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
-        # TODO Decide if always take shortest route (avoiding floor as unprojectable). Vertical route accross ceiling may be shoter at times but horizontal more intuitive
-        # TODO Implement
+        if(targetWall != REAR_WALL):
+            if(targetWall == CEILING):
+                part1 = self.getSurfaceWidthRemUp(startX, startY, FRONT_WALL)
+                part2 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, CEILING) #TODO CHECK WHAT START AND TARGET ARE THIS IS NOT CORRECT
+            elif(targetWall == LEFT_WALL):
+                part1 = self.getSurfaceWidthRemLeft(startX, startY, FRONT_WALL)
+                part2 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, LEFT_WALL)
+            elif(targetWall == RIGHT_WALL):
+                part1 = self.getSurfaceWidthRemRight(startX, startY, FRONT_WALL)
+                part2 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY. RIGHT_WALL)
+            else:
+                print "Invalid target wall"
+        else:
+            #Calculate distance across ceiling
+            part1 = self.getSurfaceWidthRemUp(startX, startX, FRONT_WALL)
+            part2 = CEILING_LENGTH
+            part3 = self.getSurfaceWidthRemUp(targetGridX, targetGridY, REAR_WALL)
+            distanceCeiling = part1 + part2 + part3
+
+            #Calculate distance across floor
+            part1 = self.getSurfaceWidthRemDown(startX, startX, FRONT_WALL)
+            part2 = FLOOR_LENGTH
+            part3 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, REAR_WALL)
+            distanceFloor = part1 + part2 + part3
+
+            #Calculate distance across left wall
+            part1 = self.getSurfaceWidthRemLeft(startX, startX, FRONT_WALL)
+            part2 = LEFT_LENGTH
+            part3 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, REAR_WALL)
+            distanceLeft = part1 + part2 + part3
+
+            #Calculate distance across right wall
+            part1 = self.getSurfaceWidthRemRight(startX, startX, FRONT_WALL)
+            part2 = RIGHT_LENGTH
+            part3 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, REAR_WALL)
+            distanceRight = part1 + part2 + part3
+
+            #Find which path is shortest
+            shortest = distanceCeiling
+            shortestStr = "ceiling"
+            if distanceFloor < shortest:
+                shortest = distanceFloor
+                shortestStr = "floor"
+            if distanceLeft < shortest:
+                shortest = distanceLeft
+                shortestStr = "left"
+            if distanceRight < shortest:
+                shortest = distanceRight
+                shortestStr = "right"
+
+            #Calculate horizontal distance component
+
+            #TODO distance remainder on current wall + side wall length + distance on target wall
 
     def getDirectDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
         start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
@@ -616,7 +666,7 @@ class client:
         realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = 0, realPointY
         wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]
+        wallTR = self.planes[wall][0][3]# TODO Implement
         wallBL = self.planes[wall][0][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
@@ -740,14 +790,6 @@ class client:
             self.planes.append([content[18], content[19], content[20], content[21], content[22], content[23]])
             self.planes.append([content[24], content[25], content[26], content[27], content[28], content[29]])
 
-    def getSurfaceTargets(self, surfaceString):
-        surface = surfaceString.split(";")
-        for x in range(0,len(surface)):
-            surface[x] = surface[x].split(":")
-            temp = surface[x][0].split(",")
-            surface[x][0] = (int(temp[0]),int(temp[1]))
-        return surface
-
     # The main loop
     def __init__(self):
         parser = SafeConfigParser()
@@ -765,22 +807,8 @@ class client:
         temp = temp.split(";")
         self.wall2ProjectorSurface[4] = (int(temp[0]), int(temp[1]))
 
-        targetParser = SafeConfigParser()
-        targetParser.read("targets.ini")
-        self.targets = {}
-        for x in range(1,101):
-            wall1Str = targetParser.get(str(x), 'wall1')
-            wall2Str = targetParser.get(str(x), 'wall2')
-            wall3Str = targetParser.get(str(x), 'wall3')
-            wall4Str = targetParser.get(str(x), 'wall4')
-            ceilingStr = targetParser.get(str(x), 'ceiling')
-            self.targets[x] = {}
-            self.targets[x]['target'] = targetParser.get(str(x), 'target')
-            self.targets[x]['wall1'] = self.getSurfaceTargets(wall1Str)
-            self.targets[x]['wall2'] = self.getSurfaceTargets(wall2Str)
-            self.targets[x]['wall3'] = self.getSurfaceTargets(wall3Str)
-            self.targets[x]['wall4'] = self.getSurfaceTargets(wall4Str)
-            self.targets[x]['ceiling'] = self.getSurfaceTargets(ceilingStr)
+        self.targets = Targets()
+        self.targets.parseFile("targets.ini")
 
         self.drawLayout(1)
 
@@ -842,5 +870,127 @@ class client:
         time.sleep(0.2)
         pygame.quit()
 
+class Targets:
+    NO_TARGETS_WIDE = None
+    NO_TARGETS_TALL = None
+    NO_TARGETS_DEEP = None
+    TARGET_COUNT_LONG_SURFACE = None
+    TARGET_COUNT_SQUARE_SURFACE = None
+    KEY_X = None
+    KEY_Y = None
+
+    def stringToTargetArray(self, surfaceString):
+        surface = surfaceString.split(";")
+        for x in range(0,len(surface)):
+            surface[x] = surface[x].split(":")
+            temp = surface[x][0].split(",")
+            surface[x][0] = (int(temp[0]), int(temp[1]))
+        return surface
+
+    def parseFile(self, filename):
+        targetParser = SafeConfigParser()
+        targetParser.read(filename)
+
+        # Get all the configuration details from the targets.ini file
+        self.NO_TARGETS_WIDE = int(targetParser.get("configuration", "NO_TARGETS_WIDE"))
+        self.NO_TARGETS_TALL = int(targetParser.get("configuration", "NO_TARGETS_TALL"))
+        self.NO_TARGETS_DEEP = int(targetParser.get("configuration", "NO_TARGETS_DEEP"))
+        self.TARGET_COUNT_LONG_SURFACE = int(targetParser.get("configuration", "TARGET_COUNT_LONG_SURFACE"))
+        self.TARGET_COUNT_SQUARE_SURFACE = int(targetParser.get("configuration", "TARGET_COUNT_SQUARE_SURFACE"))
+        self.KEY_X = int(targetParser.get("configuration", "KEY_X"))
+        self.KEY_Y = int(targetParser.get("configuration", "KEY_Y"))
+
+        # Get all the target locations from the targets.ini file
+        self.targets = {}
+        for x in range(1,101):
+            wall1Str = targetParser.get(str(x), 'wallF')
+            wall2Str = targetParser.get(str(x), 'wallB')
+            wall3Str = targetParser.get(str(x), 'wallL')
+            wall4Str = targetParser.get(str(x), 'wallR')
+            ceilingStr = targetParser.get(str(x), 'ceiling')
+            self.targets[x] = {}
+            self.targets[x]['target'] = targetParser.get(str(x), 'target')
+            self.targets[x]['wallF'] = self.stringToTargetArray(wall1Str)
+            self.targets[x]['wallB'] = self.stringToTargetArray(wall2Str)
+            self.targets[x]['wallL'] = self.stringToTargetArray(wall3Str)
+            self.targets[x]['wallR'] = self.stringToTargetArray(wall4Str)
+            self.targets[x]['ceiling'] = self.stringToTargetArray(ceilingStr)
+
+    def getTargetsWide(self):
+        return self.NO_TARGETS_WIDE
+
+    def getTargetsTall(self):
+        return self.NO_TARGETS_TALL
+
+    def getTargetsDeep(self):
+        return self.NO_TARGETS_DEEP
+
+    def getTargetCountLongSurface(self):
+        return self.TARGET_COUNT_LONG_SURFACE
+
+    def getTargetCountSquareSurface(self):
+        return self.TARGET_COUNT_SQUARE_SURFACE
+
+    def getTargetKeyLocation(self):
+        return self.KEY_X, self.KEY_Y
+
+    def getTargetIcon(self, layout):
+        return self.targets[layout]['target']
+
+    def getTargetLocation(self, layout):
+        for x in range(0, self.TARGET_COUNT_SQUARE_SURFACE):
+            target = self.targets[layout]["wallF"][x]
+            if target[1] == self.getTargetIcon(layout):
+                return target[0], "Front"
+        for x in range(0, self.TARGET_COUNT_SQUARE_SURFACE):
+            target = self.targets[layout]["wallB"][x]
+            if target[1] == self.getTargetIcon(layout):
+                return target[0], "Back"
+        for x in range(0, self.TARGET_COUNT_LONG_SURFACE):
+            target = self.targets[layout]["wallL"][x]
+            if target[1] == self.getTargetIcon(layout):
+                return target[0], "Left"
+        for x in range(0, self.TARGET_COUNT_LONG_SURFACE):
+            target = self.targets[layout]["wallR"][x]
+            if target[1] == self.getTargetIcon(layout):
+                return target[0], "Right"
+        for x in range(0, self.TARGET_COUNT_LONG_SURFACE):
+            target = self.targets[layout]["ceiling"][x]
+            if target[1] == self.getTargetIcon(layout):
+                return target[0], "Ceiling"
+        print "ERROR: Target not found among distractors. Poorly formed ini file."
+
+
+    def getDistractorLocation(self, layout, wall, targetNo):
+        location = None
+        if wall.lower() == "front":
+            location = self.targets[layout]['wallF'][targetNo][0]
+        elif wall.lower() == "back":
+            location = self.targets[layout]['wallB'][targetNo][0]
+        elif wall.lower() == "left":
+            location = self.targets[layout]['wallL'][targetNo][0]
+        elif wall.lower() == "right":
+            location = self.targets[layout]['wallR'][targetNo][0]
+        elif wall.lower() == "ceiling":
+            location = self.targets[layout]['ceiling'][targetNo][0]
+        else:
+            print "ERROR: Invalid wall name - \"" + wall + "\""
+        return location
+
+    def getDistractorIconImage(self, layout, wall, targetNo):
+        icon = None
+        if wall.lower() == "front":
+            icon = self.targets[layout]['wallF'][targetNo][1]
+        elif wall.lower() == "back":
+            icon = self.targets[layout]['wallB'][targetNo][1]
+        elif wall.lower() == "left":
+            icon = self.targets[layout]['wallL'][targetNo][1]
+        elif wall.lower() == "right":
+            icon = self.targets[layout]['wallR'][targetNo][1]
+        elif wall.lower() == "ceiling":
+            icon = self.targets[layout]['ceiling'][targetNo][1]
+        else:
+            print "ERROR: Invalid wall name - \"" + wall + "\""
+        return icon
 
 client()
