@@ -34,10 +34,12 @@ class MyDialog(tkSimpleDialog.Dialog):
 
 class client:
     __slots__ = ['ppe']
-    CANVAS1PROJ = 1
-    CANVAS2PROJ = 1
-    CANVAS3PROJ = 1
-    CANVAS4PROJ = 1
+    FRONTCANVASPROJ = 2
+    RIGHTCANVASPROJ = 1
+    BACKCANVASPROJ = 1
+    LEFTCANVASPROJ = 1
+    CEILINGCANVASPROJ = 1
+    wallToPlaneIndex = {'front': 0, 'right': 1, 'back': 2, 'left': 3, 'ceiling': 4}
     quit = False
     refreshrate = 0
     mainCur = None
@@ -50,36 +52,11 @@ class client:
     mouseTask = True
     wall2ProjectorSurface = {}
     planes = []
-    wallgrids = [[[0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0]],
-
-                 [[0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0]],
-
-                 [[0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0]],
-
-                 [[0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0]],
-
-                 [[0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0]]]
     wallTargets = [[],[],[],[],[]]
+    mouseLocationProp = (0,0)
+    mouseProjector = 1
+    mouseSurface = 1
+    surfaceToCanvas = {}
 
 
 
@@ -392,10 +369,16 @@ class client:
                             if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
                                 self.sender.hideCursor(2, self.curs[2+x])
                                 self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                                self.mouseProjector = 1
+                                self.mouseSurface = mouseLocations[x][2][1]
                                 self.sender.showCursor(1, self.curs[0+x])
                             elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
                                 self.sender.hideCursor(1, self.curs[0+x])
                                 self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                                self.mouseProjector = 2
+                                self.mouseSurface = mouseLocations[x][2][1]
                                 self.sender.showCursor(2, self.curs[2+x])
                 else: # Runs if it is pointing that is to control the cursor
                     intersections = [1, 1, 1, 1]
@@ -429,10 +412,16 @@ class client:
                         if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
                             self.sender.hideCursor(2, self.curs[2+x])
                             self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                            self.mouseProjector = 1
+                            self.mouseSurface = mouseLocations[x][2][1]
                             self.sender.showCursor(1, self.curs[0+x])
                         elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
                             self.sender.hideCursor(1, self.curs[0+x])
                             self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                            self.mouseProjector = 2
+                            self.mouseSurface = mouseLocations[x][2][1]
                             self.sender.showCursor(2, self.curs[2+x])
 
     # Locks the mouse so that the server can be controlled
@@ -498,147 +487,107 @@ class client:
         self.slogan.pack(side=LEFT)
         self.master.mainloop()
 
-    '''def assignRandomTargets(self, wallNo, noOfTargets):
-        if 0 < wallNo <= 5:  # Checks that the wall number is valid (between 1 and 5)
-            if noOfTargets <= 25:
-                targets = []
-                for x in range(0, noOfTargets):
-                    foundSpace = False
-                    while not foundSpace:
-                        # Create random grid coordinates
-                        xrand = randint(0, 4)
-                        yrand = randint(0, 4)
-                        hit = False
-                        for y in range(0, len(targets)):
-                            if targets[y][0] == xrand and targets[y][1] == yrand:
-                                hit = True
-                        if not hit:
-                            foundSpace = True
-
-                    # Convert grid coordinates to surface coordinates
-                    realX = xrand*2/10.0+0.1
-                    realY = 1-(yrand*2/10.0+0.1)
-                    foundUnused = False
-                    while not foundUnused:
-                        fileNumber = randint(7, 144)
-                        hit = False
-                        for y in range(0, len(self.wallTargets)):
-                            for z in range(0, len(self.wallTargets[y])):
-                                if self.wallTargets[y][z][2] == fileNumber:
-                                    hit = True
-                        if not hit:
-                            foundUnused = True
-                    icon = self.sender.newTexRectangle(1, self.wallCanvases[wallNo-1], realX - 0.05, realY + 0.05, 0.1,
-                                                       0.1, "prop", "img/" + str(fileNumber) + ".png")
-                    targets.append((xrand, yrand, fileNumber, icon))
-                self.wallTargets[wallNo-1] = targets
-            else:
-                print "You can't have that many targets"
-        else:
-            print "There is no wall " + str(wallNo)'''
-
-    def drawTarget(self, wallNo, x, y, icon):
-        realX, realY = self.gridCoordToPropCenter(x, y)
-        projector, canvas = self.targetWallToRoom(wallNo)
-        target = self.sender.newTexRectangle(projector, canvas, realX - 0.05, realY + 0.05, 0.1, 0.1, "prop", "img/" + str(icon) + ".png")
+    def drawTarget(self, wall, x, y, icon):
+        projector, canvas = self.wallToProjCanvas(wall)
+        targetDim = self.targets.getTargetDimensionProp()
+        target = self.sender.newTexRectangle(projector, canvas, x - (targetDim/2), y + (targetDim/2), targetDim, targetDim, "prop", "img/" + str(icon))
         return target
 
     def drawLayout(self, layoutNo):
-        dest = self.targets[layoutNo]['target']
-        location = None
-        wallTargets = self.targets[layoutNo]['wall1']
-        for x in range(0, len(wallTargets)):
-            target = wallTargets[x]
-            if int(dest) == int(target[1]):
-                location = target[0]
-            self.drawTarget(0, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
-        wallTargets = self.targets[layoutNo]['wall2']
-        for x in range(0, len(wallTargets)):
-            target = wallTargets[x]
-            if int(dest) == int(target[1]):
-                location = target[0]
-            self.drawTarget(1, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
-        wallTargets = self.targets[layoutNo]['wall3']
-        for x in range(0, len(wallTargets)):
-            target = wallTargets[x]
-            if int(dest) == int(target[1]):
-                location = target[0]
-            self.drawTarget(2, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
-        wallTargets = self.targets[layoutNo]['wall4']
-        for x in range(0, len(wallTargets)):
-            target = wallTargets[x]
-            if int(dest) == int(target[1]):
-                location = target[0]
-            self.drawTarget(3, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
-        wallTargets = self.targets[layoutNo]['ceiling']
-        for x in range(0, len(wallTargets)):
-            target = wallTargets[x]
-            if int(dest) == int(target[1]):
-                location = target[0]
-            self.drawTarget(4, target[0][0], target[0][1], target[1]) #TODO STATE WALL NO
-        return (location[0]-1, location[1]-1)
+        targetIcon = self.targets.getTargetIcon(layoutNo)
+        keyLocation = self.targets.getTargetKeyLocation()
+        self.drawTarget("Front", keyLocation[0], keyLocation[1], targetIcon)
+        self.drawKeyBorder("Front", keyLocation[0], keyLocation[1])
 
-    def isHit(self, mouseCanvas, mouseCoor, targetCanvas, targetLoc):
-        canvasNo = self.wallCanvases(mouseCanvas)[1]
-        projectorNo = self.wallCanvases(mouseCanvas)[0]
-        canvasWidth = self.sender.getCanvasWidth(projectorNo, canvasNo)
-        canvasHeight = self.sender.getCanvasHeight(projectorNo, canvasNo)
-        targetXProp, targetYProp = self.gridCoordToPropCenter(targetLoc[0], targetLoc[1])
-        targetXReal = targetXProp * canvasWidth
-        targetYReal = targetYProp * canvasHeight
-        targetWidth = 0.1 * canvasWidth
-        targetHeight = 0.1 * canvasHeight
-        if mouseCoor[0]>targetXReal and mouseCoor[0]<(targetXReal+targetWidth):
-            if mouseCoor[1]>targetYReal and mouseCoor[1]<(targetYReal+targetHeight):
-                return True
+        for x in range(0, self.targets.getTargetCountSquareSurface()):
+            distractorIcon = self.targets.getDistractorIcon(layoutNo, "Front", x)
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Front", x)[0]
+            self.drawTarget("Front", distractorLocation[0], distractorLocation[1], distractorIcon)
+
+        for x in range(0, self.targets.getTargetCountSquareSurface()):
+            distractorIcon = self.targets.getDistractorIcon(layoutNo, "Back", x)
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Back", x)[0]
+            self.drawTarget("Back", distractorLocation[0], distractorLocation[1], distractorIcon)
+
+        for x in range(0, self.targets.getTargetCountLongSurface()):
+            distractorIcon = self.targets.getDistractorIcon(layoutNo, "Left", x)
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Left", x)[0]
+            self.drawTarget("Left", distractorLocation[0], distractorLocation[1], distractorIcon)
+
+        for x in range(0, self.targets.getTargetCountLongSurface()):
+            distractorIcon = self.targets.getDistractorIcon(layoutNo, "Right", x)
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Right", x)[0]
+            self.drawTarget("Right", distractorLocation[0], distractorLocation[1], distractorIcon)
+
+        for x in range(0, self.targets.getTargetCountLongSurface()):
+            distractorIcon = self.targets.getDistractorIcon(layoutNo, "Ceiling", x)
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Ceiling", x)[0]
+            self.drawTarget("Ceiling", distractorLocation[0], distractorLocation[1], distractorIcon)
+
+    def isTargetHit(self, layout):
+        mouseCanvas = self.surfaceToCanvas[(self.mouseProjector, self.mouseSurface)]
+        wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas).lower()
+        if wallName == self.targets.getTargetLocation(layout)[1].lower(): # Check whether mouse and target on same wall
+            targetLocationProp = self.targets.getTargetLocationProp(layout)
+            targetDim = self.targets.getTargetDimensionProp()
+            xLeftTarget = targetLocationProp[0][0] - (targetDim/2)
+            xRightTarget = targetLocationProp[0][0] + (targetDim/2)
+            yTopTarget = targetLocationProp[0][1] + (targetDim/2)
+            yBottomTarget = targetLocationProp[0][1] - (targetDim/2)
+            if(self.mouseLocationProp[0]>=xLeftTarget and self.mouseLocationProp[0]<=xRightTarget):
+                if(self.mouseLocationProp[1]>=yBottomTarget and self.mouseLocationProp[1]<=yTopTarget):
+                    return True
         return False
 
     #self.angleBetweenVectors
     # Give grid coordinates and walls of start and end points to compute rotational distance between edges of start point and end point
-    def getRotationalDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
-        start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
+    def getRotationalDists(self, layout):
+        start, target = self.getStartAndTargetLocs(layout)
         headLoc = self.getHeadAxes()[0]
         startVec = start-headLoc
         targetVec = target-headLoc
         return self.angleBetweenVectors(startVec, targetVec)
 
     #return horizontal and vertical distances separately
-    def getPlanarDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
-        if(targetWall != REAR_WALL):
-            if(targetWall == CEILING):
-                part1 = self.getSurfaceWidthRemUp(startX, startY, FRONT_WALL)
-                part2 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, CEILING) #TODO CHECK WHAT START AND TARGET ARE THIS IS NOT CORRECT
-            elif(targetWall == LEFT_WALL):
-                part1 = self.getSurfaceWidthRemLeft(startX, startY, FRONT_WALL)
-                part2 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, LEFT_WALL)
-            elif(targetWall == RIGHT_WALL):
-                part1 = self.getSurfaceWidthRemRight(startX, startY, FRONT_WALL)
-                part2 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY. RIGHT_WALL)
+    def getPlanarDists(self, layout):
+        startX, startY = self.targets.getTargetKeyLocation()
+        targetLoc, targetWall = self.targets.getTargetLocation(layout)
+        targetGridX, targetGridY = targetLoc
+        if(targetWall.lower() != "back"):
+            if(targetWall.lower == "ceiling"):
+                part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
+                part2 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, "ceiling")
+            elif(targetWall == "left"):
+                part1 = self.getSurfaceWidthRemLeft(startX, startY, "front")
+                part2 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, "left")
+            elif(targetWall == "right"):
+                part1 = self.getSurfaceWidthRemRight(startX, startY, "front")
+                part2 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, "right")
             else:
                 print "Invalid target wall"
         else:
             #Calculate distance across ceiling
-            part1 = self.getSurfaceWidthRemUp(startX, startX, FRONT_WALL)
-            part2 = CEILING_LENGTH
-            part3 = self.getSurfaceWidthRemUp(targetGridX, targetGridY, REAR_WALL)
+            part1 = self.getSurfaceWidthRemUp(startX, startX, "front")
+            part2 = self.getSurfaceLength("ceiling")
+            part3 = self.getSurfaceWidthRemUp(targetGridX, targetGridY, "back")
             distanceCeiling = part1 + part2 + part3
 
             #Calculate distance across floor
-            part1 = self.getSurfaceWidthRemDown(startX, startX, FRONT_WALL)
-            part2 = FLOOR_LENGTH
-            part3 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, REAR_WALL)
+            part1 = self.getSurfaceWidthRemDown(startX, startX, "front")
+            part2 = self.getSurfaceLength("floor")
+            part3 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, "back")
             distanceFloor = part1 + part2 + part3
 
             #Calculate distance across left wall
-            part1 = self.getSurfaceWidthRemLeft(startX, startX, FRONT_WALL)
-            part2 = LEFT_LENGTH
-            part3 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, REAR_WALL)
+            part1 = self.getSurfaceWidthRemLeft(startX, startX, "front")
+            part2 = self.getSurfaceLength("left")
+            part3 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, "back")
             distanceLeft = part1 + part2 + part3
 
             #Calculate distance across right wall
-            part1 = self.getSurfaceWidthRemRight(startX, startX, FRONT_WALL)
-            part2 = RIGHT_LENGTH
-            part3 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, REAR_WALL)
+            part1 = self.getSurfaceWidthRemRight(startX, startX, "front")
+            part2 = self.getSurfaceLength("right")
+            part3 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, "back")
             distanceRight = part1 + part2 + part3
 
             #Find which path is shortest
@@ -658,15 +607,29 @@ class client:
 
             #TODO distance remainder on current wall + side wall length + distance on target wall
 
-    def getDirectDists(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
-        start, target = self.getStartAndTargetLocs(startWall, startX, startY, targetWall, targetGridX, targetGridY)
+    def getSurfaceLength(self, wall): #TODO CREATE SURFACE LENGTH VARIABLES
+        if wall.lower() == "ceiling":
+            return self.CEILINGLENGTH
+        elif wall.lower() == "left":
+            return self.LEFTWALLLENGTH
+        elif wall.lower() == "right":
+            return self.RIGHTWALLLENGTH
+        elif wall.lower() == "floor":
+            return self.FLOORLENGTH
+        else:
+            print "Invalid surface name - " + str(wall)
+            return 0
+
+    def getDirectDists(self, layout):
+        start, target = self.getStartAndTargetLocs(layout)
         return self.distBetweenPoints(start, target)
 
     def getSurfaceWidthRemLeft(self, pointX, pointY, wall):
+        wall = self.wallToPlaneIndex[wall.lower()]
         realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = 0, realPointY
         wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]# TODO Implement
+        wallTR = self.planes[wall][0][3]  #TODO CHECK
         wallBL = self.planes[wall][0][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
@@ -677,6 +640,7 @@ class client:
         return self.distBetweenPoints(point, edge)
 
     def getSurfaceWidthRemRight(self, pointX, pointY, wall):
+        wall = self.wallToPlaneIndex[wall.lower()]
         realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = 1, realPointY
         wallTL = self.planes[wall][0][2]
@@ -691,8 +655,9 @@ class client:
         return self.distBetweenPoints(point, edge)
 
     def getSurfaceWidthRemUp(self, pointX, pointY, wall):
+        wall = self.wallToPlaneIndex[wall.lower()]
         realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
-        realEdgeX, realEdgeY = realPointX, 1 #TODO check if 1 is top
+        realEdgeX, realEdgeY = realPointX, 1
         wallTL = self.planes[wall][0][2]
         wallTR = self.planes[wall][0][3]
         wallBL = self.planes[wall][0][5]
@@ -705,8 +670,9 @@ class client:
         return self.distBetweenPoints(point, edge)
 
     def getSurfaceWidthRemDown(self, pointX, pointY, wall):
+        wall = self.wallToPlaneIndex[wall.lower()]
         realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
-        realEdgeX, realEdgeY = realPointX, 0  #TODO check if 0 is bottom
+        realEdgeX, realEdgeY = realPointX, 0
         wallTL = self.planes[wall][0][2]
         wallTR = self.planes[wall][0][3]
         wallBL = self.planes[wall][0][5]
@@ -720,7 +686,12 @@ class client:
 
 
     # Get the real world locations of the start and target points
-    def getStartAndTargetLocs(self, startWall, startX, startY, targetWall, targetGridX, targetGridY):
+    def getStartAndTargetLocs(self, layout):
+        startX, startY = self.targets.getTargetKeyLocation()
+        targetLoc, targetWall = self.targets.getTargetLocation(layout)
+        targetGridX, targetGridY = targetLoc
+        startWall = self.wallToPlaneIndex["front"]
+        targetWall = self.wallToPlaneIndex[targetWall.lower()]
         # Gather the proportional coordinates for the start and target points
         realStartX, realStartY = self.gridCoordToPropCenter(startX, startY)
         realTargetX, realTargetY = self.gridCoordToPropCenter(targetGridX, targetGridY)
@@ -741,27 +712,32 @@ class client:
         target = targetWallTL+targetHVec+targetVVec
         return start, target
 
-    def gridCoordToPropCenter(self, x, y):
+    def gridCoordToPropCenter(self, x, y): #TODO FIX FOR ALL NUMBERS OF TARGETS
         x -= 1
         y -= 1
         x = x*2/10.0+0.1
         y = 1 - (y*2/10/0+0.1)
         return (x, y)
 
-    def removeWallTargets(self, wallNo):
-        targets = self.wallTargets[wallNo-1]
+    def removeWallTargets(self, wallNo): #TODO NEED TO REIMPLEMENT
+        '''targets = self.wallTargets[wallNo-1]
         self.wallTargets[wallNo-1] = []
         for x in range(0, len(targets)):
-            self.sender.removeElement(self.wallCanvases[wallNo-1][0], targets[x][3], self.wallCanvases[wallNo-1][1])
+            self.sender.removeElement(self.wallCanvases[wallNo-1][0], targets[x][3], self.wallCanvases[wallNo-1][1])'''
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
         self.wallCanvases = []
-        self.wallCanvases.append((self.CANVAS1PROJ, self.sender.newCanvas(self.CANVAS1PROJ, 1, 0, 1, 1, 1, "prop", "wall1")))
-        self.assignRandomTargets(1, 25)
-        self.wallCanvases.append((self.CANVAS2PROJ, self.sender.newCanvas(self.CANVAS2PROJ, 2, 0, 1, 1, 1, "prop", "wall2")))
-        self.wallCanvases.append((self.CANVAS3PROJ, self.sender.newCanvas(self.CANVAS3PROJ, 3, 0, 1, 1, 1, "prop", "wall3")))
-        self.wallCanvases.append((self.CANVAS4PROJ, self.sender.newCanvas(self.CANVAS4PROJ, 4, 0, 1, 1, 1, "prop", "wall4")))
+        self.wallCanvases.append((self.FRONTCANVASPROJ, self.sender.newCanvas(self.FRONTCANVASPROJ, 1, 0, 1, 1, 1, "prop", "front")))
+        self.wallCanvases.append((self.RIGHTCANVASPROJ, self.sender.newCanvas(self.RIGHTCANVASPROJ, 1, 0, 1, 1, 1, "prop", "right")))
+        self.wallCanvases.append((self.BACKCANVASPROJ, self.sender.newCanvas(self.BACKCANVASPROJ, 2, 0, 1, 1, 1, "prop", "back")))
+        self.wallCanvases.append((self.LEFTCANVASPROJ, self.sender.newCanvas(self.LEFTCANVASPROJ, 3, 0, 1, 1, 1, "prop", "left")))
+        self.wallCanvases.append((self.CEILINGCANVASPROJ, self.sender.newCanvas(self.CEILINGCANVASPROJ, 4, 0, 1, 1, 1, "prop", "ceiling")))
+        self.surfaceToCanvas[(self.FRONTCANVASPROJ, 1)] = self.wallCanvases[0]
+        self.surfaceToCanvas[(self.RIGHTCANVASPROJ, 1)] = self.wallCanvases[1]
+        self.surfaceToCanvas[(self.BACKCANVASPROJ, 2)] = self.wallCanvases[2]
+        self.surfaceToCanvas[(self.LEFTCANVASPROJ, 3)] = self.wallCanvases[3]
+        self.surfaceToCanvas[(self.CEILINGCANVASPROJ, 4)] = self.wallCanvases[4]
         self.curs = []
         self.curs.append(self.sender.newCursor(1, 1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(1, self.curs[0])
@@ -771,6 +747,21 @@ class client:
         self.sender.hideCursor(2, self.curs[0])
         self.curs.append(self.sender.newCursor(2, 1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(2, self.curs[1])
+
+    def wallToProjCanvas(self, wall):
+        for x in range(0, len(self.wallCanvases)):
+            if self.sender.getCanvasName(self.wallCanvases[x][0], self.wallCanvases[x][1]) == wall.lower():
+                return self.wallCanvases[x][0], self.wallCanvases[x][1]
+        print "No such wall"
+        return None
+
+    def projCanvasToWall(self, projector, canvas):
+        for x in range(0, len(self.wallCanvases)):
+            if self.wallCanvases[x][0] == projector and self.wallCanvases[x][1] == canvas:
+                return self.sender.getCanvasName(self.wallCanvases[x][0], self.wallCanvases[x][1])
+        print "No such projector/canvas combination"
+        return None
+
 
     def loadWallCoordinates(self, filename):
         with open(filename, 'rb') as csvfile:
@@ -878,6 +869,7 @@ class Targets:
     TARGET_COUNT_SQUARE_SURFACE = None
     KEY_X = None
     KEY_Y = None
+    targetDimProp = None
 
     def stringToTargetArray(self, surfaceString):
         surface = surfaceString.split(";")
@@ -915,6 +907,7 @@ class Targets:
             self.targets[x]['wallL'] = self.stringToTargetArray(wall3Str)
             self.targets[x]['wallR'] = self.stringToTargetArray(wall4Str)
             self.targets[x]['ceiling'] = self.stringToTargetArray(ceilingStr)
+        self.targetDimProp = 1.0/(self.NO_TARGETS_TALL) * 0.75
 
     def getTargetsWide(self):
         return self.NO_TARGETS_WIDE
@@ -934,8 +927,19 @@ class Targets:
     def getTargetKeyLocation(self):
         return self.KEY_X, self.KEY_Y
 
+    def getTargetKeyLocationProp(self):
+        gridLoc = self.getTargetKeyLocation()
+        widthSegment = 1.0/self.getTargetsWide()
+        locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+        heightSegment = 1.0/self.getTargetsTall()
+        locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        return locationX, locationY
+
     def getTargetIcon(self, layout):
         return self.targets[layout]['target']
+
+    def getTargetDimensionProp(self): #TODO Make Dimension based on wall
+        return self.targetDimProp
 
     def getTargetLocation(self, layout):
         for x in range(0, self.TARGET_COUNT_SQUARE_SURFACE):
@@ -960,6 +964,28 @@ class Targets:
                 return target[0], "Ceiling"
         print "ERROR: Target not found among distractors. Poorly formed ini file."
 
+    def getTargetLocationProp(self, layout):
+        gridLoc = self.getTargetLocation(layout)
+        locationX = 0
+        locationY = 0
+        wall = gridLoc[1]
+        gridLoc = gridLoc[0]
+        if wall.lower() == "front" or wall.lower() == "back":
+            widthSegment = 1.0/self.getTargetsWide()
+            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+            heightSegment = 1.0/self.getTargetsTall()
+            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        elif wall.lower() == "left" or wall.lower() == "right":
+            widthSegment = 1.0/self.getTargetsDeep()
+            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+            heightSegment = 1.0/self.getTargetsTall()
+            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        elif wall.lower() == "ceiling":
+            widthSegment = 1.0/self.getTargetsWide()
+            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+            heightSegment = 1.0/self.getTargetsDeep()
+            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        return (locationX, locationY), wall
 
     def getDistractorLocation(self, layout, wall, targetNo):
         location = None
@@ -976,6 +1002,27 @@ class Targets:
         else:
             print "ERROR: Invalid wall name - \"" + wall + "\""
         return location
+
+    def getDistractorLocationProp(self, layout, wall, targetNo):
+        gridLoc = self.getDistractorLocation(layout, wall, targetNo)
+        locationX = 0
+        locationY = 0
+        if wall.lower() == "front" or wall.lower() == "back":
+            widthSegment = 1.0/self.getTargetsWide()
+            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+            heightSegment = 1.0/self.getTargetsTall()
+            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        elif wall.lower() == "left" or wall.lower() == "right":
+            widthSegment = 1.0/self.getTargetsDeep()
+            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+            heightSegment = 1.0/self.getTargetsTall()
+            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        elif wall.lower() == "ceiling":
+            widthSegment = 1.0/self.getTargetsWide()
+            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
+            heightSegment = 1.0/self.getTargetsDeep()
+            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        return locationX, locationY
 
     def getDistractorIcon(self, layout, wall, targetNo):
         icon = None
