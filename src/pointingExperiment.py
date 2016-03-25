@@ -57,7 +57,14 @@ class client:
     mouseProjector = 1
     mouseSurface = 1
     surfaceToCanvas = {}
-
+    visibleTargets = []
+    ceilingLength = 0
+    floorLength = 0
+    leftLength = 0
+    rightLength = 0
+    roomWidth = 0
+    roomHeight = 0
+    roomDepth = 0
 
 
     # Checks for mouse button and keyboard
@@ -489,8 +496,9 @@ class client:
 
     def drawTarget(self, wall, x, y, icon):
         projector, canvas = self.wallToProjCanvas(wall)
-        targetDim = self.targets.getTargetDimensionProp()
-        target = self.sender.newTexRectangle(projector, canvas, x - (targetDim/2), y + (targetDim/2), targetDim, targetDim, "prop", "img/" + str(icon))
+        targetDim = self.targets.getTargetDimensionProp(wall, self.roomHeight, self.roomWidth, self.roomDepth)
+        target = self.sender.newTexRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim, targetDim, "prop", "img/" + str(icon))
+        self.visibleTargets.append((projector, target, canvas))
         return target
 
     def drawLayout(self, layoutNo):
@@ -529,11 +537,11 @@ class client:
         wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas).lower()
         if wallName == self.targets.getTargetLocation(layout)[1].lower(): # Check whether mouse and target on same wall
             targetLocationProp = self.targets.getTargetLocationProp(layout)
-            targetDim = self.targets.getTargetDimensionProp()
-            xLeftTarget = targetLocationProp[0][0] - (targetDim/2)
-            xRightTarget = targetLocationProp[0][0] + (targetDim/2)
-            yTopTarget = targetLocationProp[0][1] + (targetDim/2)
-            yBottomTarget = targetLocationProp[0][1] - (targetDim/2)
+            targetDim = self.targets.getTargetDimensionProp(wallName, self.roomHeight, self.roomWidth, self.roomDepth)
+            xLeftTarget = targetLocationProp[0][0] - (targetDim[0]/2)
+            xRightTarget = targetLocationProp[0][0] + (targetDim[0]/2)
+            yTopTarget = targetLocationProp[0][1] + (targetDim[1]/2)
+            yBottomTarget = targetLocationProp[0][1] - (targetDim[1]/2)
             if(self.mouseLocationProp[0]>=xLeftTarget and self.mouseLocationProp[0]<=xRightTarget):
                 if(self.mouseLocationProp[1]>=yBottomTarget and self.mouseLocationProp[1]<=yTopTarget):
                     return True
@@ -550,8 +558,8 @@ class client:
 
     #return horizontal and vertical distances separately
     def getPlanarDists(self, layout):
-        startX, startY = self.targets.getTargetKeyLocation()
-        targetLoc, targetWall = self.targets.getTargetLocation(layout)
+        startX, startY = self.targets.getTargetKeyLocationProp()
+        targetLoc, targetWall = self.targets.getTargetLocationProp(layout)
         targetGridX, targetGridY = targetLoc
         if(targetWall.lower() != "back"):
             if(targetWall.lower == "ceiling"):
@@ -609,13 +617,13 @@ class client:
 
     def getSurfaceLength(self, wall): #TODO CREATE SURFACE LENGTH VARIABLES
         if wall.lower() == "ceiling":
-            return self.CEILINGLENGTH
+            return self.ceilingLength
         elif wall.lower() == "left":
-            return self.LEFTWALLLENGTH
+            return self.leftLength
         elif wall.lower() == "right":
-            return self.RIGHTWALLLENGTH
+            return self.rightLength
         elif wall.lower() == "floor":
-            return self.FLOORLENGTH
+            return self.floorLength
         else:
             print "Invalid surface name - " + str(wall)
             return 0
@@ -624,12 +632,11 @@ class client:
         start, target = self.getStartAndTargetLocs(layout)
         return self.distBetweenPoints(start, target)
 
-    def getSurfaceWidthRemLeft(self, pointX, pointY, wall):
+    def getSurfaceWidthRemLeft(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
-        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = 0, realPointY
         wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]  #TODO CHECK
+        wallTR = self.planes[wall][0][3]
         wallBL = self.planes[wall][0][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
@@ -639,9 +646,8 @@ class client:
         edge = wallTL + edgeHVec + edgeVVec
         return self.distBetweenPoints(point, edge)
 
-    def getSurfaceWidthRemRight(self, pointX, pointY, wall):
+    def getSurfaceWidthRemRight(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
-        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = 1, realPointY
         wallTL = self.planes[wall][0][2]
         wallTR = self.planes[wall][0][3]
@@ -654,9 +660,8 @@ class client:
         edge = wallTL + edgeHVec + edgeVVec
         return self.distBetweenPoints(point, edge)
 
-    def getSurfaceWidthRemUp(self, pointX, pointY, wall):
+    def getSurfaceWidthRemUp(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
-        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = realPointX, 1
         wallTL = self.planes[wall][0][2]
         wallTR = self.planes[wall][0][3]
@@ -669,9 +674,8 @@ class client:
         edge = wallTL + edgeHVec + edgeVVec
         return self.distBetweenPoints(point, edge)
 
-    def getSurfaceWidthRemDown(self, pointX, pointY, wall):
+    def getSurfaceWidthRemDown(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
-        realPointX, realPointY = self.gridCoordToPropCenter(pointX, pointY)
         realEdgeX, realEdgeY = realPointX, 0
         wallTL = self.planes[wall][0][2]
         wallTR = self.planes[wall][0][3]
@@ -684,17 +688,13 @@ class client:
         edge = wallTL + edgeHVec + edgeVVec
         return self.distBetweenPoints(point, edge)
 
-
     # Get the real world locations of the start and target points
     def getStartAndTargetLocs(self, layout):
-        startX, startY = self.targets.getTargetKeyLocation()
-        targetLoc, targetWall = self.targets.getTargetLocation(layout)
-        targetGridX, targetGridY = targetLoc
+        realStartX, realStartY = self.targets.getTargetKeyLocationProp()
+        targetLoc, targetWall = self.targets.getTargetLocationProp(layout)
+        realTargetX, realTargetY = targetLoc
         startWall = self.wallToPlaneIndex["front"]
         targetWall = self.wallToPlaneIndex[targetWall.lower()]
-        # Gather the proportional coordinates for the start and target points
-        realStartX, realStartY = self.gridCoordToPropCenter(startX, startY)
-        realTargetX, realTargetY = self.gridCoordToPropCenter(targetGridX, targetGridY)
         # Get the 3D real world coordinates for the top left, bottom right and bottom left of each surface
         startWallTL = self.planes[startWall][0][2]
         startWallTR = self.planes[startWall][0][3]
@@ -712,18 +712,10 @@ class client:
         target = targetWallTL+targetHVec+targetVVec
         return start, target
 
-    def gridCoordToPropCenter(self, x, y): #TODO FIX FOR ALL NUMBERS OF TARGETS
-        x -= 1
-        y -= 1
-        x = x*2/10.0+0.1
-        y = 1 - (y*2/10/0+0.1)
-        return (x, y)
-
-    def removeWallTargets(self, wallNo): #TODO NEED TO REIMPLEMENT
-        '''targets = self.wallTargets[wallNo-1]
-        self.wallTargets[wallNo-1] = []
-        for x in range(0, len(targets)):
-            self.sender.removeElement(self.wallCanvases[wallNo-1][0], targets[x][3], self.wallCanvases[wallNo-1][1])'''
+    def removeAllTargets(self):
+        for x in range(0, len(self.visibleTargets)):
+            projector, elementNo, canvasNo = self.visibleTargets[x]
+            self.sender.removeElement(projector, elementNo, canvasNo)
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
@@ -780,6 +772,24 @@ class client:
             self.planes.append([content[12], content[13], content[14], content[15], content[16], content[17]])
             self.planes.append([content[18], content[19], content[20], content[21], content[22], content[23]])
             self.planes.append([content[24], content[25], content[26], content[27], content[28], content[29]])
+
+            self.ceilingLength = (self.distBetweenPoints(content[26], content[29]) + self.distBetweenPoints(content[27], content[28]))/2
+            self.floorLength = (self.distBetweenPoints(content[4], content[17]) + self.distBetweenPoints(content[5], content[16]))/2
+            self.rightLength = (self.distBetweenPoints(content[8], content[9]) + self.distBetweenPoints(content[11], content[10]))/2
+            self.leftLength = (self.distBetweenPoints(content[20], content[21]) + self.distBetweenPoints(content[23], content[22]))/2
+            self.roomDepth = (self.ceilingLength + self.floorLength + self.leftLength + self.rightLength)/4
+
+            ceilingWidth = (self.distBetweenPoints(content[26], content[27]) + self.distBetweenPoints(content[29], content[28]))/2
+            leftHeight = (self.distBetweenPoints(content[21], content[22]) + self.distBetweenPoints(content[23], content[20]))/2
+            rightHeight = (self.distBetweenPoints(content[9], content[10]) + self.distBetweenPoints(content[11], content[8]))/2
+            floorWidth = (self.distBetweenPoints(content[4], content[5]) + self.distBetweenPoints(content[17], content[16]))/2
+            frontWidth = (self.distBetweenPoints(content[2], content[3]) + self.distBetweenPoints(content[5], content[4]))/2
+            frontHeight = (self.distBetweenPoints(content[2], content[5]) + self.distBetweenPoints(content[4], content[3]))/2
+            backWidth = (self.distBetweenPoints(content[14], content[15]) + self.distBetweenPoints(content[17], content[16]))/2
+            backHeight = (self.distBetweenPoints(content[14], content[17]) + self.distBetweenPoints(content[16], content[15]))/2
+
+            self.roomWidth = (frontWidth + backWidth + ceilingWidth + floorWidth)/4
+            self.roomHeight = (frontHeight + leftHeight + rightHeight + backHeight)/4
 
     # The main loop
     def __init__(self):
@@ -907,7 +917,9 @@ class Targets:
             self.targets[x]['wallL'] = self.stringToTargetArray(wall3Str)
             self.targets[x]['wallR'] = self.stringToTargetArray(wall4Str)
             self.targets[x]['ceiling'] = self.stringToTargetArray(ceilingStr)
-        self.targetDimProp = 1.0/(self.NO_TARGETS_TALL) * 0.75
+        self.targetAreaTall = 1.0/self.NO_TARGETS_TALL
+        self.targetAreaWide = 1.0/self.NO_TARGETS_WIDE
+        self.targetAreaDepth = 1.0/self.NO_TARGETS_DEEP
 
     def getTargetsWide(self):
         return self.NO_TARGETS_WIDE
@@ -938,8 +950,36 @@ class Targets:
     def getTargetIcon(self, layout):
         return self.targets[layout]['target']
 
-    def getTargetDimensionProp(self): #TODO Make Dimension based on wall
-        return self.targetDimProp
+    def getTargetDimensionProp(self, wall, realRoomHeight, realRoomWidth, realRoomDepth):
+        realTargetAreaTall = self.targetAreaTall * realRoomHeight
+        realTargetAreaWide = self.targetAreaWide * realRoomWidth
+        realTargetAreaDeep = self.targetAreaDepth * realRoomDepth
+        realTargetDeepProp = 0
+        realTargetWideProp = 0
+        realTargetTallProp = 0
+        if realTargetAreaTall <= realTargetAreaWide and realTargetAreaTall <= realTargetAreaDeep:
+            realTargetTallReal = 0.75 * realTargetAreaTall
+            realTargetTallProp = 0.75 * self.targetAreaTall
+            realTargetWideProp = realTargetTallReal/realRoomWidth
+            realTargetDeepProp = realTargetTallReal/realRoomDepth
+        elif realTargetAreaWide <= realTargetAreaTall and realTargetAreaWide <= realTargetAreaDeep:
+            realTargetWideReal = 0.75 * realTargetAreaWide
+            realTargetWideProp = 0.75 * self.targetAreaWide
+            realTargetTallProp = realTargetWideReal/realRoomHeight
+            realTargetDeepProp = realTargetWideReal/realRoomDepth
+        elif realTargetAreaDeep <= realTargetAreaTall and realTargetAreaDeep <= realTargetAreaWide:
+            realTargetDeepReal = 0.75 * realTargetAreaDeep
+            realTargetDeepProp = 0.75 * self.targetAreaDepth
+            realTargetWideProp = realTargetDeepReal/realRoomWidth
+            realTargetTallProp = realTargetDeepReal/realRoomHeight
+        if wall.lower() == "front" or wall.lower() == "back":
+            return (realTargetWideProp, realTargetTallProp)
+        elif wall.lower() == "left" or wall.lower() == "right":
+            return (realTargetDeepProp, realTargetTallProp)
+        elif wall.lower() == "ceiling":
+            return (realTargetWideProp, realTargetDeepProp)
+        print "ERROR: Invalid wall name \"" + str(wall) + "\""
+        return 0, 0
 
     def getTargetLocation(self, layout):
         for x in range(0, self.TARGET_COUNT_SQUARE_SURFACE):
