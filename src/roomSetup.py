@@ -12,7 +12,7 @@ import tkMessageBox
 
 
 class Client:
-    PROJECTOR = 1
+    PROJECTOR = 1 # 1 or 2
     ppe = None
     cornerdrag = False
     quit = False

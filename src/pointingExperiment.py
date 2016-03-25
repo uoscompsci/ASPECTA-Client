@@ -497,7 +497,7 @@ class client:
     def drawTarget(self, wall, x, y, icon):
         projector, canvas = self.wallToProjCanvas(wall)
         targetDim = self.targets.getTargetDimensionProp(wall, self.roomHeight, self.roomWidth, self.roomDepth)
-        target = self.sender.newTexRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim, targetDim, "prop", "img/" + str(icon))
+        target = self.sender.newTexRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", "img/" + str(icon))
         self.visibleTargets.append((projector, target, canvas))
         return target
 
@@ -505,31 +505,32 @@ class client:
         targetIcon = self.targets.getTargetIcon(layoutNo)
         keyLocation = self.targets.getTargetKeyLocation()
         self.drawTarget("Front", keyLocation[0], keyLocation[1], targetIcon)
-        self.drawKeyBorder("Front", keyLocation[0], keyLocation[1])
+        #TODO Enable
+        #self.drawKeyBorder("Front", keyLocation[0], keyLocation[1])
 
         for x in range(0, self.targets.getTargetCountSquareSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Front", x)
-            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Front", x)[0]
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Front", x)
             self.drawTarget("Front", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets.getTargetCountSquareSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Back", x)
-            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Back", x)[0]
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Back", x)
             self.drawTarget("Back", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets.getTargetCountLongSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Left", x)
-            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Left", x)[0]
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Left", x)
             self.drawTarget("Left", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets.getTargetCountLongSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Right", x)
-            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Right", x)[0]
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Right", x)
             self.drawTarget("Right", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets.getTargetCountLongSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Ceiling", x)
-            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Ceiling", x)[0]
+            distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Ceiling", x)
             self.drawTarget("Ceiling", distractorLocation[0], distractorLocation[1], distractorIcon)
 
     def isTargetHit(self, layout):
@@ -811,8 +812,6 @@ class client:
         self.targets = Targets()
         self.targets.parseFile("targets.ini")
 
-        self.drawLayout(1)
-
 
         tkinterThread = threading.Thread(target=self.tkinthread, args=())  # Creates the display thread
         tkinterThread.start()  # Starts the display thread
@@ -850,6 +849,7 @@ class client:
         # self.sender.loadDefinedSurfaces("DEFAULT")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
+        self.drawLayout(1)
 
         self.mouseLock = False
         pygame.mouse.set_visible(False)
