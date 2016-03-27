@@ -501,13 +501,19 @@ class client:
         self.visibleTargets.append((projector, target, canvas))
         return target
 
+    def drawKeyBorder(self, wall, layout):
+        projector, canvas = self.wallToProjCanvas(wall)
+        targetDim = self.targets.getTargetDimensionProp(wall, self.roomHeight, self.roomWidth, self.roomDepth)
+        x, y = self.targets.getTargetKeyLocationProp()
+        targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
+        self.border = self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1))
+
     def drawLayout(self, layoutNo):
         targetIcon = self.targets.getTargetIcon(layoutNo)
         keyLocation = self.targets.getTargetKeyLocationProp()
         print str(keyLocation)
+        self. drawKeyBorder("Front", layoutNo)
         self.drawTarget("Front", keyLocation[0], keyLocation[1], targetIcon)
-        #TODO Enable
-        #self.drawKeyBorder("Front", keyLocation[0], keyLocation[1])
 
         for x in range(0, self.targets.getTargetCountSquareSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Front", x)
@@ -718,6 +724,7 @@ class client:
         for x in range(0, len(self.visibleTargets)):
             projector, elementNo, canvasNo = self.visibleTargets[x]
             self.sender.removeElement(projector, elementNo, canvasNo)
+            # TODO Remove border too
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
