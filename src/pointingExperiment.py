@@ -503,7 +503,8 @@ class client:
 
     def drawLayout(self, layoutNo):
         targetIcon = self.targets.getTargetIcon(layoutNo)
-        keyLocation = self.targets.getTargetKeyLocation()
+        keyLocation = self.targets.getTargetKeyLocationProp()
+        print str(keyLocation)
         self.drawTarget("Front", keyLocation[0], keyLocation[1], targetIcon)
         #TODO Enable
         #self.drawKeyBorder("Front", keyLocation[0], keyLocation[1])
@@ -1068,6 +1069,7 @@ class Targets:
         icon = None
         if wall.lower() == "front":
             icon = self.targets[layout]['wallF'][targetNo][1]
+            print "Showing front icon " + icon
         elif wall.lower() == "back":
             icon = self.targets[layout]['wallB'][targetNo][1]
         elif wall.lower() == "left":
