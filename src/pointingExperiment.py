@@ -504,9 +504,9 @@ class client:
         targetDim = self.targets.getTargetDimensionProp(wall, self.roomHeight, self.roomWidth, self.roomDepth)
         x, y = self.targets.getTargetKeyLocationProp()
         targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
-        self.border = self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1))
+        self.border = (projector, self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1)), canvas)
 
-    def drawLayout(self, layoutNo):
+    def drawTargetLayout(self, layoutNo):
         targetIcon = self.targets.getTargetIcon(layoutNo)
         keyLocation = self.targets.getTargetKeyLocationProp()
         print str(keyLocation)
@@ -718,11 +718,11 @@ class client:
         target = targetWallTL+targetHVec+targetVVec
         return start, target
 
-    def removeAllTargets(self):
+    def clearTargetLayout(self):
         for x in range(0, len(self.visibleTargets)):
             projector, elementNo, canvasNo = self.visibleTargets[x]
             self.sender.removeElement(projector, elementNo, canvasNo)
-            # TODO Remove border too
+            self.sender.removeElement(self.border[0], self.border[1], self.border[2])
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
@@ -857,7 +857,7 @@ class client:
         # self.sender.loadDefinedSurfaces("DEFAULT")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
-        self.drawLayout(1)
+        self.drawTargetLayout(1)
 
         self.mouseLock = False
         pygame.mouse.set_visible(False)
