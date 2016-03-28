@@ -345,7 +345,7 @@ class client:
                         oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                         curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
-                        intersections = [1, 1, 1, 1]
+                        intersections = [1, 1, 1, 1, 1]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
@@ -368,8 +368,9 @@ class client:
                                 hvecangle = numpy.rad2deg(hvecangle)
                                 vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                                 vvecangle = numpy.rad2deg(vvecangle)
+                                surfaces = ["front", "right", "back", "left", "ceiling"]
                                 if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
-                                    mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[x+1]))
+                                    mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                 else:
                                     intersections[x] = 0
                         for x in range(0,len(mouseLocations)):
@@ -388,7 +389,7 @@ class client:
                                 self.mouseSurface = mouseLocations[x][2][1]
                                 self.sender.showCursor(2, self.curs[2+x])
                 else: # Runs if it is pointing that is to control the cursor
-                    intersections = [1, 1, 1, 1]
+                    intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
                         segCheck = self.segmentPlane(self.planes[x], self.getTrackerData()[0][0], self.getTrackerData()[0][1])
@@ -411,8 +412,9 @@ class client:
                             hvecangle = numpy.rad2deg(hvecangle)
                             vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                             vvecangle = numpy.rad2deg(vvecangle)
+                            surfaces = ["front", "right", "back", "left", "ceiling"]
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
-                                mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[x+1]))
+                                mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                             else:
                                 intersections[x] = 0
                     for x in range(0,len(mouseLocations)):
@@ -436,10 +438,6 @@ class client:
         self.mouseLock = True
         pygame.mouse.set_visible(False)
         self.sender.showCursor(1, self.curs[0])
-
-    def wall2proj(self, wall):
-        return self.wall2proj[wall]
-
 
     def serverInit(self):
         CONNECTION_LIST = []
@@ -804,19 +802,21 @@ class client:
     def __init__(self):
         parser = SafeConfigParser()
         parser.read("config.ini")
-        temp = parser.get('RoomSetup', 'wall1Surface')
+        temp = parser.get('RoomSetup', 'frontSurface')
         temp = temp.split(";")
-        self.wall2ProjectorSurface[1] = (int(temp[0]), int(temp[1]))
-        temp = parser.get('RoomSetup', 'wall2Surface')
+        self.wall2ProjectorSurface["front"] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'rightSurface')
         temp = temp.split(";")
-        self.wall2ProjectorSurface[2] = (int(temp[0]), int(temp[1]))
-        temp = parser.get('RoomSetup', 'wall3Surface')
+        self.wall2ProjectorSurface["right"] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'backSurface')
         temp = temp.split(";")
-        self.wall2ProjectorSurface[3] = (int(temp[0]), int(temp[1]))
-        temp = parser.get('RoomSetup', 'wall4Surface')
+        self.wall2ProjectorSurface["back"] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'leftSurface')
         temp = temp.split(";")
-        self.wall2ProjectorSurface[4] = (int(temp[0]), int(temp[1]))
-
+        self.wall2ProjectorSurface["left"] = (int(temp[0]), int(temp[1]))
+        temp = parser.get('RoomSetup', 'ceilingSurface')
+        temp = temp.split(";")
+        self.wall2ProjectorSurface["ceiling"] = (int(temp[0]), int(temp[1]))
         self.targets = Targets()
         self.targets.parseFile("targets.ini")
 
