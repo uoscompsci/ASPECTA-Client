@@ -65,6 +65,9 @@ class client:
     roomWidth = 0
     roomHeight = 0
     roomDepth = 0
+    keyHit = False
+    targetHit = False
+    state = 0
 
 
     # Checks for mouse button and keyboard
@@ -103,7 +106,12 @@ class client:
                         elapsedSecs = (
                         lClickRelTime - self.lClickTime).total_seconds()  # Checks how long the button was depressed
                         if (elapsedSecs < 0.15):
-                            pass
+                            if self.state == 1:
+                                if self.isKeyHit():
+                                    self.keyHit = True
+                            if self.state == 2:
+                                if self.isTargetHit(self.currentLayout):
+                                    self.targetHit = True
                         else:
                             pass
                     # Runs if the middle mouse button has been released
@@ -506,13 +514,13 @@ class client:
         targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
         self.border = (projector, self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1)), canvas)
 
-    def drawTargetLayout(self, layoutNo):
+    def drawKeyLayout(self, layoutNo):
         targetIcon = self.targets.getTargetIcon(layoutNo)
         keyLocation = self.targets.getTargetKeyLocationProp()
-        print str(keyLocation)
-        self. drawKeyBorder("Front", layoutNo)
+        self.drawKeyBorder("Front", layoutNo)
         self.drawTarget("Front", keyLocation[0], keyLocation[1], targetIcon)
 
+    def drawTargetLayout(self, layoutNo):
         for x in range(0, self.targets.getTargetCountSquareSurface()):
             distractorIcon = self.targets.getDistractorIcon(layoutNo, "Front", x)
             distractorLocation = self.targets.getDistractorLocationProp(layoutNo, "Front", x)
@@ -550,6 +558,22 @@ class client:
             yBottomTarget = targetLocationProp[0][1] - (targetDim[1]/2)
             if(self.mouseLocationProp[0]>=xLeftTarget and self.mouseLocationProp[0]<=xRightTarget):
                 if(self.mouseLocationProp[1]>=yBottomTarget and self.mouseLocationProp[1]<=yTopTarget):
+                    return True
+        return False
+
+    def isKeyHit(self):
+        mouseCanvas = self.surfaceToCanvas[(self.mouseProjector, self.mouseSurface)]
+        wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas).lower()
+        if wallName.lower() == "front":
+            keyLocationProp = self.targets.getTargetKeyLocationProp()
+            targetDim = self.targets.getTargetDimensionProp("front", self.roomHeight, self.roomWidth, self.roomDepth)
+            targetDim = targetDim[0]/75*100, targetDim[1]/75*100
+            xLeftTarget = keyLocationProp[0][0] - (targetDim[0] / 2)
+            xRightTarget = keyLocationProp[0][0] + (targetDim[0] / 2)
+            yTopTarget = keyLocationProp[0][1] + (targetDim[1] / 2)
+            yBottomTarget = keyLocationProp[0][1] - (targetDim[1] / 2)
+            if (self.mouseLocationProp[0] >= xLeftTarget and self.mouseLocationProp[0] <= xRightTarget):
+                if (self.mouseLocationProp[1] >= yBottomTarget and self.mouseLocationProp[1] <= yTopTarget):
                     return True
         return False
 
@@ -857,6 +881,7 @@ class client:
         # self.sender.loadDefinedSurfaces("DEFAULT")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
+        self.state = 0
         self.drawTargetLayout(1)
 
         self.mouseLock = False
@@ -864,6 +889,7 @@ class client:
 
         mouseThread = threading.Thread(target=self.mouseMovement, args=())  # Creates the display thread
         mouseThread.start()  # Starts the display thread
+        self.currentLayout = 1
 
         if (self.quit == False):
             while (self.quit == False):
@@ -873,6 +899,26 @@ class client:
                 textpos.centerx = self.background.get_rect().centerx
                 self.background.blit(text, textpos)
                 self.getInput(False)
+
+                # Run experimental process
+                if self.state == 0:
+                    self.drawKeyLayout(self.currentLayout)
+                    self.state = 1
+                    self.keyHit = False
+                elif self.state == 1:
+                    if self.keyHit:
+                        self.drawTargetLayout(self.currentLayout)
+                        self.sender.setRectangleLineColor(self.border[0], self.border[1], (0,1,0,1))
+                        # TODO start timing
+                        self.state = 2
+                        self.targetHit = False
+                elif self.state == 2:
+                    if self.targetHit:
+                        # TODO stop and record timing
+                        self.clearTargetLayout()
+                        self.currentLayout += 1
+                        self.state = 0
+
                 self.screen.blit(self.background, (0, 0))
                 pygame.display.flip()
                 time.sleep(1 / 30)
