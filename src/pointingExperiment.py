@@ -103,8 +103,7 @@ class client:
                     # Runs if the left mouse button has been released
                     if (event.button == 1):
                         lClickRelTime = datetime.datetime.now()
-                        elapsedSecs = (
-                        lClickRelTime - self.lClickTime).total_seconds()  # Checks how long the button was depressed
+                        elapsedSecs = (lClickRelTime - self.lClickTime).total_seconds()  # Checks how long the button was depressed
                         if (elapsedSecs < 0.15):
                             if self.state == 1:
                                 if self.isKeyHit():
@@ -117,8 +116,7 @@ class client:
                     # Runs if the middle mouse button has been released
                     if (event.button == 2):
                         mClickRelTime = datetime.datetime.now()
-                        elapsedSecs = (
-                        mClickRelTime - self.mClickTime).total_seconds()  # Checks how long the button was depressed
+                        elapsedSecs = (mClickRelTime - self.mClickTime).total_seconds()  # Checks how long the button was depressed
                         if (elapsedSecs < 0.25):
                             self.mouseLock = False
                             pygame.mouse.set_visible(True)
@@ -645,7 +643,7 @@ class client:
 
             #TODO distance remainder on current wall + side wall length + distance on target wall
 
-    def getSurfaceLength(self, wall): #TODO CREATE SURFACE LENGTH VARIABLES
+    def getSurfaceLength(self, wall):
         if wall.lower() == "ceiling":
             return self.ceilingLength
         elif wall.lower() == "left":
@@ -908,13 +906,15 @@ class client:
                 elif self.state == 1:
                     if self.keyHit:
                         self.drawTargetLayout(self.currentLayout)
-                        self.sender.setRectangleLineColor(self.border[0], self.border[1], (0,1,0,1))
-                        # TODO start timing
+                        self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
+                        self.keyClickTime = datetime.datetime.now()
                         self.state = 2
                         self.targetHit = False
                 elif self.state == 2:
                     if self.targetHit:
-                        # TODO stop and record timing
+                        self.targetClickTime = datetime.datetime.now()
+                        elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
+                        print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
                         self.clearTargetLayout()
                         self.currentLayout += 1
                         self.state = 0
