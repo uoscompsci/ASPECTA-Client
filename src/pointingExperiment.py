@@ -546,7 +546,7 @@ class client:
 
     def isTargetHit(self, layout):
         mouseCanvas = self.surfaceToCanvas[(self.mouseProjector, self.mouseSurface)]
-        wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas).lower()
+        wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas[1]).lower()
         if wallName == self.targets.getTargetLocation(layout)[1].lower(): # Check whether mouse and target on same wall
             targetLocationProp = self.targets.getTargetLocationProp(layout)
             targetDim = self.targets.getTargetDimensionProp(wallName, self.roomHeight, self.roomWidth, self.roomDepth)
@@ -561,15 +561,15 @@ class client:
 
     def isKeyHit(self):
         mouseCanvas = self.surfaceToCanvas[(self.mouseProjector, self.mouseSurface)]
-        wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas).lower()
+        wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas[1]).lower()
         if wallName.lower() == "front":
             keyLocationProp = self.targets.getTargetKeyLocationProp()
             targetDim = self.targets.getTargetDimensionProp("front", self.roomHeight, self.roomWidth, self.roomDepth)
             targetDim = targetDim[0]/75*100, targetDim[1]/75*100
-            xLeftTarget = keyLocationProp[0][0] - (targetDim[0] / 2)
-            xRightTarget = keyLocationProp[0][0] + (targetDim[0] / 2)
-            yTopTarget = keyLocationProp[0][1] + (targetDim[1] / 2)
-            yBottomTarget = keyLocationProp[0][1] - (targetDim[1] / 2)
+            xLeftTarget = keyLocationProp[0] - (targetDim[0] / 2)
+            xRightTarget = keyLocationProp[0] + (targetDim[0] / 2)
+            yTopTarget = keyLocationProp[1] + (targetDim[1] / 2)
+            yBottomTarget = keyLocationProp[1] - (targetDim[1] / 2)
             if (self.mouseLocationProp[0] >= xLeftTarget and self.mouseLocationProp[0] <= xRightTarget):
                 if (self.mouseLocationProp[1] >= yBottomTarget and self.mouseLocationProp[1] <= yTopTarget):
                     return True
@@ -780,7 +780,7 @@ class client:
         for x in range(0, len(self.wallCanvases)):
             if self.wallCanvases[x][0] == projector and self.wallCanvases[x][1] == canvas:
                 return self.sender.getCanvasName(self.wallCanvases[x][0], self.wallCanvases[x][1])
-        print "No such projector/canvas combination"
+        print "No such projector/canvas combination: proj = " + str(projector) + ", canvas = " + str(canvas)
         return None
 
 
