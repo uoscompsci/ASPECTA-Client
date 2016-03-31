@@ -889,6 +889,12 @@ class client:
         mouseThread.start()  # Starts the display thread
         self.currentLayout = 1
 
+        # TODO Record date
+        # TODO Record time
+        # TODO Record room real width
+        # TODO Record room real height
+        # TODO Record room real depth
+
         if (self.quit == False):
             while (self.quit == False):
                 self.background.fill((255, 255, 255))
@@ -914,9 +920,29 @@ class client:
                     if self.targetHit:
                         self.targetClickTime = datetime.datetime.now()
                         elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
+                        # TODO Record condition (pointing vs perspective)
+                        # TODO Record target ini file name
+                        # TODO Record distractor count long
+                        # TODO Record distractor count square
+                        # TODO Record trial number
+                        # TODO Record direct distance
+                        # TODO Record angle distance
+                        # TODO Record distance across surfaces
+                        # TODO Record movement trace coordinates
+                        # TODO Record target icon name
+                        # TODO Record key location
+                        # TODO Record target location
+                        # TODO Record depth in icons
+                        # TODO Record width in icons
+                        # TODO Record height in icons
+                        # TODO Record icon width
+                        # TODO Record icon height
+                        # TODO Record trial time
+                        # TODO Record trial date
+                        # TODO Record user coordinates (if perspective)
                         print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
                         self.clearTargetLayout()
-                        self.currentLayout += 1
+                        self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
                         self.state = 0
 
                 self.screen.blit(self.background, (0, 0))
