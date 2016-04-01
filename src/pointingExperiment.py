@@ -880,7 +880,6 @@ class client:
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
         self.state = 0
-        self.drawTargetLayout(1)
 
         self.mouseLock = False
         pygame.mouse.set_visible(False)
