@@ -939,6 +939,18 @@ class client:
                         # TODO Record trial time
                         # TODO Record trial date
                         # TODO Record user coordinates (if perspective)
+                        # TODO length of trajectory
+                        # TODO age
+                        # TODO gender
+                        # TODO order of conditions
+                        # TODO trial number within experiement and condition
+                        # TODO finding then moving vs parallel
+                        # TODO finding time and moving time
+                        # TODO maximum mouse velocity
+                        # TODO number of walls passed and needed
+                        # TODO intergrality and seperability of motion
+                        # TODO seperate file per path
+
                         print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
                         self.clearTargetLayout()
                         self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
