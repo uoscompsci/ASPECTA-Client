@@ -15,6 +15,7 @@ import tkSimpleDialog
 from math import sqrt, fabs
 import csv
 from random import randint
+import datetime
 
 
 class MyDialog(tkSimpleDialog.Dialog):
@@ -34,11 +35,16 @@ class MyDialog(tkSimpleDialog.Dialog):
 
 class client:
     __slots__ = ['ppe']
+    USERNO = 0
+    AGE = 0
+    GENDER = 'M'
+    SEQUENCENO = 0
     FRONTCANVASPROJ = 2
     RIGHTCANVASPROJ = 1
     BACKCANVASPROJ = 1
     LEFTCANVASPROJ = 1
     CEILINGCANVASPROJ = 1
+    parallelTask = True
     wallToPlaneIndex = {'front': 0, 'right': 1, 'back': 2, 'left': 3, 'ceiling': 4}
     quit = False
     refreshrate = 0
@@ -381,14 +387,16 @@ class client:
                                     intersections[x] = 0
                         for x in range(0,len(mouseLocations)):
                             if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
-                                self.sender.hideCursor(2, self.curs[2+x])
+                                self.sender.hideCursor(2, self.curs[3])
+                                self.sender.hideCursor(2, self.curs[2])
                                 self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                                 self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
                                 self.mouseProjector = 1
                                 self.mouseSurface = mouseLocations[x][2][1]
                                 self.sender.showCursor(1, self.curs[0+x])
                             elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
-                                self.sender.hideCursor(1, self.curs[0+x])
+                                self.sender.hideCursor(1, self.curs[1])
+                                self.sender.hideCursor(1, self.curs[0])
                                 self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
                                 self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
                                 self.mouseProjector = 2
@@ -820,6 +828,9 @@ class client:
             self.roomWidth = (frontWidth + backWidth + ceilingWidth + floorWidth)/4
             self.roomHeight = (frontHeight + leftHeight + rightHeight + backHeight)/4
 
+    def loadOrderFile(self, filename):
+
+
     # The main loop
     def __init__(self):
         parser = SafeConfigParser()
@@ -887,78 +898,161 @@ class client:
         mouseThread = threading.Thread(target=self.mouseMovement, args=())  # Creates the display thread
         mouseThread.start()  # Starts the display thread
         self.currentLayout = 1
+        now = datetime.datetime.now()
 
-        # TODO Record date
-        # TODO Record time
-        # TODO Record room real width
-        # TODO Record room real height
-        # TODO Record room real depth
+        order = {}
+        with open("order1.csv") as f:
+            records = csv.DictReader(f)
+            for row in records:
+                order[row['layout']] = row
+        orderIndex = 1
 
-        if (self.quit == False):
-            while (self.quit == False):
-                self.background.fill((255, 255, 255))
-                text = self.font.render("", 1, (10, 10, 10))
-                textpos = text.get_rect()
-                textpos.centerx = self.background.get_rect().centerx
-                self.background.blit(text, textpos)
-                self.getInput(False)
+        with open(str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
+            fieldnames = ['user_number',
+                          'date',
+                          'time',
+                          'age',
+                          'gender',
+                          'sequence_number',
+                          'room_width',
+                          'room_height',
+                          'room_depth',
+                          'key_location_prop',
+                          'target_dim_prop_F_B',
+                          'target_dim_prop_L_R',
+                          'target_dim_prop_C']
+            writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow({'user_number': str(self.USERNO),
+                             'date': str(now.date().day).zfill(2) + "/" +
+                                     str(now.date().month).zfill(2) + "/" +
+                                     str(now.date().year),
+                             'time': str(now.time().hour).zfill(2) + ":" +
+                                     str(now.time().minute).zfill(2) + ":" +
+                                     str(now.time().second).zfill(2),
+                             'age': str(self.AGE),
+                             'gender': self.GENDER,
+                             'sequence_number': str(self.SEQUENCENO),
+                             'room_width': str(self.roomWidth),
+                             'room_height': str(self.roomHeight),
+                             'room_depth': str(self.roomDepth),
+                             'key_location_prop': str(self.targets.getTargetKeyLocationProp()[0]) + "," +
+                                             str(self.targets.getTargetKeyLocationProp()[1]),
+                             'target_dim_prop_F_B': str(self.targets.getTargetDimensionProp('front', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
+                                               str(self.targets.getTargetDimensionProp('front', self.roomHeight, self.roomWidth, self.roomDepth)[1]),
+                             'target_dim_prop_L_R': str(self.targets.getTargetDimensionProp('left', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
+                                               str(self.targets.getTargetDimensionProp('left', self.roomHeight, self.roomWidth, self.roomDepth)[1]),
+                             'target_dim_prop_C': str(self.targets.getTargetDimensionProp('ceiling', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
+                                               str(self.targets.getTargetDimensionProp('ceiling', self.roomHeight, self.roomWidth, self.roomDepth)[1])})
 
-                # Run experimental process
-                if self.state == 0:
-                    self.drawKeyLayout(self.currentLayout)
-                    self.state = 1
-                    self.keyHit = False
-                elif self.state == 1:
-                    if self.keyHit:
-                        self.drawTargetLayout(self.currentLayout)
-                        self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
-                        self.keyClickTime = datetime.datetime.now()
-                        self.state = 2
-                        self.targetHit = False
-                elif self.state == 2:
-                    if self.targetHit:
-                        self.targetClickTime = datetime.datetime.now()
-                        elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
-                        # TODO Record condition (pointing vs perspective)
-                        # TODO Record target ini file name
-                        # TODO Record distractor count long
-                        # TODO Record distractor count square
-                        # TODO Record trial number
-                        # TODO Record direct distance
-                        # TODO Record angle distance
-                        # TODO Record distance across surfaces
-                        # TODO Record movement trace coordinates
-                        # TODO Record target icon name
-                        # TODO Record key location
-                        # TODO Record target location
-                        # TODO Record depth in icons
-                        # TODO Record width in icons
-                        # TODO Record height in icons
-                        # TODO Record icon width
-                        # TODO Record icon height
-                        # TODO Record trial time
-                        # TODO Record trial date
-                        # TODO Record user coordinates (if perspective)
-                        # TODO length of trajectory
-                        # TODO age
-                        # TODO gender
-                        # TODO order of conditions
-                        # TODO trial number within experiement and condition
-                        # TODO finding then moving vs parallel
-                        # TODO finding time and moving time
-                        # TODO maximum mouse velocity
-                        # TODO number of walls passed and needed
-                        # TODO intergrality and seperability of motion
-                        # TODO seperate file per path
+        with open(str(self.USERNO) + "_trialResults.csv", 'w') as trialDetailsCSV:
+            fieldnames = ['condition1',  # pointing vs perspective
+                          'condition2',  # Synchronous vs asychronous
+                          'target_ini',
+                          'target_layout',
+                          'no_distractors_long',
+                          'no_distractors_square',
+                          'trial_num_exp',
+                          'trial_num_cond',
+                          'direct_dist',
+                          'angular_dist',
+                          'surface_dist',
+                          'trace_file',
+                          'trace_distance',
+                          'target_icon',
+                          'target_location',
+                          'depth_icons',
+                          'width_icons',
+                          'height_icons',
+                          'icon_width',
+                          'trial_time',
+                          'trial_date',
+                          'head_coordinates',  # For perspective
+                          'tracker_coordinates',  # For pointing
+                          'finding_duration',  # For asynchronous
+                          'moving_duration',
+                          'max_mouse_velocity',
+                          'no_walls_passed',
+                          'no_walls_needed',
+                          'integrality',
+                          'seperability'
+                          ]
+            writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
+            writer.writeheader()
+            self.loadOrderFile()
 
-                        print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
-                        self.clearTargetLayout()
-                        self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
-                        self.state = 0
+            if (self.quit == False):
+                while (self.quit == False):
+                    self.background.fill((255, 255, 255))
+                    text = self.font.render("", 1, (10, 10, 10))
+                    textpos = text.get_rect()
+                    textpos.centerx = self.background.get_rect().centerx
+                    self.background.blit(text, textpos)
+                    self.getInput(False)
 
-                self.screen.blit(self.background, (0, 0))
-                pygame.display.flip()
-                time.sleep(1 / 30)
+                    # Run experimental process
+                    if self.state == 0:
+                        self.drawKeyLayout(self.currentLayout)
+                        if not self.parallelTask:
+                            self.drawTargetLayout(self.currentLayout)
+                        self.state = 1
+                        self.keyHit = False
+                    elif self.state == 1:
+                        if self.keyHit:
+                            if self.parallelTask:
+                                self.drawTargetLayout(self.currentLayout)
+                            self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
+                            self.keyClickTime = datetime.datetime.now()
+                            self.state = 2
+                            self.targetHit = False
+                    elif self.state == 2:
+                        if self.targetHit:
+                            self.targetClickTime = datetime.datetime.now()
+                            elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
+                            headLoc = self.getHeadAxes()[0]
+                            trackerLoc = self.getTrackerData()[0][0]
+                            writer.writerow({'condition1': self.CONDITION1,  # pointing vs perspective
+                                             'condition2': self.CONDITION2,  # Synchronous vs asychronous
+                                             'target_ini': self.TARGETINI,
+                                             'target_layout': self.currentLayout,
+                                             'no_distractors_long': self.targets[self.CONDITION1, self.CONDITION2].getTargetCountLongSurface(),
+                                             'no_distractors_square': self.targets[self.CONDITION1, self.CONDITION2].getTargetCountSquareSurface(),
+                                             'trial_num_cond': self.getTrialNumCond(self.CONDITION1, self.CONDITION2),
+                                             'direct_dist': self.getDirectDists(self.currentLayout),
+                                             'angular_dist': self.getRotationalDists(self.currentLayout),
+                                             'surface_dist': self.getPlanarDists(self.currentLayout),
+                                             'trace_file': str(self.getTrialNumCond(self.CONDITION1, self.CONDITION2)) + "_" + self.CONDITION1 + "_" + self.CONDITION2 + ".csv" ,
+                                             'trace_distance': str(traceDistance),
+                                             'target_icon': self.targets[self.CONDITION1, self.CONDITION2].getTargetIcon(self.currentLayout),
+                                             'target_location': self.targets[self.CONDITION1, self.CONDITION2].getTargetLocationProp(self.currentLayout),
+                                             'depth_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsDeep(),
+                                             'width_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsWide(),
+                                             'height_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsTall(),
+                                             'trial_time': str(now.time().hour).zfill(2) + ":" +
+                                                           str(now.time().minute).zfill(2) + ":" +
+                                                           str(now.time().second).zfill(2),
+                                             'trial_date': str(now.date().day).zfill(2) + "/" +
+                                                           str(now.date().month).zfill(2) + "/" +
+                                                           str(now.date().year),
+                                             'head_coordinates': str(headLoc[0]) + "," +
+                                                                 str(headLoc[1]),  # For perspective
+                                             'tracker_coordinates': str(trackerLoc[0]) + "," +
+                                                                    str(trackerLoc[1]),  # For pointing
+                                             'finding_duration': sfsdf,  # For asynchronous
+                                             'moving_duration': elapsedSecs,
+                                             'max_mouse_velocity': self.maxMouseVelocity,
+                                             'no_walls_passed': self.passedWalls,
+                                             'no_walls_needed': self.neededWalls,
+                                             'euc_to_city_block': self.ratio})
+                            self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
+                            print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
+                            self.clearTargetLayout()
+                            self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
+                            self.state = 0
+
+                    self.screen.blit(self.background, (0, 0))
+                    pygame.display.flip()
+                    time.sleep(1 / 30)
         time.sleep(0.2)
         pygame.quit()
 
