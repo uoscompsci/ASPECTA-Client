@@ -385,23 +385,26 @@ class client:
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                 else:
                                     intersections[x] = 0
-                        for x in range(0,len(mouseLocations)):
-                            if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
-                                self.sender.hideCursor(2, self.curs[3])
-                                self.sender.hideCursor(2, self.curs[2])
-                                self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                                self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
-                                self.mouseProjector = 1
-                                self.mouseSurface = mouseLocations[x][2][1]
-                                self.sender.showCursor(1, self.curs[0+x])
-                            elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
-                                self.sender.hideCursor(1, self.curs[1])
-                                self.sender.hideCursor(1, self.curs[0])
-                                self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                                self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
-                                self.mouseProjector = 2
-                                self.mouseSurface = mouseLocations[x][2][1]
-                                self.sender.showCursor(2, self.curs[2+x])
+                        #  NOTE - Secondary cursors are now never used but still exist just in case
+                        x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
+                        if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
+                            self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
+                            self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
+                            self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
+                            self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                            self.mouseProjector = 1
+                            self.mouseSurface = mouseLocations[x][2][1]
+                            self.sender.showCursor(1, self.curs[0+x])
+                        elif mouseLocations[x][2][0]==2:  # If the cursor is on projector 2
+                            self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
+                            self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
+                            self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
+                            self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                            self.mouseProjector = 2
+                            self.mouseSurface = mouseLocations[x][2][1]
+                            self.sender.showCursor(2, self.curs[2+x])
                 else: # Runs if it is pointing that is to control the cursor
                     intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
@@ -431,21 +434,26 @@ class client:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                             else:
                                 intersections[x] = 0
-                    for x in range(0,len(mouseLocations)):
-                        if mouseLocations[x][2][0]==1: #if the cursor is on surface 1
-                            self.sender.hideCursor(2, self.curs[2+x])
-                            self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
-                            self.mouseProjector = 1
-                            self.mouseSurface = mouseLocations[x][2][1]
-                            self.sender.showCursor(1, self.curs[0+x])
-                        elif mouseLocations[x][2][0]==2: #if the cursor is on surface 2
-                            self.sender.hideCursor(1, self.curs[0+x])
-                            self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
-                            self.mouseProjector = 2
-                            self.mouseSurface = mouseLocations[x][2][1]
-                            self.sender.showCursor(2, self.curs[2+x])
+                    # NOTE - Secondary cursors are now never used but still exist just in case
+                    x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
+                    if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
+                        self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
+                        self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
+                        self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
+                        self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                        self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1])
+                        self.mouseProjector = 1
+                        self.mouseSurface = mouseLocations[x][2][1]
+                        self.sender.showCursor(1, self.curs[0 + x])
+                    elif mouseLocations[x][2][0] == 2:  # If the cursor is on projector 2
+                        self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
+                        self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
+                        self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
+                        self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                        self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1])
+                        self.mouseProjector = 2
+                        self.mouseSurface = mouseLocations[x][2][1]
+                        self.sender.showCursor(2, self.curs[2 + x])
 
     # Locks the mouse so that the server can be controlled
     def LockMouse(self):
