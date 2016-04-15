@@ -836,7 +836,7 @@ class client:
             self.roomWidth = (frontWidth + backWidth + ceilingWidth + floorWidth)/4
             self.roomHeight = (frontHeight + leftHeight + rightHeight + backHeight)/4
 
-    def loadOrderFile(self, filename):
+    # def loadOrderFile(self, filename):
 
 
     # The main loop
@@ -1019,7 +1019,7 @@ class client:
                             elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
                             headLoc = self.getHeadAxes()[0]
                             trackerLoc = self.getTrackerData()[0][0]
-                            writer.writerow({'condition1': self.CONDITION1,  # pointing vs perspective
+                            '''writer.writerow({'condition1': self.CONDITION1,  # pointing vs perspective
                                              'condition2': self.CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
                                              'target_layout': self.currentLayout,
@@ -1051,7 +1051,7 @@ class client:
                                              'max_mouse_velocity': self.maxMouseVelocity,
                                              'no_walls_passed': self.passedWalls,
                                              'no_walls_needed': self.neededWalls,
-                                             'euc_to_city_block': self.ratio})
+                                             'euc_to_city_block': self.ratio})'''
                             self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
                             self.clearTargetLayout()
