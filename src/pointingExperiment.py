@@ -387,24 +387,25 @@ class client:
                                     intersections[x] = 0
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
-                        if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
-                            self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
-                            self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
-                            self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
-                            self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
-                            self.mouseProjector = 1
-                            self.mouseSurface = mouseLocations[x][2][1]
-                            self.sender.showCursor(1, self.curs[0+x])
-                        elif mouseLocations[x][2][0]==2:  # If the cursor is on projector 2
-                            self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
-                            self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
-                            self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
-                            self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                            self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
-                            self.mouseProjector = 2
-                            self.mouseSurface = mouseLocations[x][2][1]
-                            self.sender.showCursor(2, self.curs[2+x])
+                        if len(mouseLocations)!=0:
+                            if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
+                                self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
+                                self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
+                                self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
+                                self.sender.relocateCursor(1, self.curs[0+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                                self.mouseProjector = 1
+                                self.mouseSurface = mouseLocations[x][2][1]
+                                self.sender.showCursor(1, self.curs[0+x])
+                            elif mouseLocations[x][2][0]==2:  # If the cursor is on projector 2
+                                self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
+                                self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
+                                self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
+                                self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                                self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1])
+                                self.mouseProjector = 2
+                                self.mouseSurface = mouseLocations[x][2][1]
+                                self.sender.showCursor(2, self.curs[2+x])
                 else: # Runs if it is pointing that is to control the cursor
                     intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
@@ -761,6 +762,7 @@ class client:
             projector, elementNo, canvasNo = self.visibleTargets[x]
             self.sender.removeElement(projector, elementNo, canvasNo)
             self.sender.removeElement(self.border[0], self.border[1], self.border[2])
+        self.visibleTargets = []
 
     # Sets up the surfaces which can be defined within the client
     def initGUI(self):
@@ -896,6 +898,8 @@ class client:
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
         # self.sender.loadDefinedSurfaces("DEFAULT")
+        self.sender.loadDefinedSurfaces(2, "Test1Wall")
+        self.sender.loadDefinedSurfaces(1, "AllMinusFront")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
         self.state = 0
@@ -909,7 +913,7 @@ class client:
         now = datetime.datetime.now()
 
         order = {}
-        with open("order1.csv") as f:
+        with open("order1.csv", "w+") as f:
             records = csv.DictReader(f)
             for row in records:
                 order[row['layout']] = row
@@ -987,7 +991,7 @@ class client:
                           ]
             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
             writer.writeheader()
-            self.loadOrderFile()
+            #self.loadOrderFile()
 
             if (self.quit == False):
                 while (self.quit == False):
@@ -1052,7 +1056,7 @@ class client:
                                              'no_walls_passed': self.passedWalls,
                                              'no_walls_needed': self.neededWalls,
                                              'euc_to_city_block': self.ratio})'''
-                            self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
+                            #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
                             self.clearTargetLayout()
                             self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
