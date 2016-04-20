@@ -387,6 +387,8 @@ class client:
                                     intersections[x] = 0
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
+                        # TODO Find furthest mouse from edge and set x accordingly (need to know what edge crossed... furthest "closest" edge?)
+                        # TODO May not need to do if recalibration works well
                         if len(mouseLocations)!=0:
                             if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
                                 self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
