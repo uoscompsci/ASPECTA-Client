@@ -989,7 +989,7 @@ class client:
         with open("order1.csv", "w+") as f:
             records = csv.DictReader(f)
             for row in records:
-                order[row['layout']] = row
+                order[row['number']] = row
         orderIndex = 1
 
         with open(str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
@@ -1119,24 +1119,27 @@ class client:
                             elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
                             headLoc = self.getHeadAxes()[0]
                             trackerLoc = self.getTrackerData()[0][0]
-                            writer.writerow({'condition1': self.CONDITION1,  # pointing vs perspective
-                                             'condition2': self.CONDITION2,  # Synchronous vs asychronous
-                                             'target_ini': self.TARGETINI, #TODO Make
+                            CONDITION1 = order[orderIndex]['condition1']
+                            CONDITION2 = order[orderIndex]['condition2']
+                            TARGETINI = order[orderIndex]['targetfile']
+                            writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
+                                             'condition2': CONDITION2,  # Synchronous vs asychronous
+                                             'target_ini': TARGETINI,
                                              'target_layout': self.currentLayout,
-                                             'no_distractors_long': self.targets[self.CONDITION1, self.CONDITION2].getTargetCountLongSurface(),
-                                             'no_distractors_square': self.targets[self.CONDITION1, self.CONDITION2].getTargetCountSquareSurface(),
-                                             'trial_num_cond': self.getTrialNumCond(self.CONDITION1, self.CONDITION2),
+                                             'no_distractors_long': self.targets[CONDITION1, CONDITION2].getTargetCountLongSurface(),
+                                             'no_distractors_square': self.targets[CONDITION1, CONDITION2].getTargetCountSquareSurface(),
+                                             'trial_num_cond': self.getTrialNumForCond(CONDITION1, CONDITION2),
                                              'direct_dist': self.getDirectDists(self.currentLayout),
                                              'angular_dist': self.getRotationalDists(self.currentLayout),
                                              'surface_dist': self.getPlanarDists(self.currentLayout),
-                                             'trace_file': str(self.getTrialNumCond(self.CONDITION1, self.CONDITION2)) + "_" + self.CONDITION1 + "_" + self.CONDITION2 + ".csv" , #TODO Make
+                                             'trace_file': str(self.getTrialNumForCond(CONDITION1, CONDITION2)) + "_" + CONDITION1 + "_" + CONDITION2 + ".csv" , #TODO Make
                                              'trace_distance': str(self.pathLength(recordedPath)),
                                              'trace_angular_distance': str(self.pathAngle(recordedPath)),
-                                             'target_icon': self.targets[self.CONDITION1, self.CONDITION2].getTargetIcon(self.currentLayout),
-                                             'target_location': self.targets[self.CONDITION1, self.CONDITION2].getTargetLocationProp(self.currentLayout),
-                                             'depth_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsDeep(),
-                                             'width_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsWide(),
-                                             'height_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsTall(),
+                                             'target_icon': self.targets[CONDITION1, CONDITION2].getTargetIcon(self.currentLayout),
+                                             'target_location': self.targets[CONDITION1, CONDITION2].getTargetLocationProp(self.currentLayout),
+                                             'depth_icons': self.targets[CONDITION1, CONDITION2].getTargetsDeep(),
+                                             'width_icons': self.targets[CONDITION1, CONDITION2].getTargetsWide(),
+                                             'height_icons': self.targets[CONDITION1, CONDITION2].getTargetsTall(),
                                              'trial_time': str(now.time().hour).zfill(2) + ":" +
                                                            str(now.time().minute).zfill(2) + ":" +
                                                            str(now.time().second).zfill(2),
@@ -1163,6 +1166,7 @@ class client:
                     self.screen.blit(self.background, (0, 0))
                     pygame.display.flip()
                     time.sleep(1 / 30)
+                    orderIndex += 1
         time.sleep(0.2)
         pygame.quit()
 
