@@ -74,6 +74,7 @@ class client:
     keyHit = False
     targetHit = False
     state = 0
+    recordPath = False
 
 
     # Checks for mouse button and keyboard
@@ -111,6 +112,8 @@ class client:
                         lClickRelTime = datetime.datetime.now()
                         elapsedSecs = (lClickRelTime - self.lClickTime).total_seconds()  # Checks how long the button was depressed
                         if (elapsedSecs < 0.15):
+                            if self.state == 0.5:
+                                self.foundClick = True
                             if self.state == 1:
                                 if self.isKeyHit():
                                     self.keyHit = True
@@ -338,6 +341,7 @@ class client:
         axes = self.getHeadAxes()
         curVec = axes[1]
         lastHeadLoc = axes[0]
+        time = datetime.datetime.now()
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -385,6 +389,21 @@ class client:
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                 else:
                                     intersections[x] = 0
+                                temptime = datetime.datetime.now()
+                                if self.state==2:
+                                    moveDuration = (temptime-time).seconds
+                                    time = temptime
+                                    distance = self.distBetweenPoints(self.intersect, oldIntersect)
+                                    angle = self.angleBetweenVectors(self.intersect-lastHeadLoc, oldIntersect-lastHeadLoc)
+                                    degreesPerSecond = angle/moveDuration
+                                    distanceUnitsPerSecond = angle/moveDuration
+                                    self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
+                                                             "endPoint": self.intersect, "distance": distance,
+                                                             "angle": angle, "angularVelocity": degreesPerSecond,
+                                                             "velocity": distanceUnitsPerSecond})
+                                time = temptime
+                                #TODO Need to stop velocity boost between walls
+
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                         # TODO Find furthest mouse from edge and set x accordingly (need to know what edge crossed... furthest "closest" edge?)
@@ -437,6 +456,21 @@ class client:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                             else:
                                 intersections[x] = 0
+                            temptime = datetime.datetime.now()
+                            if self.state == 2:
+                                moveDuration = (temptime - time).seconds
+                                time = temptime
+                                distance = self.distBetweenPoints(self.intersect, oldIntersect)
+                                angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
+                                                                 oldIntersect - lastHeadLoc)
+                                degreesPerSecond = angle / moveDuration
+                                distanceUnitsPerSecond = angle / moveDuration
+                                self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
+                                                         "endPoint": self.intersect, "distance": distance,
+                                                         "angle": angle, "angularVelocity": degreesPerSecond,
+                                                         "velocity": distanceUnitsPerSecond})
+                            time = temptime
+                            # TODO Need to stop velocity boost between walls
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
@@ -457,6 +491,34 @@ class client:
                         self.mouseProjector = 2
                         self.mouseSurface = mouseLocations[x][2][1]
                         self.sender.showCursor(2, self.curs[2 + x])
+
+    def pathLength(self, path):
+        totalLength = 0
+        for x in range(1, len(path)): #The first is skipped because the "start" point was before recording
+            totalLength += path[x]["distance"]
+        return totalLength
+
+    def pathAngle(self, path):
+        totalAngle = 0
+        for x in range(1, len(path)):  # The first is skipped because the "start" point was before recording
+            totalAngle += path[x]["angle"]
+        return totalAngle
+
+    def fastestAngularVelocity(self, path):
+        velocity = 0
+        for x in range(1, len(path)):
+            tempVelocity = path[x]["angularVelocity"]
+            if tempVelocity>velocity:
+                velocity = tempVelocity
+        return velocity
+
+    def fastestVelocity(self, path):
+        velocity = 0
+        for x in range(1, len(path)):
+            tempVelocity = path[x]["velocity"]
+            if tempVelocity>velocity:
+                velocity = tempVelocity
+        return velocity
 
     # Locks the mouse so that the server can be controlled
     def LockMouse(self):
@@ -1009,25 +1071,39 @@ class client:
                         self.drawKeyLayout(self.currentLayout)
                         if not self.parallelTask:
                             self.drawTargetLayout(self.currentLayout)
-                        self.state = 1
-                        self.keyHit = False
+                            self.state = 0.5
+                            self.foundClick = False
+                            self.findTimer = datetime.datetime.now()
+                        else:
+                            self.state = 1
+                            self.keyHit = False
+                    elif self.state == 0.5:
+                        if self.foundClick:
+                            clicktime = datetime.datetime.now()
+                            self.clickelapsedsecs = (clicktime - self.findTimer)
+                            self.state = 1
+                            self.keyHit = False
                     elif self.state == 1:
                         if self.keyHit:
                             if self.parallelTask:
                                 self.drawTargetLayout(self.currentLayout)
                             self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
                             self.keyClickTime = datetime.datetime.now()
+                            self.currentPath = []
                             self.state = 2
                             self.targetHit = False
+
                     elif self.state == 2:
                         if self.targetHit:
                             self.targetClickTime = datetime.datetime.now()
+                            recordedPath = self.currentPath
+                            self.currentPath = []
                             elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
                             headLoc = self.getHeadAxes()[0]
                             trackerLoc = self.getTrackerData()[0][0]
-                            '''writer.writerow({'condition1': self.CONDITION1,  # pointing vs perspective
+                            writer.writerow({'condition1': self.CONDITION1,  # pointing vs perspective
                                              'condition2': self.CONDITION2,  # Synchronous vs asychronous
-                                             'target_ini': self.TARGETINI,
+                                             'target_ini': self.TARGETINI, #TODO Make
                                              'target_layout': self.currentLayout,
                                              'no_distractors_long': self.targets[self.CONDITION1, self.CONDITION2].getTargetCountLongSurface(),
                                              'no_distractors_square': self.targets[self.CONDITION1, self.CONDITION2].getTargetCountSquareSurface(),
@@ -1035,8 +1111,9 @@ class client:
                                              'direct_dist': self.getDirectDists(self.currentLayout),
                                              'angular_dist': self.getRotationalDists(self.currentLayout),
                                              'surface_dist': self.getPlanarDists(self.currentLayout),
-                                             'trace_file': str(self.getTrialNumCond(self.CONDITION1, self.CONDITION2)) + "_" + self.CONDITION1 + "_" + self.CONDITION2 + ".csv" ,
-                                             'trace_distance': str(traceDistance),
+                                             'trace_file': str(self.getTrialNumCond(self.CONDITION1, self.CONDITION2)) + "_" + self.CONDITION1 + "_" + self.CONDITION2 + ".csv" , #TODO Make
+                                             'trace_distance': str(self.pathLength(recordedPath)),
+                                             'trace_angular_distance': str(self.pathAngle(recordedPath)),
                                              'target_icon': self.targets[self.CONDITION1, self.CONDITION2].getTargetIcon(self.currentLayout),
                                              'target_location': self.targets[self.CONDITION1, self.CONDITION2].getTargetLocationProp(self.currentLayout),
                                              'depth_icons': self.targets[self.CONDITION1, self.CONDITION2].getTargetsDeep(),
@@ -1052,18 +1129,19 @@ class client:
                                                                  str(headLoc[1]),  # For perspective
                                              'tracker_coordinates': str(trackerLoc[0]) + "," +
                                                                     str(trackerLoc[1]),  # For pointing
-                                             'finding_duration': sfsdf,  # For asynchronous
+                                             'finding_duration': str(self.clickelapsedsecs),  # For asynchronous
                                              'moving_duration': elapsedSecs,
-                                             'max_mouse_velocity': self.maxMouseVelocity,
-                                             'no_walls_passed': self.passedWalls,
-                                             'no_walls_needed': self.neededWalls,
-                                             'euc_to_city_block': self.ratio})'''
+                                             'max_mouse_angular_velocity': self.fastestAngularVelocity(recordedPath),
+                                             'max_mouse_velocity': self.fastestVelocity(recordedPath),
+                                             'no_walls_passed': self.passedWalls, #TODO Make
+                                             'no_walls_needed': self.neededWalls, #TODO Make
+                                             'euc_to_city_block': self.ratio}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
-                            print "Time elapsed: " + str(elapsedSecs)  # TODO Record to file instead of printing
+                            print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
                             self.clearTargetLayout()
                             self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
                             self.state = 0
-
+                            self.currentPath = []
                     self.screen.blit(self.background, (0, 0))
                     pygame.display.flip()
                     time.sleep(1 / 30)
