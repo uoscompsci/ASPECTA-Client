@@ -75,6 +75,7 @@ class client:
     targetHit = False
     state = 0
     recordPath = False
+    passedSurfaces = 0
 
 
     # Checks for mouse button and keyboard
@@ -387,6 +388,10 @@ class client:
                                 surfaces = ["front", "right", "back", "left", "ceiling"]
                                 if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
+                                    if len(mouseLocations) == 1 and self.state == 2:
+                                        if surfaces[x]!=self.currentSurface:
+                                            self.passedSurfaces+=1
+                                            self.currentSurface = surfaces[x]
                                 else:
                                     intersections[x] = 0
                                 temptime = datetime.datetime.now()
@@ -454,6 +459,10 @@ class client:
                             surfaces = ["front", "right", "back", "left", "ceiling"]
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
+                                if len(mouseLocations) == 1 and self.state == 2:
+                                    if surfaces[x] != self.currentSurface:
+                                        self.passedSurfaces += 1
+                                        self.currentSurface = surfaces[x]
                             else:
                                 intersections[x] = 0
                             temptime = datetime.datetime.now()
@@ -1090,12 +1099,21 @@ class client:
                             self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
                             self.keyClickTime = datetime.datetime.now()
                             self.currentPath = []
+                            self.passedSurfaces = 0
                             self.state = 2
                             self.targetHit = False
 
                     elif self.state == 2:
                         if self.targetHit:
                             self.targetClickTime = datetime.datetime.now()
+                            targetWall = self.targets[self.CONDITION1, self.CONDITION2].getTargetLocation(self.currentLayout)[1]
+                            wallsneeded = 0
+                            if targetWall == "back":
+                                wallsneeded = 3
+                            elif targetWall == "front":
+                                wallsneeded = 1
+                            else:
+                                wallsneeded = 2
                             recordedPath = self.currentPath
                             self.currentPath = []
                             elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
@@ -1133,8 +1151,8 @@ class client:
                                              'moving_duration': elapsedSecs,
                                              'max_mouse_angular_velocity': self.fastestAngularVelocity(recordedPath),
                                              'max_mouse_velocity': self.fastestVelocity(recordedPath),
-                                             'no_walls_passed': self.passedWalls, #TODO Make
-                                             'no_walls_needed': self.neededWalls, #TODO Make
+                                             'no_walls_passed': self.passedSurfaces,
+                                             'no_walls_needed': wallsneeded,
                                              'euc_to_city_block': self.ratio}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
