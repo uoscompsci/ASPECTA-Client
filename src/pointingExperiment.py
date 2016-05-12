@@ -76,6 +76,8 @@ class client:
     state = 0
     recordPath = False
     passedSurfaces = 0
+    conditionCounter = {"pointing,synchronous": 0, "perspective,synchronous": 0,
+                        "pointing,asynchronous": 0, "perspective,asynchronous": 0}
 
 
     # Checks for mouse button and keyboard
@@ -1067,8 +1069,7 @@ class client:
                           'max_mouse_velocity',
                           'no_walls_passed',
                           'no_walls_needed',
-                          'integrality',
-                          'seperability'
+                          'euc_to_city_block'
                           ]
             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
             writer.writeheader()
@@ -1150,7 +1151,8 @@ class client:
                                              'direct_dist': self.getDirectDists(self.currentLayout),
                                              'angular_dist': self.getRotationalDists(self.currentLayout),
                                              'surface_dist': self.getPlanarDists(self.currentLayout),
-                                             'trace_file': str(orderIndex) + "_" + CONDITION1 + "_" + CONDITION2 + ".csv" , #TODO Make
+                                             'trace_file': CONDITION1 + "_" + CONDITION2 + "_" +
+                                                           str(self.getTrialNumForCond(CONDITION1, CONDITION2)) + ".csv",
                                              'trace_distance': str(self.pathLength(recordedPath)),
                                              'trace_angular_distance': str(self.pathAngle(recordedPath)),
                                              'target_icon': self.targets[self.TARGETINI].getTargetIcon(self.currentLayout),
@@ -1187,6 +1189,11 @@ class client:
                     orderIndex += 1
         time.sleep(0.2)
         pygame.quit()
+
+    def getTrialNumForCond(self, condition1, condition2):
+        self.conditionCounter[condition1 + "," + condition2] += 1
+        return self.conditionCounter[condition1 + "," + condition2]
+
 
 class Targets:
     NO_TARGETS_WIDE = None
