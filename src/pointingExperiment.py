@@ -1148,6 +1148,8 @@ class client:
                             headLoc = self.getHeadAxes()[0]
                             trackerLoc = self.getTrackerData()[0][0]
                             self.incrementTrialNumForCond(CONDITION1, CONDITION2)
+                            if self.parallelTask:
+                                self.clickelapsedsecs = 0
                             writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
