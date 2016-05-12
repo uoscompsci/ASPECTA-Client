@@ -1085,6 +1085,16 @@ class client:
 
                     self.currentLayout = order[orderIndex]['layout']
                     self.TARGETINI = order[orderIndex]['targetfile']
+                    CONDITION1 = order[orderIndex]['condition1']
+                    if CONDITION1 == "pointing":
+                        self.mouseTask = False
+                    else:
+                        self.mouseTask = True
+                    CONDITION2 = order[orderIndex]['condition2']
+                    if CONDITION2 == "synchronous":
+                        self.parallelTask = True
+                    else:
+                        self.parallelTask = False
 
                     # Run experimental process
                     if self.state == 0:
@@ -1130,8 +1140,6 @@ class client:
                             elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
                             headLoc = self.getHeadAxes()[0]
                             trackerLoc = self.getTrackerData()[0][0]
-                            CONDITION1 = order[orderIndex]['condition1']
-                            CONDITION2 = order[orderIndex]['condition2']
                             writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
