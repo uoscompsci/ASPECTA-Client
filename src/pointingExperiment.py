@@ -388,12 +388,14 @@ class client:
                                 vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                                 vvecangle = numpy.rad2deg(vvecangle)
                                 surfaces = ["front", "right", "back", "left", "ceiling"]
+                                isWallChange = False
                                 if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                     if len(mouseLocations) == 1 and self.state == 2:
                                         if surfaces[x]!=self.currentSurface:
                                             self.passedSurfaces+=1
                                             self.currentSurface = surfaces[x]
+                                            isWallChange = True
                                 else:
                                     intersections[x] = 0
                                 temptime = datetime.datetime.now()
@@ -402,8 +404,11 @@ class client:
                                     time = temptime
                                     distance = self.distBetweenPoints(self.intersect, oldIntersect)
                                     angle = self.angleBetweenVectors(self.intersect-lastHeadLoc, oldIntersect-lastHeadLoc)
-                                    degreesPerSecond = angle/moveDuration
-                                    distanceUnitsPerSecond = angle/moveDuration
+                                    degreesPerSecond = 0
+                                    distanceUnitsPerSecond = 0
+                                    if not isWallChange:
+                                        degreesPerSecond = angle/moveDuration
+                                        distanceUnitsPerSecond = angle/moveDuration
                                     self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
                                                              "endPoint": self.intersect, "distance": distance,
                                                              "angle": angle, "angularVelocity": degreesPerSecond,
@@ -459,12 +464,14 @@ class client:
                             vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                             vvecangle = numpy.rad2deg(vvecangle)
                             surfaces = ["front", "right", "back", "left", "ceiling"]
+                            isWallChange = False
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                 if len(mouseLocations) == 1 and self.state == 2:
                                     if surfaces[x] != self.currentSurface:
                                         self.passedSurfaces += 1
                                         self.currentSurface = surfaces[x]
+                                        isWallChange = True
                             else:
                                 intersections[x] = 0
                             temptime = datetime.datetime.now()
@@ -474,8 +481,11 @@ class client:
                                 distance = self.distBetweenPoints(self.intersect, oldIntersect)
                                 angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
                                                                  oldIntersect - lastHeadLoc)
-                                degreesPerSecond = angle / moveDuration
-                                distanceUnitsPerSecond = angle / moveDuration
+                                degreesPerSecond = 0
+                                distanceUnitsPerSecond = 0
+                                if not isWallChange:
+                                    degreesPerSecond = angle / moveDuration
+                                    distanceUnitsPerSecond = angle / moveDuration
                                 self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
                                                          "endPoint": self.intersect, "distance": distance,
                                                          "angle": angle, "angularVelocity": degreesPerSecond,
