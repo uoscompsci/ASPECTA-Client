@@ -1147,6 +1147,7 @@ class client:
                             elapsedSecs = (self.targetClickTime - self.keyClickTime).total_seconds()
                             headLoc = self.getHeadAxes()[0]
                             trackerLoc = self.getTrackerData()[0][0]
+                            self.incrementTrialNumForCond(CONDITION1, CONDITION2)
                             writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
@@ -1157,7 +1158,7 @@ class client:
                                              'direct_dist': self.getDirectDists(self.currentLayout),
                                              'angular_dist': self.getRotationalDists(self.currentLayout),
                                              'surface_dist': self.getPlanarDists(self.currentLayout),
-                                             'trace_file': CONDITION1 + "_" + CONDITION2 + "_" +
+                                             'trace_file': "trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                                                            str(self.getTrialNumForCond(CONDITION1, CONDITION2)) + ".csv",
                                              'trace_distance': str(self.pathLength(recordedPath)),
                                              'trace_angular_distance': str(self.pathAngle(recordedPath)),
@@ -1186,8 +1187,21 @@ class client:
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
                             self.clearTargetLayout()
-                            self.currentLayout += 1  #TODO Make order file which contains target ini file name and layout numbers use this as index to that
+                            self.currentLayout += 1
                             self.state = 0
+                            with open("trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+                                              str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
+                                              ".csv", 'w') as traceFile:
+                                traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity")
+                                for index in range(0,len(self.currentPath))
+                                    traceFile.write(self.currentPath[index]["userLoc"] + "," +
+                                                    self.currentPath[index]["startPoint"] + "," +
+                                                    self.currentPath[index]["endPoint"] + "," +
+                                                    self.currentPath[index]["distance"] + "," +
+                                                    self.currentPath[index]["angle"] + "," +
+                                                    self.currentPath[index]["angularVelocity"] + "," +
+                                                    self.currentPath[index]["velocity"])
+                                writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.currentPath = []
                     self.screen.blit(self.background, (0, 0))
                     pygame.display.flip()
@@ -1196,8 +1210,10 @@ class client:
         time.sleep(0.2)
         pygame.quit()
 
-    def getTrialNumForCond(self, condition1, condition2):
+    def incrementTrialNumForCond(self, condition1, condition2):
         self.conditionCounter[condition1 + "," + condition2] += 1
+
+    def getTrialNumForCond(self, condition1, condition2):
         return self.conditionCounter[condition1 + "," + condition2]
 
 
