@@ -344,7 +344,7 @@ class client:
         axes = self.getHeadAxes()
         curVec = axes[1]
         lastHeadLoc = axes[0]
-        time = datetime.datetime.now()
+        startTime = datetime.datetime.now()
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -400,8 +400,8 @@ class client:
                                     intersections[x] = 0
                                 temptime = datetime.datetime.now()
                                 if self.state==2:
-                                    moveDuration = (temptime-time).seconds
-                                    time = temptime
+                                    moveDuration = (temptime-startTime).seconds
+                                    startTime = temptime
                                     distance = self.distBetweenPoints(self.intersect, oldIntersect)
                                     angle = self.angleBetweenVectors(self.intersect-lastHeadLoc, oldIntersect-lastHeadLoc)
                                     degreesPerSecond = 0
@@ -413,8 +413,6 @@ class client:
                                                              "endPoint": self.intersect, "distance": distance,
                                                              "angle": angle, "angularVelocity": degreesPerSecond,
                                                              "velocity": distanceUnitsPerSecond})
-                                time = temptime
-                                #TODO Need to stop velocity boost between walls
 
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
@@ -476,8 +474,8 @@ class client:
                                 intersections[x] = 0
                             temptime = datetime.datetime.now()
                             if self.state == 2:
-                                moveDuration = (temptime - time).seconds
-                                time = temptime
+                                moveDuration = (temptime - startTime).seconds
+                                startTime = temptime
                                 distance = self.distBetweenPoints(self.intersect, oldIntersect)
                                 angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
                                                                  oldIntersect - lastHeadLoc)
@@ -490,8 +488,6 @@ class client:
                                                          "endPoint": self.intersect, "distance": distance,
                                                          "angle": angle, "angularVelocity": degreesPerSecond,
                                                          "velocity": distanceUnitsPerSecond})
-                            time = temptime
-                            # TODO Need to stop velocity boost between walls
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
