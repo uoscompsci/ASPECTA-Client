@@ -1193,7 +1193,7 @@ class client:
                                               str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                                               ".csv", 'w') as traceFile:
                                 traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity")
-                                for index in range(0,len(self.currentPath))
+                                for index in range(0,len(self.currentPath)):
                                     traceFile.write(self.currentPath[index]["userLoc"] + "," +
                                                     self.currentPath[index]["startPoint"] + "," +
                                                     self.currentPath[index]["endPoint"] + "," +
