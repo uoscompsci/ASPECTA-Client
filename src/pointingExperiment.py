@@ -699,29 +699,47 @@ class client:
             else:
                 print "Invalid target wall"
         else:
-            #Calculate distance across ceiling
-            part1 = self.getSurfaceWidthRemUp(startX, startX, "front")
+            # Calculate vertical distance across ceiling
+            part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
             part2 = self.getSurfaceLength("ceiling")
             part3 = self.getSurfaceWidthRemUp(targetGridX, targetGridY, "back")
-            distanceCeiling = part1 + part2 + part3
+            vDistanceCeiling = part1 + part2 + part3
 
-            #Calculate distance across floor
-            part1 = self.getSurfaceWidthRemDown(startX, startX, "front")
+            # Calculate vertical distance across floor
+            part1 = self.getSurfaceWidthRemDown(startX, startY, "front")
             part2 = self.getSurfaceLength("floor")
             part3 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, "back")
-            distanceFloor = part1 + part2 + part3
+            vDistanceFloor = part1 + part2 + part3
 
-            #Calculate distance across left wall
-            part1 = self.getSurfaceWidthRemLeft(startX, startX, "front")
+            # Calculate vertical distance across left wall
+            part1 = self.getSurfaceWidthRemLeft(startX, startY, "front")
             part2 = self.getSurfaceLength("left")
             part3 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, "back")
-            distanceLeft = part1 + part2 + part3
+            vDistanceLeft = part1 + part2 + part3
 
-            #Calculate distance across right wall
-            part1 = self.getSurfaceWidthRemRight(startX, startX, "front")
+            # Calculate vertical distance across right wall
+            part1 = self.getSurfaceWidthRemRight(startX, startY, "front")
             part2 = self.getSurfaceLength("right")
             part3 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, "back")
-            distanceRight = part1 + part2 + part3
+            vDistanceRight = part1 + part2 + part3
+
+            # Calculate horizontal distance across ceiling and floor
+            part1 = self.getSurfaceWidthRemRight(startX, startY, "front")
+            part2 = self.getSurfaceWidthRemLeft(startX, startY, "back")
+            hDistanceCeiling = abs(part1-part2)
+            hDistanceFloor = hDistanceCeiling
+
+            # Calculate horizontal distance across left rand right walls
+            part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
+            part2 = self.getSurfaceWidthRemUp(startX, startY, "back")
+            hDistanceLeft = abs(part1 - part2)
+            hDistanceRight = hDistanceLeft
+
+            # Find the real diagonal distances across all the walls
+            distanceCeiling = sqrt(pow(hDistanceCeiling, 2) + pow(vDistanceCeiling, 2))
+            distanceFloor = sqrt(pow(hDistanceFloor, 2) + pow(vDistanceFloor, 2))
+            distanceLeft = sqrt(pow(hDistanceLeft, 2) + pow(vDistanceLeft, 2))
+            distanceRight = sqrt(pow(hDistanceRight, 2) + pow(vDistanceRight, 2))
 
             #Find which path is shortest
             shortest = distanceCeiling
@@ -736,9 +754,8 @@ class client:
                 shortest = distanceRight
                 shortestStr = "right"
 
-            #Calculate horizontal distance component
+            return shortest
 
-            #TODO distance remainder on current wall + side wall length + distance on target wall
 
     def getSurfaceLength(self, wall):
         if wall.lower() == "ceiling":
