@@ -673,7 +673,6 @@ class client:
                     return True
         return False
 
-    #self.angleBetweenVectors
     # Give grid coordinates and walls of start and end points to compute rotational distance between edges of start point and end point
     def getRotationalDists(self, layout):
         start, target = self.getStartAndTargetLocs(layout)
@@ -758,7 +757,7 @@ class client:
         start, target = self.getStartAndTargetLocs(layout)
         return self.distBetweenPoints(start, target)
 
-    def getSurfaceWidthRemLeft(self, realPointX, realPointY, wall):
+    def getSurfaceWidthRemLeft(self, realPointX, realPointY, wall): #TODO Are coordinates FROM TR or BR?
         wall = self.wallToPlaneIndex[wall.lower()]
         realEdgeX, realEdgeY = 0, realPointY
         wallTL = self.planes[wall][0][2]
@@ -816,9 +815,9 @@ class client:
 
     # Get the real world locations of the start and target points
     def getStartAndTargetLocs(self, layout):
-        realStartX, realStartY = self.targets[self.TARGETINI].getTargetKeyLocationProp()
+        propStartX, propStartY = self.targets[self.TARGETINI].getTargetKeyLocationProp()
         targetLoc, targetWall = self.targets[self.TARGETINI].getTargetLocationProp(layout)
-        realTargetX, realTargetY = targetLoc
+        propTargetX, propTargetY = targetLoc
         startWall = self.wallToPlaneIndex["front"]
         targetWall = self.wallToPlaneIndex[targetWall.lower()]
         # Get the 3D real world coordinates for the top left, bottom right and bottom left of each surface
@@ -829,10 +828,10 @@ class client:
         targetWallTR = self.planes[targetWall][0][3]
         targetWallBL = self.planes[targetWall][0][5]
         # Calculate the horizontal and vertical vectors that run along the top and left side of the walls and then convert them to the vectors to the start and target.
-        startHVec = startWallTR - startWallTL * realStartX
-        startVVec = startWallBL - startWallTL * realStartY
-        targetHVec = targetWallTR - targetWallTL * realTargetX
-        targetVVec = targetWallBL - targetWallTL * realTargetY
+        startHVec = startWallTR - startWallTL * propStartX
+        startVVec = startWallBL - startWallTL * propStartY
+        targetHVec = targetWallTR - targetWallTL * propTargetX
+        targetVVec = targetWallBL - targetWallTL * propTargetY
         # Use the calculated vectors to find the start and target 3D real world coordinates.
         start = startWallTL+startHVec+startVVec
         target = targetWallTL+targetHVec+targetVVec
@@ -1189,7 +1188,6 @@ class client:
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
                             self.clearTargetLayout()
-                            self.currentLayout += 1
                             self.state = 0
                             with open("trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                                               str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
