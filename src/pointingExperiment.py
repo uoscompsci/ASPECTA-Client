@@ -1143,6 +1143,7 @@ class client:
                             self.keyClickTime = datetime.datetime.now()
                             self.currentPath = []
                             self.passedSurfaces = 0
+                            self.currentSurface = 'front'
                             self.state = 2
                             self.targetHit = False
 
