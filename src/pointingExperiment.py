@@ -488,24 +488,25 @@ class client:
                                                          "velocity": distanceUnitsPerSecond})
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
-                    if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
-                        self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
-                        self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
-                        self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
-                        self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                        self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1])
-                        self.mouseProjector = 1
-                        self.mouseSurface = mouseLocations[x][2][1]
-                        self.sender.showCursor(1, self.curs[0 + x])
-                    elif mouseLocations[x][2][0] == 2:  # If the cursor is on projector 2
-                        self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
-                        self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
-                        self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
-                        self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1], "prop", mouseLocations[x][2][1])
-                        self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1])
-                        self.mouseProjector = 2
-                        self.mouseSurface = mouseLocations[x][2][1]
-                        self.sender.showCursor(2, self.curs[2 + x])
+                    if len(mouseLocations)!=0:
+                        if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
+                            self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
+                            self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
+                            self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
+                            self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1])
+                            self.mouseProjector = 1
+                            self.mouseSurface = mouseLocations[x][2][1]
+                            self.sender.showCursor(1, self.curs[0 + x])
+                        elif mouseLocations[x][2][0] == 2:  # If the cursor is on projector 2
+                            self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
+                            self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
+                            self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
+                            self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1], "prop", mouseLocations[x][2][1])
+                            self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1])
+                            self.mouseProjector = 2
+                            self.mouseSurface = mouseLocations[x][2][1]
+                            self.sender.showCursor(2, self.curs[2 + x])
 
     def pathLength(self, path):
         totalLength = 0
@@ -1008,7 +1009,7 @@ class client:
         self.targets = {}
         order = {}
         foundLayouts = []
-        with open("order1.csv", "w+") as f:
+        with open("order1.csv", "rb") as f:
             records = csv.DictReader(f)
             for row in records:
                 order[row['number']] = row
@@ -1104,14 +1105,14 @@ class client:
                     self.background.blit(text, textpos)
                     self.getInput(False)
 
-                    self.currentLayout = order[orderIndex]['layout']
-                    self.TARGETINI = order[orderIndex]['targetfile']
-                    CONDITION1 = order[orderIndex]['condition1']
+                    self.currentLayout = int(order[str(orderIndex)]['layout'])
+                    self.TARGETINI = order[str(orderIndex)]['targetfile']
+                    CONDITION1 = order[str(orderIndex)]['condition1']
                     if CONDITION1 == "pointing":
                         self.mouseTask = False
                     else:
                         self.mouseTask = True
-                    CONDITION2 = order[orderIndex]['condition2']
+                    CONDITION2 = order[str(orderIndex)]['condition2']
                     if CONDITION2 == "synchronous":
                         self.parallelTask = True
                     else:
@@ -1218,10 +1219,12 @@ class client:
                                                     self.currentPath[index]["velocity"])
                                 writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.currentPath = []
+                            orderIndex += 1
                     self.screen.blit(self.background, (0, 0))
                     pygame.display.flip()
                     time.sleep(1 / 30)
-                    orderIndex += 1
+                    if orderIndex > len(order):
+                        break
         time.sleep(0.2)
         pygame.quit()
 
