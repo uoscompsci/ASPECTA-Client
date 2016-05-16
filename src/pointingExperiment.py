@@ -702,7 +702,7 @@ class client:
         targetGridX, targetGridY = targetLoc
         if(targetWall.lower() != "back"):
             diagDist = 0
-            if(targetWall.lower == "ceiling"):
+            if(targetWall.lower() == "ceiling"):
                 part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
                 part2 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, "ceiling")
                 vdist = part1 + part2
@@ -712,7 +712,7 @@ class client:
                 hdist = abs(part1 - part2)
 
                 diagDist = sqrt(pow(vdist, 2) + pow(hdist, 2))
-            elif(targetWall == "left"):
+            elif(targetWall.lower() == "left"):
                 part1 = self.getSurfaceWidthRemLeft(startX, startY, "front")
                 part2 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, "left")
                 vdist = part1 + part2
@@ -722,7 +722,7 @@ class client:
                 hdist = abs(part1 - part2)
 
                 diagDist = sqrt(pow(vdist, 2) + pow(hdist, 2))
-            elif(targetWall == "right"):
+            elif(targetWall.lower() == "right"):
                 part1 = self.getSurfaceWidthRemRight(startX, startY, "front")
                 part2 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, "right")
                 vdist = part1 + part2
@@ -842,9 +842,9 @@ class client:
     def getSurfaceWidthRemUp(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
         realEdgeX, realEdgeY = realPointX, 1
-        wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]
-        wallBL = self.planes[wall][0][5]
+        wallTL = self.planes[wall][2]
+        wallTR = self.planes[wall][3]
+        wallBL = self.planes[wall][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
         edgeHVec = wallTR - wallTL * realEdgeX
