@@ -402,7 +402,7 @@ class client:
                                     intersections[x] = 0
                                 temptime = datetime.datetime.now()
                                 if self.state==2:
-                                    moveDuration = (temptime-startTime).seconds
+                                    moveDuration = (temptime-startTime).total_seconds()
                                     startTime = temptime
                                     distance = self.distBetweenPoints(self.intersect, oldIntersect)
                                     angle = self.angleBetweenVectors(self.intersect-lastHeadLoc, oldIntersect-lastHeadLoc)
@@ -410,7 +410,7 @@ class client:
                                     distanceUnitsPerSecond = 0
                                     if not isWallChange:
                                         degreesPerSecond = angle/moveDuration
-                                        distanceUnitsPerSecond = angle/moveDuration
+                                        distanceUnitsPerSecond = distance/moveDuration
                                     self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
                                                              "endPoint": self.intersect, "distance": distance,
                                                              "angle": angle, "angularVelocity": degreesPerSecond,
@@ -483,16 +483,16 @@ class client:
                                 intersections[x] = 0
                             temptime = datetime.datetime.now()
                             if self.state == 2:
-                                moveDuration = (temptime - startTime).seconds
+                                moveDuration = (temptime - startTime).total_seconds()
                                 startTime = temptime
                                 distance = self.distBetweenPoints(self.intersect, oldIntersect)
                                 angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
-                                                                 oldIntersect - lastHeadLoc)
+                                                                 oldIntersect - lastHeadLoc) # TODO SHOULDN'T BE HEAD LOC
                                 degreesPerSecond = 0
                                 distanceUnitsPerSecond = 0
                                 if not isWallChange and moveDuration != 0:
                                     degreesPerSecond = angle / moveDuration
-                                    distanceUnitsPerSecond = angle / moveDuration
+                                    distanceUnitsPerSecond = distance / moveDuration
                                 elif moveDuration == 0:
                                     degreesPerSecond = 0
                                     distanceUnitsPerSecond = 0
@@ -500,6 +500,7 @@ class client:
                                                          "endPoint": self.intersect, "distance": distance,
                                                          "angle": angle, "angularVelocity": degreesPerSecond,
                                                          "velocity": distanceUnitsPerSecond})
+                                print str(len(self.currentPath))
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if len(mouseLocations)!=0:
@@ -700,17 +701,40 @@ class client:
         targetLoc, targetWall = self.targets[self.TARGETINI].getTargetLocationProp(layout)
         targetGridX, targetGridY = targetLoc
         if(targetWall.lower() != "back"):
+            diagDist = 0
             if(targetWall.lower == "ceiling"):
                 part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
                 part2 = self.getSurfaceWidthRemDown(targetGridX, targetGridY, "ceiling")
+                vdist = part1 + part2
+
+                part1 = self.getSurfaceWidthRemLeft(startX, startY, "front")
+                part2 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, "ceiling")
+                hdist = abs(part1 - part2)
+
+                diagDist = sqrt(pow(vdist, 2) + pow(hdist, 2))
             elif(targetWall == "left"):
                 part1 = self.getSurfaceWidthRemLeft(startX, startY, "front")
                 part2 = self.getSurfaceWidthRemRight(targetGridX, targetGridY, "left")
+                vdist = part1 + part2
+
+                part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
+                part2 = self.getSurfaceWidthRemUp(targetGridX, targetGridY, "left")
+                hdist = abs(part1 - part2)
+
+                diagDist = sqrt(pow(vdist, 2) + pow(hdist, 2))
             elif(targetWall == "right"):
                 part1 = self.getSurfaceWidthRemRight(startX, startY, "front")
                 part2 = self.getSurfaceWidthRemLeft(targetGridX, targetGridY, "right")
+                vdist = part1 + part2
+
+                part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
+                part2 = self.getSurfaceWidthRemUp(targetGridX, targetGridY, "right")
+                hdist = abs(part1 - part2)
+
+                diagDist = sqrt(pow(vdist, 2) + pow(hdist, 2))
             else:
                 print "Invalid target wall"
+            return diagDist
         else:
             # Calculate vertical distance across ceiling
             part1 = self.getSurfaceWidthRemUp(startX, startY, "front")
@@ -1082,7 +1106,6 @@ class client:
                           'target_layout',
                           'no_distractors_long',
                           'no_distractors_square',
-                          'trial_num_exp',
                           'trial_num_cond',
                           'direct_dist',
                           'angular_dist',
@@ -1165,6 +1188,7 @@ class client:
 
                     elif self.state == 2:
                         if self.targetHit:
+                            self.state = 0
                             self.targetClickTime = datetime.datetime.now()
                             targetWall = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[1]
                             wallsneeded = 0
@@ -1201,6 +1225,7 @@ class client:
                                              'depth_icons': self.targets[self.TARGETINI].getTargetsDeep(),
                                              'width_icons': self.targets[self.TARGETINI].getTargetsWide(),
                                              'height_icons': self.targets[self.TARGETINI].getTargetsTall(),
+                                             'icon_width': "ICON WIDTH",
                                              'trial_time': str(now.time().hour).zfill(2) + ":" +
                                                            str(now.time().minute).zfill(2) + ":" +
                                                            str(now.time().second).zfill(2),
@@ -1221,21 +1246,20 @@ class client:
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
                             self.clearTargetLayout()
-                            self.state = 0
                             with open("trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                                               str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                                               ".csv", 'w') as traceFile:
-                                traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity")
-                                for index in range(0,len(self.currentPath)):
-                                    traceFile.write(str(self.currentPath[index]["userLoc"]) + "," +
-                                                    str(self.currentPath[index]["startPoint"]) + "," +
-                                                    str(self.currentPath[index]["endPoint"]) + "," +
-                                                    str(self.currentPath[index]["distance"]) + "," +
-                                                    str(self.currentPath[index]["angle"]) + "," +
-                                                    str(self.currentPath[index]["angularVelocity"]) + "," +
-                                                    str(self.currentPath[index]["velocity"]))
+                                traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
+                                print "Current path length = " + str(len(recordedPath))
+                                for index in range(0, len(recordedPath)):
+                                    traceFile.write(str(recordedPath[index]["userLoc"]) + "," +
+                                                    str(recordedPath[index]["startPoint"]) + "," +
+                                                    str(recordedPath[index]["endPoint"]) + "," +
+                                                    str(recordedPath[index]["distance"]) + "," +
+                                                    str(recordedPath[index]["angle"]) + "," +
+                                                    str(recordedPath[index]["angularVelocity"]) + "," +
+                                                    str(recordedPath[index]["velocity"]) + "\n")
                                 writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
-                            self.currentPath = []
                             orderIndex += 1
                     self.screen.blit(self.background, (0, 0))
                     pygame.display.flip()
