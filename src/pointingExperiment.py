@@ -345,6 +345,8 @@ class client:
         curVec = axes[1]
         lastHeadLoc = axes[0]
         startTime = datetime.datetime.now()
+        segCheck2 = self.getTrackerData()[0][0]
+        segCheck3 = self.getTrackerData()[0][1]
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -436,10 +438,19 @@ class client:
                                 self.mouseSurface = mouseLocations[x][2][1]
                                 self.sender.showCursor(2, self.curs[2+x])
                 else: # Runs if it is pointing that is to control the cursor
+                    for x in range(0, len(self.planes)):  # Finds where the last intersect point was
+                        segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
+                        if(segCheck == 1):
+                            break
+                    oldIntersect = self.intersect  # Saves the last intersect point
+                    axes = self.getHeadAxes()
+                    lastHeadLoc = axes[0]  # From now on the current head location is used
                     intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
-                        segCheck = self.segmentPlane(self.planes[x], self.getTrackerData()[0][0], self.getTrackerData()[0][1])
+                        segCheck2 = self.getTrackerData()[0][0]
+                        segCheck3 = self.getTrackerData()[0][1]
+                        segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
                         if segCheck == 1:
                             intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                             diagVec = intersections[x] - self.planes[x][2]
@@ -479,9 +490,12 @@ class client:
                                                                  oldIntersect - lastHeadLoc)
                                 degreesPerSecond = 0
                                 distanceUnitsPerSecond = 0
-                                if not isWallChange:
+                                if not isWallChange and moveDuration != 0:
                                     degreesPerSecond = angle / moveDuration
                                     distanceUnitsPerSecond = angle / moveDuration
+                                elif moveDuration == 0:
+                                    degreesPerSecond = 0
+                                    distanceUnitsPerSecond = 0
                                 self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
                                                          "endPoint": self.intersect, "distance": distance,
                                                          "angle": angle, "angularVelocity": degreesPerSecond,
@@ -776,9 +790,9 @@ class client:
     def getSurfaceWidthRemLeft(self, realPointX, realPointY, wall): #TODO Are coordinates FROM TR or BR?
         wall = self.wallToPlaneIndex[wall.lower()]
         realEdgeX, realEdgeY = 0, realPointY
-        wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]
-        wallBL = self.planes[wall][0][5]
+        wallTL = self.planes[wall][2]
+        wallTR = self.planes[wall][3]
+        wallBL = self.planes[wall][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
         edgeHVec = wallTR - wallTL * realEdgeX
@@ -790,9 +804,9 @@ class client:
     def getSurfaceWidthRemRight(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
         realEdgeX, realEdgeY = 1, realPointY
-        wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]
-        wallBL = self.planes[wall][0][5]
+        wallTL = self.planes[wall][2]
+        wallTR = self.planes[wall][3]
+        wallBL = self.planes[wall][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
         edgeHVec = wallTR - wallTL * realEdgeX
@@ -818,9 +832,9 @@ class client:
     def getSurfaceWidthRemDown(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
         realEdgeX, realEdgeY = realPointX, 0
-        wallTL = self.planes[wall][0][2]
-        wallTR = self.planes[wall][0][3]
-        wallBL = self.planes[wall][0][5]
+        wallTL = self.planes[wall][2]
+        wallTR = self.planes[wall][3]
+        wallBL = self.planes[wall][5]
         pointHVec = wallTR - wallTL * realPointX
         pointVVec = wallBL - wallTL * realPointY
         edgeHVec = wallTR - wallTL * realEdgeX
@@ -837,12 +851,12 @@ class client:
         startWall = self.wallToPlaneIndex["front"]
         targetWall = self.wallToPlaneIndex[targetWall.lower()]
         # Get the 3D real world coordinates for the top left, bottom right and bottom left of each surface
-        startWallTL = self.planes[startWall][0][2]
-        startWallTR = self.planes[startWall][0][3]
-        startWallBL = self.planes[startWall][0][5]
-        targetWallTL = self.planes[targetWall][0][2]
-        targetWallTR = self.planes[targetWall][0][3]
-        targetWallBL = self.planes[targetWall][0][5]
+        startWallTL = self.planes[startWall][2]
+        startWallTR = self.planes[startWall][3]  # TODO Fix index out of bounds
+        startWallBL = self.planes[startWall][5]
+        targetWallTL = self.planes[targetWall][2]
+        targetWallTR = self.planes[targetWall][3]
+        targetWallBL = self.planes[targetWall][5]
         # Calculate the horizontal and vertical vectors that run along the top and left side of the walls and then convert them to the vectors to the start and target.
         startHVec = startWallTR - startWallTL * propStartX
         startVVec = startWallBL - startWallTL * propStartY
@@ -1075,6 +1089,7 @@ class client:
                           'surface_dist',
                           'trace_file',
                           'trace_distance',
+                          'trace_angular_distance',
                           'target_icon',
                           'target_location',
                           'depth_icons',
@@ -1087,6 +1102,7 @@ class client:
                           'tracker_coordinates',  # For pointing
                           'finding_duration',  # For asynchronous
                           'moving_duration',
+                          'max_mouse_angular_velocity',
                           'max_mouse_velocity',
                           'no_walls_passed',
                           'no_walls_needed',
@@ -1201,7 +1217,7 @@ class client:
                                              'max_mouse_velocity': self.fastestVelocity(recordedPath),
                                              'no_walls_passed': self.passedSurfaces,
                                              'no_walls_needed': wallsneeded,
-                                             'euc_to_city_block': self.ratio}) #TODO Make
+                                             'euc_to_city_block': "RATIO"}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
                             self.clearTargetLayout()
@@ -1211,13 +1227,13 @@ class client:
                                               ".csv", 'w') as traceFile:
                                 traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity")
                                 for index in range(0,len(self.currentPath)):
-                                    traceFile.write(self.currentPath[index]["userLoc"] + "," +
-                                                    self.currentPath[index]["startPoint"] + "," +
-                                                    self.currentPath[index]["endPoint"] + "," +
-                                                    self.currentPath[index]["distance"] + "," +
-                                                    self.currentPath[index]["angle"] + "," +
-                                                    self.currentPath[index]["angularVelocity"] + "," +
-                                                    self.currentPath[index]["velocity"])
+                                    traceFile.write(str(self.currentPath[index]["userLoc"]) + "," +
+                                                    str(self.currentPath[index]["startPoint"]) + "," +
+                                                    str(self.currentPath[index]["endPoint"]) + "," +
+                                                    str(self.currentPath[index]["distance"]) + "," +
+                                                    str(self.currentPath[index]["angle"]) + "," +
+                                                    str(self.currentPath[index]["angularVelocity"]) + "," +
+                                                    str(self.currentPath[index]["velocity"]))
                                 writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.currentPath = []
                             orderIndex += 1
