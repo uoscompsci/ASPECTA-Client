@@ -876,19 +876,19 @@ class client:
         targetWall = self.wallToPlaneIndex[targetWall.lower()]
         # Get the 3D real world coordinates for the top left, bottom right and bottom left of each surface
         startWallTL = self.planes[startWall][2]
-        startWallTR = self.planes[startWall][3]  # TODO Fix index out of bounds
+        startWallBR = self.planes[startWall][4]
         startWallBL = self.planes[startWall][5]
         targetWallTL = self.planes[targetWall][2]
-        targetWallTR = self.planes[targetWall][3]
+        targetWallBR = self.planes[targetWall][4]
         targetWallBL = self.planes[targetWall][5]
         # Calculate the horizontal and vertical vectors that run along the top and left side of the walls and then convert them to the vectors to the start and target.
-        startHVec = startWallTR - startWallTL * propStartX
-        startVVec = startWallBL - startWallTL * propStartY
-        targetHVec = targetWallTR - targetWallTL * propTargetX
-        targetVVec = targetWallBL - targetWallTL * propTargetY
+        startHVec = (startWallBR - startWallBL) * propStartX
+        startVVec = (startWallTL - startWallBL) * propStartY
+        targetHVec = (targetWallBR - targetWallBL) * propTargetX
+        targetVVec = (targetWallTL - targetWallBL) * propTargetY
         # Use the calculated vectors to find the start and target 3D real world coordinates.
-        start = startWallTL+startHVec+startVVec
-        target = targetWallTL+targetHVec+targetVVec
+        start = startWallBL+startHVec+startVVec
+        target = targetWallBL+targetHVec+targetVVec
         return start, target
 
     def clearTargetLayout(self):
