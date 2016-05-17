@@ -1123,8 +1123,10 @@ class client:
                           'width_icons',
                           'height_icons',
                           'icon_width',
-                          'trial_time',
-                          'trial_date',
+                          'key_click_time',
+                          'key_click_date',
+                          'target_click_time',
+                          'target_click_date',
                           'head_coordinates',  # For perspective
                           'tracker_coordinates',  # For pointing
                           'finding_duration',  # For asynchronous
@@ -1210,7 +1212,7 @@ class client:
                             self.incrementTrialNumForCond(CONDITION1, CONDITION2)
                             if self.parallelTask:
                                 self.clickelapsedsecs = 0
-                            targetLocation = self.targets[self.TARGETINI].getTargetLoction(self.currentLayout)
+                            targetLocation = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)
                             writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
@@ -1231,12 +1233,18 @@ class client:
                                              'width_icons': self.targets[self.TARGETINI].getTargetsWide(),
                                              'height_icons': self.targets[self.TARGETINI].getTargetsTall(),
                                              'icon_width': self.targets[self.TARGETINI].getTargetDimension(targetLocation[1], self.roomHeight, self.roomWidth, self.roomDepth),
-                                             'trial_time': str(now.time().hour).zfill(2) + ":" +
-                                                           str(now.time().minute).zfill(2) + ":" +
-                                                           str(now.time().second).zfill(2),
-                                             'trial_date': str(now.date().day).zfill(2) + "/" +
-                                                           str(now.date().month).zfill(2) + "/" +
-                                                           str(now.date().year),
+                                             'key_click_time': str(self.keyClickTime.time().hour).zfill(2) + ":" +
+                                                           str(self.keyClickTime.time().minute).zfill(2) + ":" +
+                                                           str(self.keyClickTime.time().second).zfill(2),
+                                             'key_click_date': str(self.keyClickTime.date().day).zfill(2) + "/" +
+                                                           str(self.keyClickTime.date().month).zfill(2) + "/" +
+                                                           str(self.keyClickTime.date().year),
+                                             'target_click_time': str(self.targetClickTime.time().hour).zfill(2) + ":" +
+                                                           str(self.targetClickTime.time().minute).zfill(2) + ":" +
+                                                           str(self.targetClickTime.time().second).zfill(2),
+                                             'target_click_date': str(self.targetClickTime.date().day).zfill(2) + "/" +
+                                                           str(self.targetClickTime.date().month).zfill(2) + "/" +
+                                                           str(self.targetClickTime.date().year),
                                              'head_coordinates': str(headLoc[0]) + "," +
                                                                  str(headLoc[1]),  # For perspective
                                              'tracker_coordinates': str(trackerLoc[0]) + "," +
