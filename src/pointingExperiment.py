@@ -78,6 +78,7 @@ class client:
     passedSurfaces = 0
     conditionCounter = {"pointing,synchronous": 0, "perspective,synchronous": 0,
                         "pointing,asynchronous": 0, "perspective,asynchronous": 0}
+    alreadyPassed = ["front"]
 
 
     # Checks for mouse button and keyboard
@@ -395,7 +396,9 @@ class client:
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                     if len(mouseLocations) == 1 and self.state == 2:
                                         if surfaces[x]!=self.currentSurface:
-                                            self.passedSurfaces+=1
+                                            if surfaces[x] not in self.alreadyPassed:
+                                                self.passedSurfaces += 1
+                                                self.alreadyPassed.append(surfaces[x])
                                             self.currentSurface = surfaces[x]
                                             isWallChange = True
                                 else:
@@ -475,9 +478,11 @@ class client:
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                 if len(mouseLocations) == 1 and self.state == 2:
-                                    if surfaces[x] != self.currentSurface:
-                                        self.passedSurfaces += 1
-                                        self.currentSurface = surfaces[x]
+                                    if surfaces[x] != self.currentSurface: #Current surface is what was last recorded as the current surfrace
+                                        if surfaces[x] not in self.alreadyPassed:
+                                            self.passedSurfaces += 1
+                                            self.alreadyPassed.append(surfaces[x])
+                                        self.currentSurface = surfaces[x] #What is this doing?
                                         isWallChange = True
                             else:
                                 intersections[x] = 0
@@ -500,7 +505,6 @@ class client:
                                                          "endPoint": self.intersect, "distance": distance,
                                                          "angle": angle, "angularVelocity": degreesPerSecond,
                                                          "velocity": distanceUnitsPerSecond})
-                                print str(len(self.currentPath))
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if len(mouseLocations)!=0:
@@ -1244,13 +1248,11 @@ class client:
                                              'no_walls_needed': wallsneeded,
                                              'euc_to_city_block': "RATIO"}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
-                            print "Time elapsed: " + str(elapsedSecs) #TODO Remove eventually
                             self.clearTargetLayout()
                             with open("trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                                               str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                                               ".csv", 'w') as traceFile:
                                 traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
-                                print "Current path length = " + str(len(recordedPath))
                                 for index in range(0, len(recordedPath)):
                                     traceFile.write(str(recordedPath[index]["userLoc"]) + "," +
                                                     str(recordedPath[index]["startPoint"]) + "," +
@@ -1260,6 +1262,7 @@ class client:
                                                     str(recordedPath[index]["angularVelocity"]) + "," +
                                                     str(recordedPath[index]["velocity"]) + "\n")
                                 writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
+                            self.alreadyPassed = ['front']
                             orderIndex += 1
                     self.screen.blit(self.background, (0, 0))
                     pygame.display.flip()
