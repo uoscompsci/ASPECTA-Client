@@ -1210,6 +1210,7 @@ class client:
                             self.incrementTrialNumForCond(CONDITION1, CONDITION2)
                             if self.parallelTask:
                                 self.clickelapsedsecs = 0
+                            targetLocation = self.targets[self.TARGETINI].getTargetLoction(self.currentLayout)
                             writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
@@ -1229,7 +1230,7 @@ class client:
                                              'depth_icons': self.targets[self.TARGETINI].getTargetsDeep(),
                                              'width_icons': self.targets[self.TARGETINI].getTargetsWide(),
                                              'height_icons': self.targets[self.TARGETINI].getTargetsTall(),
-                                             'icon_width': "ICON WIDTH",
+                                             'icon_width': self.targets[self.TARGETINI].getTargetDimension(targetLocation[1], self.roomHeight, self.roomWidth, self.roomDepth),
                                              'trial_time': str(now.time().hour).zfill(2) + ":" +
                                                            str(now.time().minute).zfill(2) + ":" +
                                                            str(now.time().second).zfill(2),
@@ -1387,6 +1388,16 @@ class Targets:
         elif wall.lower() == "ceiling":
             return (realTargetWideProp, realTargetDeepProp)
         print "ERROR: Invalid wall name \"" + str(wall) + "\""
+        return 0, 0
+
+    def getTargetDimension(self, wall, realRoomHeight, realRoomWidth, realRoomDepth):
+        propX, propY = self.getTargetDimensionProp(wall, realRoomHeight, realRoomWidth, realRoomDepth)
+        if wall.lower() == "front" or wall.lower() == "back":
+            return realRoomWidth*propX, realRoomHeight*propY
+        elif wall.lower() == "left" or wall.lower() == "right":
+            return realRoomDepth*propX, realRoomHeight*propY
+        elif wall.lower() == "ceiling":
+            return realRoomWidth*propX, realRoomDepth*propY
         return 0, 0
 
     def getTargetLocation(self, layout):
