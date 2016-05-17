@@ -1065,7 +1065,7 @@ class client:
             print "Layout scanned\n\n"
         orderIndex = 1
 
-        with open(str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
+        with open("results/" + str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
             fieldnames = ['user_number',
                           'date',
                           'time',
@@ -1103,7 +1103,7 @@ class client:
                              'target_dim_prop_C': str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
                                                str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling', self.roomHeight, self.roomWidth, self.roomDepth)[1])})
 
-        with open(str(self.USERNO) + "_trialResults.csv", 'w') as trialDetailsCSV:
+        with open("results/" + str(self.USERNO) + "_trialResults.csv", 'w') as trialDetailsCSV:
             fieldnames = ['condition1',  # pointing vs perspective
                           'condition2',  # Synchronous vs asychronous
                           'target_ini',
@@ -1258,7 +1258,7 @@ class client:
                                              'euc_to_city_block': "RATIO"}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
-                            with open("trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+                            with open("results/trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                                               str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                                               ".csv", 'w') as traceFile:
                                 traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
