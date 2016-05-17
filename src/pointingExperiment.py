@@ -616,14 +616,14 @@ class client:
 
     def drawTarget(self, wall, x, y, icon):
         projector, canvas = self.wallToProjCanvas(wall)
-        targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wall, self.roomHeight, self.roomWidth, self.roomDepth)
+        targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wall)
         target = self.sender.newTexRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", "img/" + str(icon))
         self.visibleTargets.append((projector, target, canvas))
         return target
 
     def drawKeyBorder(self, wall, layout):
         projector, canvas = self.wallToProjCanvas(wall)
-        targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wall, self.roomHeight, self.roomWidth, self.roomDepth)
+        targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wall)
         x, y = self.targets[self.TARGETINI].getTargetKeyLocationProp()
         targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
         self.border = (projector, self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1)), canvas)
@@ -631,41 +631,41 @@ class client:
     def drawKeyLayout(self, layoutNo):
         targetIcon = self.targets[self.TARGETINI].getTargetIcon(layoutNo)
         keyLocation = self.targets[self.TARGETINI].getTargetKeyLocationProp()
-        self.drawKeyBorder("Front", layoutNo)
-        self.drawTarget("Front", keyLocation[0], keyLocation[1], targetIcon)
+        self.drawKeyBorder("front", layoutNo)
+        self.drawTarget("front", keyLocation[0], keyLocation[1], targetIcon)
 
     def drawTargetLayout(self, layoutNo):
         for x in range(0, self.targets[self.TARGETINI].getTargetCountSquareSurface()):
-            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "Front", x)
-            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "Front", x)
-            self.drawTarget("Front", distractorLocation[0], distractorLocation[1], distractorIcon)
+            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "front", x)
+            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "front", x)
+            self.drawTarget("front", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets[self.TARGETINI].getTargetCountSquareSurface()):
-            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "Back", x)
-            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "Back", x)
-            self.drawTarget("Back", distractorLocation[0], distractorLocation[1], distractorIcon)
+            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "back", x)
+            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "back", x)
+            self.drawTarget("back", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets[self.TARGETINI].getTargetCountLongSurface()):
-            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "Left", x)
-            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "Left", x)
-            self.drawTarget("Left", distractorLocation[0], distractorLocation[1], distractorIcon)
+            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "left", x)
+            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "left", x)
+            self.drawTarget("left", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets[self.TARGETINI].getTargetCountLongSurface()):
-            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "Right", x)
-            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "Right", x)
-            self.drawTarget("Right", distractorLocation[0], distractorLocation[1], distractorIcon)
+            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "right", x)
+            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "right", x)
+            self.drawTarget("right", distractorLocation[0], distractorLocation[1], distractorIcon)
 
         for x in range(0, self.targets[self.TARGETINI].getTargetCountLongSurface()):
-            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "Ceiling", x)
-            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "Ceiling", x)
-            self.drawTarget("Ceiling", distractorLocation[0], distractorLocation[1], distractorIcon)
+            distractorIcon = self.targets[self.TARGETINI].getDistractorIcon(layoutNo, "ceiling", x)
+            distractorLocation = self.targets[self.TARGETINI].getDistractorLocationProp(layoutNo, "ceiling", x)
+            self.drawTarget("ceiling", distractorLocation[0], distractorLocation[1], distractorIcon)
 
     def isTargetHit(self, layout):
         mouseCanvas = self.surfaceToCanvas[(self.mouseProjector, self.mouseSurface)]
         wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas[1]).lower()
         if wallName == self.targets[self.TARGETINI].getTargetLocation(layout)[1].lower(): # Check whether mouse and target on same wall
             targetLocationProp = self.targets[self.TARGETINI].getTargetLocationProp(layout)
-            targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wallName, self.roomHeight, self.roomWidth, self.roomDepth)
+            targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wallName)
             xLeftTarget = targetLocationProp[0][0] - (targetDim[0]/2)
             xRightTarget = targetLocationProp[0][0] + (targetDim[0]/2)
             yTopTarget = targetLocationProp[0][1] + (targetDim[1]/2)
@@ -680,7 +680,7 @@ class client:
         wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas[1]).lower()
         if wallName.lower() == "front":
             keyLocationProp = self.targets[self.TARGETINI].getTargetKeyLocationProp()
-            targetDim = self.targets[self.TARGETINI].getTargetDimensionProp("front", self.roomHeight, self.roomWidth, self.roomDepth)
+            targetDim = self.targets[self.TARGETINI].getTargetDimensionProp("front")
             targetDim = targetDim[0]/75*100, targetDim[1]/75*100
             xLeftTarget = keyLocationProp[0] - (targetDim[0] / 2)
             xRightTarget = keyLocationProp[0] + (targetDim[0] / 2)
@@ -958,23 +958,22 @@ class client:
             self.planes.append([content[18], content[19], content[20], content[21], content[22], content[23]])
             self.planes.append([content[24], content[25], content[26], content[27], content[28], content[29]])
 
-            self.ceilingLength = (self.distBetweenPoints(content[26], content[29]) + self.distBetweenPoints(content[27], content[28]))/2
-            self.floorLength = (self.distBetweenPoints(content[4], content[17]) + self.distBetweenPoints(content[5], content[16]))/2
-            self.rightLength = (self.distBetweenPoints(content[8], content[9]) + self.distBetweenPoints(content[11], content[10]))/2
-            self.leftLength = (self.distBetweenPoints(content[20], content[21]) + self.distBetweenPoints(content[23], content[22]))/2
-            self.roomDepth = (self.ceilingLength + self.floorLength + self.leftLength + self.rightLength)/4
+            self.heights = {}
+            self.widths = {}
+            self.heights["front"] = (self.distBetweenPoints(content[2], content[5]) + self.distBetweenPoints(content[4], content[3]))/2
+            self.widths["front"] = (self.distBetweenPoints(content[2], content[3]) + self.distBetweenPoints(content[5], content[4]))/2
+            self.heights["right"] = (self.distBetweenPoints(content[9], content[10]) + self.distBetweenPoints(content[11], content[8]))/2
+            self.widths["right"] = (self.distBetweenPoints(content[9], content[8]) + self.distBetweenPoints(content[10], content[11]))/2
+            self.heights["back"] = (self.distBetweenPoints(content[14], content[17]) + self.distBetweenPoints(content[16], content[15]))/2
+            self.widths["back"] = (self.distBetweenPoints(content[14], content[15]) + self.distBetweenPoints(content[17], content[16]))/2
+            self.heights["left"] = (self.distBetweenPoints(content[21], content[22]) + self.distBetweenPoints(content[23], content[20]))/2
+            self.widths["left"] = (self.distBetweenPoints(content[20], content[21]) + self.distBetweenPoints(content[22], content[23]))/2
+            self.heights["ceiling"] = (self.distBetweenPoints(content[27], content[28]) + self.distBetweenPoints(content[29], content[26]))/2
+            self.widths["ceiling"] = (self.distBetweenPoints(content[26], content[27]) + self.distBetweenPoints(content[29], content[28]))/2
 
-            ceilingWidth = (self.distBetweenPoints(content[26], content[27]) + self.distBetweenPoints(content[29], content[28]))/2
-            leftHeight = (self.distBetweenPoints(content[21], content[22]) + self.distBetweenPoints(content[23], content[20]))/2
-            rightHeight = (self.distBetweenPoints(content[9], content[10]) + self.distBetweenPoints(content[11], content[8]))/2
-            floorWidth = (self.distBetweenPoints(content[4], content[5]) + self.distBetweenPoints(content[17], content[16]))/2
-            frontWidth = (self.distBetweenPoints(content[2], content[3]) + self.distBetweenPoints(content[5], content[4]))/2
-            frontHeight = (self.distBetweenPoints(content[2], content[5]) + self.distBetweenPoints(content[4], content[3]))/2
-            backWidth = (self.distBetweenPoints(content[14], content[15]) + self.distBetweenPoints(content[17], content[16]))/2
-            backHeight = (self.distBetweenPoints(content[14], content[17]) + self.distBetweenPoints(content[16], content[15]))/2
-
-            self.roomWidth = (frontWidth + backWidth + ceilingWidth + floorWidth)/4
-            self.roomHeight = (frontHeight + leftHeight + rightHeight + backHeight)/4
+            self.roomDepth = (self.heights["ceiling"] + self.widths["left"] + self.widths["right"])/3
+            self.roomWidth = (self.widths["front"] + self.widths["back"] + self.widths["ceiling"])/3
+            self.roomHeight = (self.heights["front"] + self.heights["left"] + self.heights["right"] + self.heights["back"])/4
 
     # def loadOrderFile(self, filename):
 
@@ -1062,6 +1061,7 @@ class client:
             print "Scanning Layout " + foundLayouts[x]
             self.targets[foundLayouts[x]] = Targets()
             self.targets[foundLayouts[x]].parseFile(foundLayouts[x])
+            self.targets[foundLayouts[x]].setHeightsAndWidths(self.heights, self.widths)
             print "Layout scanned\n\n"
         orderIndex = 1
 
@@ -1076,8 +1076,10 @@ class client:
                           'room_height',
                           'room_depth',
                           'key_location_prop',
-                          'target_dim_prop_F_B',
-                          'target_dim_prop_L_R',
+                          'target_dim_prop_F',
+                          'target_dim_prop_B',
+                          'target_dim_prop_R',
+                          'target_dim_prop_L',
                           'target_dim_prop_C']
             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
             writer.writeheader()
@@ -1096,12 +1098,16 @@ class client:
                              'room_depth': str(self.roomDepth),
                              'key_location_prop': str(self.targets[self.TARGETINI].getTargetKeyLocationProp()[0]) + "," +
                                              str(self.targets[self.TARGETINI].getTargetKeyLocationProp()[1]),
-                             'target_dim_prop_F_B': str(self.targets[self.TARGETINI].getTargetDimensionProp('front', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('front', self.roomHeight, self.roomWidth, self.roomDepth)[1]),
-                             'target_dim_prop_L_R': str(self.targets[self.TARGETINI].getTargetDimensionProp('left', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('left', self.roomHeight, self.roomWidth, self.roomDepth)[1]),
-                             'target_dim_prop_C': str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling', self.roomHeight, self.roomWidth, self.roomDepth)[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling', self.roomHeight, self.roomWidth, self.roomDepth)[1])})
+                             'target_dim_prop_F': str(self.targets[self.TARGETINI].getTargetDimensionProp('front')[0]) + "," +
+                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('front')[1]),
+                             'target_dim_prop_B': str(self.targets[self.TARGETINI].getTargetDimensionProp('back')[0]) + "," +
+                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('back')[1]),
+                             'target_dim_prop_R': str(self.targets[self.TARGETINI].getTargetDimensionProp('right')[0]) + "," +
+                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('right')[1]),
+                             'target_dim_prop_L': str(self.targets[self.TARGETINI].getTargetDimensionProp('left')[0]) + "," +
+                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('left')[1]),
+                             'target_dim_prop_C': str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling')[0]) + "," +
+                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling')[1])})
 
         with open("results/" + str(self.USERNO) + "_trialResults.csv", 'w') as trialDetailsCSV:
             fieldnames = ['condition1',  # pointing vs perspective
@@ -1232,7 +1238,7 @@ class client:
                                              'depth_icons': self.targets[self.TARGETINI].getTargetsDeep(),
                                              'width_icons': self.targets[self.TARGETINI].getTargetsWide(),
                                              'height_icons': self.targets[self.TARGETINI].getTargetsTall(),
-                                             'icon_width': self.targets[self.TARGETINI].getTargetDimension(targetLocation[1], self.roomHeight, self.roomWidth, self.roomDepth),
+                                             'icon_width': self.targets[self.TARGETINI].getTargetDimension(),
                                              'key_click_time': str(self.keyClickTime.time().hour).zfill(2) + ":" +
                                                            str(self.keyClickTime.time().minute).zfill(2) + ":" +
                                                            str(self.keyClickTime.time().second).zfill(2),
@@ -1367,68 +1373,67 @@ class Targets:
     def getTargetIcon(self, layout):
         return self.targets[layout]['target']
 
-    def getTargetDimensionProp(self, wall, realRoomHeight, realRoomWidth, realRoomDepth):
-        realTargetAreaTall = self.targetAreaTall * realRoomHeight
-        realTargetAreaWide = self.targetAreaWide * realRoomWidth
-        realTargetAreaDeep = self.targetAreaDepth * realRoomDepth
-        realTargetDeepProp = 0
-        realTargetWideProp = 0
-        realTargetTallProp = 0
-        if realTargetAreaTall <= realTargetAreaWide and realTargetAreaTall <= realTargetAreaDeep:
-            realTargetTallReal = 0.75 * realTargetAreaTall
-            realTargetTallProp = 0.75 * self.targetAreaTall
-            realTargetWideProp = realTargetTallReal/realRoomWidth
-            realTargetDeepProp = realTargetTallReal/realRoomDepth
-        elif realTargetAreaWide <= realTargetAreaTall and realTargetAreaWide <= realTargetAreaDeep:
-            realTargetWideReal = 0.75 * realTargetAreaWide
-            realTargetWideProp = 0.75 * self.targetAreaWide
-            realTargetTallProp = realTargetWideReal/realRoomHeight
-            realTargetDeepProp = realTargetWideReal/realRoomDepth
-        elif realTargetAreaDeep <= realTargetAreaTall and realTargetAreaDeep <= realTargetAreaWide:
-            realTargetDeepReal = 0.75 * realTargetAreaDeep
-            realTargetDeepProp = 0.75 * self.targetAreaDepth
-            realTargetWideProp = realTargetDeepReal/realRoomWidth
-            realTargetTallProp = realTargetDeepReal/realRoomHeight
-        if wall.lower() == "front" or wall.lower() == "back":
-            return (realTargetWideProp, realTargetTallProp)
-        elif wall.lower() == "left" or wall.lower() == "right":
-            return (realTargetDeepProp, realTargetTallProp)
-        elif wall.lower() == "ceiling":
-            return (realTargetWideProp, realTargetDeepProp)
-        print "ERROR: Invalid wall name \"" + str(wall) + "\""
-        return 0, 0
+    def setHeightsAndWidths(self, heights, widths):
+        self.heights = heights
+        self.widths = widths
+        walls = ["front", "left", "back", "right", "ceiling"]
+        shortestDim = 0
+        for x in range(0, len(walls)):
+            ideal = self.getIdealTargetDimensions(walls[x])
+            print str(ideal)
+            if shortestDim == 0 or ideal[0] < shortestDim:
+                print "From " + str(shortestDim) + " to " + str(ideal[0])
+                shortestDim = ideal[0]
+            if ideal[1] < shortestDim:
+                print "From " + str(shortestDim) + " to " + str(ideal[1])
+                shortestDim = ideal[1]
+        self.targetRealDimension = shortestDim
 
-    def getTargetDimension(self, wall, realRoomHeight, realRoomWidth, realRoomDepth):
-        propX, propY = self.getTargetDimensionProp(wall, realRoomHeight, realRoomWidth, realRoomDepth)
-        if wall.lower() == "front" or wall.lower() == "back":
-            return realRoomWidth*propX, realRoomHeight*propY
-        elif wall.lower() == "left" or wall.lower() == "right":
-            return realRoomDepth*propX, realRoomHeight*propY
-        elif wall.lower() == "ceiling":
-            return realRoomWidth*propX, realRoomDepth*propY
-        return 0, 0
+    def getIdealTargetDimensions(self, wall):
+        widthFull = 0
+        heightFull = 0
+        if wall == "left" or wall == "right":
+            widthFull = self.targetAreaDepth * self.widths[wall]
+            heightFull = self.targetAreaTall * self.heights[wall]
+        elif wall == "front" or wall == "back":
+            widthFull = self.targetA1reaWide * self.widths[wall]
+            heightFull = self.targetAreaTall * self.heights[wall]
+        elif wall == "ceiling":
+            widthFull = self.targetAreaWide * self.widths[wall]
+            heightFull = self.targetAreaDepth * self.heights[wall]
+        idealTargetWidth = 0.75*widthFull
+        idealTargetHeight = 0.75*heightFull
+        return idealTargetWidth, idealTargetHeight
+
+    def getTargetDimension(self):
+        return self.targetRealDimension, self.targetRealDimension
+
+    def getTargetDimensionProp(self, wall):
+        wallWidth = self.widths[wall]
+        wallHeight = self.heights[wall]
+        return self.targetRealDimension/wallWidth, self.targetRealDimension/wallHeight
 
     def getTargetLocation(self, layout):
         for x in range(0, self.TARGET_COUNT_SQUARE_SURFACE):
             target = self.targets[layout]["wallF"][x]
             if target[1] == self.getTargetIcon(layout):
-                return target[0], "Front"
+                return target[0], "front"
         for x in range(0, self.TARGET_COUNT_SQUARE_SURFACE):
             target = self.targets[layout]["wallB"][x]
             if target[1] == self.getTargetIcon(layout):
-                return target[0], "Back"
+                return target[0], "back"
         for x in range(0, self.TARGET_COUNT_LONG_SURFACE):
             target = self.targets[layout]["wallL"][x]
             if target[1] == self.getTargetIcon(layout):
-                return target[0], "Left"
+                return target[0], "left"
         for x in range(0, self.TARGET_COUNT_LONG_SURFACE):
             target = self.targets[layout]["wallR"][x]
             if target[1] == self.getTargetIcon(layout):
-                return target[0], "Right"
+                return target[0], "right"
         for x in range(0, self.TARGET_COUNT_LONG_SURFACE):
             target = self.targets[layout]["ceiling"][x]
             if target[1] == self.getTargetIcon(layout):
-                return target[0], "Ceiling"
+                return target[0], "ceiling"
         print "ERROR: Target not found among distractors. Poorly formed ini file."
 
     def getTargetLocationProp(self, layout):
