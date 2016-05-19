@@ -417,7 +417,10 @@ class client:
                                     self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
                                                              "endPoint": self.intersect, "distance": distance,
                                                              "angle": angle, "angularVelocity": degreesPerSecond,
-                                                             "velocity": distanceUnitsPerSecond})
+                                                             "velocity": distanceUnitsPerSecond,
+                                                             "time": str(temptime.time().hour).zfill(2) +
+                                                                     ":" + str(temptime.time().minute).zfill(2) +
+                                                                     ":" + str(temptime.time().second).zfill(2)})
 
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
@@ -504,7 +507,10 @@ class client:
                                 self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
                                                          "endPoint": self.intersect, "distance": distance,
                                                          "angle": angle, "angularVelocity": degreesPerSecond,
-                                                         "velocity": distanceUnitsPerSecond})
+                                                         "velocity": distanceUnitsPerSecond,
+                                                         "time": str(temptime.time().hour).zfill(2) +
+                                                                 ":" + str(temptime.time().minute).zfill(2) +
+                                                                 ":" + str(temptime.time().second).zfill(2)})
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if len(mouseLocations)!=0:
@@ -1275,7 +1281,8 @@ class client:
                                                     str(recordedPath[index]["distance"]) + "," +
                                                     str(recordedPath[index]["angle"]) + "," +
                                                     str(recordedPath[index]["angularVelocity"]) + "," +
-                                                    str(recordedPath[index]["velocity"]) + "\n")
+                                                    str(recordedPath[index]["velocity"]) + "," +
+                                                    str(recordedPath[index]["time"]) + "\n")
                                 writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.alreadyPassed = ['front']
                             orderIndex += 1
@@ -1396,7 +1403,7 @@ class Targets:
             widthFull = self.targetAreaDepth * self.widths[wall]
             heightFull = self.targetAreaTall * self.heights[wall]
         elif wall == "front" or wall == "back":
-            widthFull = self.targetA1reaWide * self.widths[wall]
+            widthFull = self.targetAreaWide * self.widths[wall]
             heightFull = self.targetAreaTall * self.heights[wall]
         elif wall == "ceiling":
             widthFull = self.targetAreaWide * self.widths[wall]
