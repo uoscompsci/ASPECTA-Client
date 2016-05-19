@@ -451,6 +451,7 @@ class client:
                     oldIntersect = self.intersect  # Saves the last intersect point
                     axes = self.getHeadAxes()
                     lastHeadLoc = axes[0]  # From now on the current head location is used
+                    pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                     intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
@@ -1012,8 +1013,8 @@ class client:
         thread.start()
 
         self.sender = messageSender()
-        self.winWidth = 320
-        self.winHeight = 240
+        self.winWidth = 640
+        self.winHeight = 480
 
         # Initialise screen
         pygame.init()
