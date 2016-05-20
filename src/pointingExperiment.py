@@ -1271,8 +1271,8 @@ class client:
                                              'euc_to_city_block': "RATIO"}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
-                            pathWriteThread = threading.Thread(target=self.writePathFile, args=(CONDITION1, CONDITION2,
-                                                                                                recordedPath))
+                            pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
+                                                                                                recordedPath]))
                             pathWriteThread.start()
                             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.alreadyPassed = ['front']
