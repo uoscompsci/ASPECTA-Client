@@ -1271,20 +1271,10 @@ class client:
                                              'euc_to_city_block': "RATIO"}) #TODO Make
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
-                            with open("results/trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
-                                              str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
-                                              ".csv", 'w') as traceFile:
-                                traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
-                                for index in range(0, len(recordedPath)):
-                                    traceFile.write(str(recordedPath[index]["userLoc"]) + "," +
-                                                    str(recordedPath[index]["startPoint"]) + "," +
-                                                    str(recordedPath[index]["endPoint"]) + "," +
-                                                    str(recordedPath[index]["distance"]) + "," +
-                                                    str(recordedPath[index]["angle"]) + "," +
-                                                    str(recordedPath[index]["angularVelocity"]) + "," +
-                                                    str(recordedPath[index]["velocity"]) + "," +
-                                                    str(recordedPath[index]["time"]) + "\n")
-                                writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
+                            pathWriteThread = threading.Thread(target=self.writePathFile, args=(CONDITION1, CONDITION2,
+                                                                                                recordedPath))
+                            pathWriteThread.start()
+                            writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.alreadyPassed = ['front']
                             orderIndex += 1
                     self.screen.blit(self.background, (0, 0))
@@ -1295,12 +1285,26 @@ class client:
         time.sleep(0.2)
         pygame.quit()
 
+    def writePathFile(self, CONDITION1, CONDITION2, recordedPath):
+        with open("results/trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+                          str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
+                          ".csv", 'w') as traceFile:
+            traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
+            for index in range(0, len(recordedPath)):
+                traceFile.write(str(recordedPath[index]["userLoc"]) + "," +
+                                str(recordedPath[index]["startPoint"]) + "," +
+                                str(recordedPath[index]["endPoint"]) + "," +
+                                str(recordedPath[index]["distance"]) + "," +
+                                str(recordedPath[index]["angle"]) + "," +
+                                str(recordedPath[index]["angularVelocity"]) + "," +
+                                str(recordedPath[index]["velocity"]) + "," +
+                                str(recordedPath[index]["time"]) + "\n")
+
     def incrementTrialNumForCond(self, condition1, condition2):
         self.conditionCounter[condition1 + "," + condition2] += 1
 
     def getTrialNumForCond(self, condition1, condition2):
         return self.conditionCounter[condition1 + "," + condition2]
-
 
 class Targets:
     NO_TARGETS_WIDE = None
