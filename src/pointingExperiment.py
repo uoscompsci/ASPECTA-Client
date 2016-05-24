@@ -1302,7 +1302,7 @@ class client:
         pygame.quit()
 
     def writePathFile(self, CONDITION1, CONDITION2, recordedPath):
-        with open("results/trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+        with open("results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                           str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                           ".csv", 'w') as traceFile:
             traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
