@@ -16,6 +16,7 @@ from math import sqrt, fabs
 import csv
 from random import randint
 import datetime
+import os.path
 
 
 class MyDialog(tkSimpleDialog.Dialog):
@@ -1070,53 +1071,69 @@ class client:
             self.targets[foundLayouts[x]].parseFile(foundLayouts[x])
             self.targets[foundLayouts[x]].setHeightsAndWidths(self.heights, self.widths)
             print "Layout scanned\n\n"
+
+        # Check if trialResults file exists already
+        exists = os.path.isfile("results/" + str(self.USERNO) + "_trialResults.csv")
         orderIndex = 1
+        newFile = False
+        writingPermissions = 'w'
+        if not exists:
+            newFile = True
+        else:
+            i = 0
+            with open("results/" + str(self.USERNO) + "_trialResults.csv") as f:
+                for i, l in enumerate(f):
+                    pass
+            orderIndex = i+1
+            writingPermissions = 'a'
+            print("Results file already exists. Starting with " + orderIndex)
 
-        with open("results/" + str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
-            fieldnames = ['user_number',
-                          'date',
-                          'time',
-                          'age',
-                          'gender',
-                          'sequence_number',
-                          'room_width',
-                          'room_height',
-                          'room_depth',
-                          'key_location_prop',
-                          'target_dim_prop_F',
-                          'target_dim_prop_B',
-                          'target_dim_prop_R',
-                          'target_dim_prop_L',
-                          'target_dim_prop_C']
-            writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerow({'user_number': str(self.USERNO),
-                             'date': str(now.date().day).zfill(2) + "/" +
-                                     str(now.date().month).zfill(2) + "/" +
-                                     str(now.date().year),
-                             'time': str(now.time().hour).zfill(2) + ":" +
-                                     str(now.time().minute).zfill(2) + ":" +
-                                     str(now.time().second).zfill(2),
-                             'age': str(self.AGE),
-                             'gender': self.GENDER,
-                             'sequence_number': str(self.SEQUENCENO),
-                             'room_width': str(self.roomWidth),
-                             'room_height': str(self.roomHeight),
-                             'room_depth': str(self.roomDepth),
-                             'key_location_prop': str(self.targets[self.TARGETINI].getTargetKeyLocationProp()[0]) + "," +
-                                             str(self.targets[self.TARGETINI].getTargetKeyLocationProp()[1]),
-                             'target_dim_prop_F': str(self.targets[self.TARGETINI].getTargetDimensionProp('front')[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('front')[1]),
-                             'target_dim_prop_B': str(self.targets[self.TARGETINI].getTargetDimensionProp('back')[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('back')[1]),
-                             'target_dim_prop_R': str(self.targets[self.TARGETINI].getTargetDimensionProp('right')[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('right')[1]),
-                             'target_dim_prop_L': str(self.targets[self.TARGETINI].getTargetDimensionProp('left')[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('left')[1]),
-                             'target_dim_prop_C': str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling')[0]) + "," +
-                                               str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling')[1])})
+        if newFile:
+            with open("results/" + str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
+                fieldnames = ['user_number',
+                              'date',
+                              'time',
+                              'age',
+                              'gender',
+                              'sequence_number',
+                              'room_width',
+                              'room_height',
+                              'room_depth',
+                              'key_location_prop',
+                              'target_dim_prop_F',
+                              'target_dim_prop_B',
+                              'target_dim_prop_R',
+                              'target_dim_prop_L',
+                              'target_dim_prop_C']
+                writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerow({'user_number': str(self.USERNO),
+                                 'date': str(now.date().day).zfill(2) + "/" +
+                                         str(now.date().month).zfill(2) + "/" +
+                                         str(now.date().year),
+                                 'time': str(now.time().hour).zfill(2) + ":" +
+                                         str(now.time().minute).zfill(2) + ":" +
+                                         str(now.time().second).zfill(2),
+                                 'age': str(self.AGE),
+                                 'gender': self.GENDER,
+                                 'sequence_number': str(self.SEQUENCENO),
+                                 'room_width': str(self.roomWidth),
+                                 'room_height': str(self.roomHeight),
+                                 'room_depth': str(self.roomDepth),
+                                 'key_location_prop': str(self.targets[self.TARGETINI].getTargetKeyLocationProp()[0]) + "," +
+                                                 str(self.targets[self.TARGETINI].getTargetKeyLocationProp()[1]),
+                                 'target_dim_prop_F': str(self.targets[self.TARGETINI].getTargetDimensionProp('front')[0]) + "," +
+                                                   str(self.targets[self.TARGETINI].getTargetDimensionProp('front')[1]),
+                                 'target_dim_prop_B': str(self.targets[self.TARGETINI].getTargetDimensionProp('back')[0]) + "," +
+                                                   str(self.targets[self.TARGETINI].getTargetDimensionProp('back')[1]),
+                                 'target_dim_prop_R': str(self.targets[self.TARGETINI].getTargetDimensionProp('right')[0]) + "," +
+                                                   str(self.targets[self.TARGETINI].getTargetDimensionProp('right')[1]),
+                                 'target_dim_prop_L': str(self.targets[self.TARGETINI].getTargetDimensionProp('left')[0]) + "," +
+                                                   str(self.targets[self.TARGETINI].getTargetDimensionProp('left')[1]),
+                                 'target_dim_prop_C': str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling')[0]) + "," +
+                                                   str(self.targets[self.TARGETINI].getTargetDimensionProp('ceiling')[1])})
 
-        with open("results/" + str(self.USERNO) + "_trialResults.csv", 'w') as trialDetailsCSV:
+        with open("results/" + str(self.USERNO) + "_trialResults.csv", writingPermissions) as trialDetailsCSV:
             fieldnames = ['condition1',  # pointing vs perspective
                           'condition2',  # Synchronous vs asychronous
                           'target_ini',
@@ -1147,11 +1164,11 @@ class client:
                           'max_mouse_angular_velocity',
                           'max_mouse_velocity',
                           'no_walls_passed',
-                          'no_walls_needed',
-                          'euc_to_city_block'
+                          'no_walls_needed'
                           ]
             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
-            writer.writeheader()
+            if newFile:
+                writer.writeheader()
             #self.loadOrderFile()
 
             if (self.quit == False):
@@ -1267,8 +1284,7 @@ class client:
                                              'max_mouse_angular_velocity': self.fastestAngularVelocity(recordedPath),
                                              'max_mouse_velocity': self.fastestVelocity(recordedPath),
                                              'no_walls_passed': self.passedSurfaces,
-                                             'no_walls_needed': wallsneeded,
-                                             'euc_to_city_block': "RATIO"}) #TODO Make
+                                             'no_walls_needed': wallsneeded})
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
                             pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
