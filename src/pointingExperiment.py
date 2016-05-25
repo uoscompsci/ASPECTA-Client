@@ -960,28 +960,37 @@ class client:
                 temp = scipy.array([temp[0], temp[1], temp[2]])
                 content.append(temp)
             # print str(content)
-            self.planes.append([content[0], content[1], content[2], content[3], content[4], content[5]])
-            self.planes.append([content[6], content[7], content[8], content[9], content[10], content[11]])
-            self.planes.append([content[12], content[13], content[14], content[15], content[16], content[17]])
-            self.planes.append([content[18], content[19], content[20], content[21], content[22], content[23]])
-            self.planes.append([content[24], content[25], content[26], content[27], content[28], content[29]])
+            self.planes.append([content[0], content[1], content[2], content[3], content[4], content[5], content[6], content[7]])
+            self.planes.append([content[8], content[9], content[10], content[11], content[12], content[13], content[14], content[15]])
+            self.planes.append([content[16], content[17], content[18], content[19], content[20], content[21], content[22], content[23]])
+            self.planes.append([content[24], content[25], content[26], content[27], content[28], content[29], content[30], content[31]])
+            self.planes.append([content[32], content[33], content[34], content[35], content[36], content[37], content[38], content[39]])
+            self.planes.append([content[40], content[41], content[42], content[43], content[44], content[45], content[46], content[47]])
 
             self.heights = {}
             self.widths = {}
+            self.fullHeights = {}
             self.heights["front"] = (self.distBetweenPoints(content[2], content[5]) + self.distBetweenPoints(content[4], content[3]))/2
             self.widths["front"] = (self.distBetweenPoints(content[2], content[3]) + self.distBetweenPoints(content[5], content[4]))/2
-            self.heights["right"] = (self.distBetweenPoints(content[9], content[10]) + self.distBetweenPoints(content[11], content[8]))/2
-            self.widths["right"] = (self.distBetweenPoints(content[9], content[8]) + self.distBetweenPoints(content[10], content[11]))/2
-            self.heights["back"] = (self.distBetweenPoints(content[14], content[17]) + self.distBetweenPoints(content[16], content[15]))/2
-            self.widths["back"] = (self.distBetweenPoints(content[14], content[15]) + self.distBetweenPoints(content[17], content[16]))/2
-            self.heights["left"] = (self.distBetweenPoints(content[21], content[22]) + self.distBetweenPoints(content[23], content[20]))/2
-            self.widths["left"] = (self.distBetweenPoints(content[20], content[21]) + self.distBetweenPoints(content[22], content[23]))/2
-            self.heights["ceiling"] = (self.distBetweenPoints(content[27], content[28]) + self.distBetweenPoints(content[29], content[26]))/2
-            self.widths["ceiling"] = (self.distBetweenPoints(content[26], content[27]) + self.distBetweenPoints(content[29], content[28]))/2
+            self.heights["right"] = (self.distBetweenPoints(content[10], content[13]) + self.distBetweenPoints(content[12], content[11]))/2
+            self.widths["right"] = (self.distBetweenPoints(content[10], content[11]) + self.distBetweenPoints(content[13], content[12]))/2
+            self.heights["back"] = (self.distBetweenPoints(content[18], content[21]) + self.distBetweenPoints(content[20], content[19]))/2
+            self.widths["back"] = (self.distBetweenPoints(content[18], content[19]) + self.distBetweenPoints(content[21], content[20]))/2
+            self.heights["left"] = (self.distBetweenPoints(content[26], content[29]) + self.distBetweenPoints(content[28], content[27]))/2
+            self.widths["left"] = (self.distBetweenPoints(content[26], content[27]) + self.distBetweenPoints(content[29], content[28]))/2
+            self.heights["ceiling"] = (self.distBetweenPoints(content[34], content[37]) + self.distBetweenPoints(content[36], content[35]))/2
+            self.widths["ceiling"] = (self.distBetweenPoints(content[34], content[35]) + self.distBetweenPoints(content[37], content[36]))/2
+            self.heights["floor"] = (self.distBetweenPoints(content[42], content[45]) + self.distBetweenPoints(content[44], content[43]))/2
+            self.widths["floor"] = (self.distBetweenPoints(content[42], content[43]) + self.distBetweenPoints(content[45], content[44]))/2
 
-            self.roomDepth = (self.heights["ceiling"] + self.widths["left"] + self.widths["right"])/3
-            self.roomWidth = (self.widths["front"] + self.widths["back"] + self.widths["ceiling"])/3
-            self.roomHeight = (self.heights["front"] + self.heights["left"] + self.heights["right"] + self.heights["back"])/4
+            self.fullHeights["front"] = (self.distBetweenPoints(content[2], content[7]) + self.distBetweenPoints(content[6], content[3])) / 2
+            self.fullHeights["right"] = (self.distBetweenPoints(content[10], content[15]) + self.distBetweenPoints(content[14], content[11])) / 2
+            self.fullHeights["back"] = (self.distBetweenPoints(content[18], content[23]) + self.distBetweenPoints(content[22], content[19])) / 2
+            self.fullHeights["left"] = (self.distBetweenPoints(content[26], content[31]) + self.distBetweenPoints(content[30], content[27])) / 2
+
+            self.roomDepth = (self.heights["ceiling"] + self.heights["floor"] + self.widths["left"] + self.widths["right"])/4
+            self.roomWidth = (self.widths["front"] + self.widths["back"] + self.widths["ceiling"] + self.widths["floor"])/4
+            self.roomHeight = (self.fullHeights["front"] + self.fullHeights["left"] + self.fullHeights["right"] + self.fullHeights["back"]) / 4
 
     # def loadOrderFile(self, filename):
 
