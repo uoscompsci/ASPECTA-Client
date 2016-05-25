@@ -17,6 +17,7 @@ import csv
 from random import randint
 import datetime
 import os.path
+import os, glob
 
 
 class MyDialog(tkSimpleDialog.Dialog):
@@ -1095,7 +1096,13 @@ class client:
                     pass
             orderIndex = i+1
             writingPermissions = 'a'
-            print("Results file already exists. Starting with " + orderIndex)
+            for filename in glob.glob("results/" + str(self.USERNO) + "_trace_*"):
+                file = filename.split("/")[1]
+                file = file.split("_")
+                condition1 = file[2]
+                condition2 = file[3]
+                self.incrementTrialNumForCond(condition1, condition2)
+            print "Results file already exists. Starting with " + str(orderIndex)
 
         if newFile:
             with open("results/" + str(self.USERNO) + "_trialDetails.csv", 'w') as trialDetailsCSV:
@@ -1311,7 +1318,7 @@ class client:
         pygame.quit()
 
     def writePathFile(self, CONDITION1, CONDITION2, recordedPath):
-        with open("results/trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+        with open("results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                           str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                           ".csv", 'w') as traceFile:
             traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
@@ -1324,6 +1331,7 @@ class client:
                                 str(recordedPath[index]["angularVelocity"]) + "," +
                                 str(recordedPath[index]["velocity"]) + "," +
                                 str(recordedPath[index]["time"]) + "\n")
+        print "Wrote path file \"results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" + str(self.getTrialNumForCond(CONDITION1, CONDITION2)) + ".csv\""
 
     def incrementTrialNumForCond(self, condition1, condition2):
         self.conditionCounter[condition1 + "," + condition2] += 1
