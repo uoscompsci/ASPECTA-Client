@@ -359,7 +359,7 @@ class client:
                     ydist = (self.winHeight / 2) - pos[1]
                     intersections = None
                     if (not (xdist == 0 and ydist == 0)):
-                        for x in range(0, len(self.planes)):  # Finds where the last intersect point was
+                        for x in range(0, len(self.planes)-1):  # Finds where the last intersect point was
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if(segCheck == 1):
                                 break
@@ -371,7 +371,7 @@ class client:
                         curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
                         intersections = [1, 1, 1, 1, 1]
                         mouseLocations = []
-                        for x in range(0, len(self.planes)):
+                        for x in range(0, len(self.planes)-1):
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if segCheck == 1:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
@@ -446,7 +446,7 @@ class client:
                                 self.mouseSurface = mouseLocations[x][2][1]
                                 self.sender.showCursor(2, self.curs[2+x])
                 else: # Runs if it is pointing that is to control the cursor
-                    for x in range(0, len(self.planes)):  # Finds where the last intersect point was
+                    for x in range(0, len(self.planes)-1):  # Finds where the last intersect point was
                         segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
                         if(segCheck == 1):
                             break
@@ -456,7 +456,7 @@ class client:
                     pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                     intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
-                    for x in range(0, len(self.planes)):
+                    for x in range(0, len(self.planes)-1):
                         segCheck2 = self.getTrackerData()[0][0]
                         segCheck3 = self.getTrackerData()[0][1]
                         segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
