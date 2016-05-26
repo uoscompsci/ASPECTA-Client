@@ -3,9 +3,21 @@ from os import listdir
 from os.path import isfile, join
 
 class generator():
-    NO_TARGETS_WIDE = 6
-    NO_TARGETS_TALL = 6
-    NO_TARGETS_DEEP = 12
+    CEILING_WIDE = 6
+    CEILING_TALL = 10
+
+    FRONT_WIDE = 6
+    FRONT_TALL = 6
+
+    BACK_WIDE = 6
+    BACK_TALL = 6
+
+    LEFT_WIDE = 10
+    LEFT_TALL = 6
+
+    RIGHT_WIDE = 10
+    RIGHT_TALL = 4
+
     TARGET_COUNT_LONG_SURFACE = 8
     TARGET_COUNT_SQUARE_SURFACE = 4
     KEY_X = 2
@@ -18,18 +30,24 @@ class generator():
     numberOfImages = 0
     availableImages = []
 
-    def getXYandIcon(self, wallType):
+    def getXYandIcon(self, wall):
         xWidth = 0
         yWidth = 0
-        if wallType == "square":
-            xWidth = self.NO_TARGETS_WIDE
-            yWidth = self.NO_TARGETS_TALL
-        elif wallType == "long":
-            xWidth = self.NO_TARGETS_DEEP
-            yWidth = self.NO_TARGETS_TALL
-        elif wallType == "longFlip":
-            xWidth = self.NO_TARGETS_WIDE
-            yWidth = self.NO_TARGETS_DEEP
+        if wall == "front":
+            xWidth = self.FRONT_WIDE
+            yWidth = self.FRONT_TALL
+        elif wall == "back":
+            xWidth = self.BACK_WIDE
+            yWidth = self.BACK_TALL
+        elif wall == "left":
+            xWidth = self.LEFT_WIDE
+            yWidth = self.LEFT_TALL
+        elif wall == "right":
+            xWidth = self.RIGHT_WIDE
+            yWidth = self.RIGHT_TALL
+        elif wall == "ceiling":
+            xWidth = self.CEILING_WIDE
+            yWidth = self.CEILING_TALL
         xPick = randint(1, xWidth)
         yPick = randint(1, yWidth)
         while (xPick, yPick) in self.usedLocs:
@@ -68,9 +86,16 @@ class generator():
         self.numberOfImages = len(self.availableImages)
         fo = open("targets.ini", "wb")
         fo.write("[configuration]\n")
-        fo.write("NO_TARGETS_WIDE=" + str(self.NO_TARGETS_WIDE) + "\n")
-        fo.write("NO_TARGETS_TALL=" + str(self.NO_TARGETS_TALL) + "\n")
-        fo.write("NO_TARGETS_DEEP=" + str(self.NO_TARGETS_DEEP) + "\n")
+        fo.write("CEILING_WIDE=" + str(self.CEILING_WIDE) + "\n")
+        fo.write("CEILING_TALL=" + str(self.CEILING_TALL) + "\n")
+        fo.write("FRONT_WIDE=" + str(self.FRONT_WIDE) + "\n")
+        fo.write("FRONT_TALL=" + str(self.FRONT_TALL) + "\n")
+        fo.write("BACK_WIDE=" + str(self.BACK_WIDE) + "\n")
+        fo.write("BACK_TALL=" + str(self.BACK_TALL) + "\n")
+        fo.write("LEFT_WIDE=" + str(self.LEFT_WIDE) + "\n")
+        fo.write("LEFT_TALL=" + str(self.LEFT_TALL) + "\n")
+        fo.write("RIGHT_WIDE=" + str(self.RIGHT_WIDE) + "\n")
+        fo.write("RIGHT_TALL=" + str(self.RIGHT_TALL) + "\n")
         fo.write("TARGET_COUNT_LONG_SURFACE=" + str(self.TARGET_COUNT_LONG_SURFACE) + "\n")
         fo.write("TARGET_COUNT_SQUARE_SURFACE=" + str(self.TARGET_COUNT_SQUARE_SURFACE) + "\n")
         fo.write("KEY_X=" + str(self.KEY_X) + "\n")
@@ -78,51 +103,51 @@ class generator():
         for w in range(1,101):
             fo.write("[" + str(w) + "]\n")
             fo.write("wallF=")
-            self.getXYandIcon("square")
-            while self.x == self.KEY_X and self.y == self.KEY_Y:
-                self.getXYandIcon("square")
+            self.getXYandIcon("front")
+            while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
+                self.getXYandIcon("front")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
-                self.getXYandIcon("square")
-                while self.x == self.KEY_X and self.y == self.KEY_Y:
-                    self.getXYandIcon("square")
+                self.getXYandIcon("front")
+                while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
+                    self.getXYandIcon("front")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallB=")
-            self.getXYandIcon("square")
+            self.getXYandIcon("back")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
-                self.getXYandIcon("square")
+                self.getXYandIcon("back")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallL=")
-            self.getXYandIcon("long")
+            self.getXYandIcon("left")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
-                self.getXYandIcon("long")
+                self.getXYandIcon("left")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallR=")
-            self.getXYandIcon("long")
+            self.getXYandIcon("right")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
-                self.getXYandIcon("long")
+                self.getXYandIcon("right")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("ceiling=")
-            self.getXYandIcon("longFlip")
+            self.getXYandIcon("ceiling")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
-                self.getXYandIcon("longFlip")
+                self.getXYandIcon("ceiling")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
             fo.write("\n")
             iconIndex = randint(0,len(self.usedIcons)-1)
