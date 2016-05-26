@@ -359,7 +359,7 @@ class client:
                     ydist = (self.winHeight / 2) - pos[1]
                     intersections = None
                     if (not (xdist == 0 and ydist == 0)):
-                        for x in range(0, len(self.planes)-1):  # Finds where the last intersect point was
+                        for x in range(0, len(self.planes)):  # Finds where the last intersect point was
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if(segCheck == 1):
                                 break
@@ -371,7 +371,7 @@ class client:
                         curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
                         intersections = [1, 1, 1, 1, 1]
                         mouseLocations = []
-                        for x in range(0, len(self.planes)-1):
+                        for x in range(0, len(self.planes)):
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if segCheck == 1:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
@@ -392,7 +392,7 @@ class client:
                                 hvecangle = numpy.rad2deg(hvecangle)
                                 vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                                 vvecangle = numpy.rad2deg(vvecangle)
-                                surfaces = ["front", "right", "back", "left", "ceiling"]
+                                surfaces = ["front", "right", "back", "left", "ceiling", "floor"]
                                 isWallChange = False
                                 if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
@@ -429,7 +429,7 @@ class client:
                         if len(mouseLocations)!=0:
                             if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
                                 wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                                if mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                                if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
                                     self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
                                     self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
                                     self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
@@ -445,7 +445,7 @@ class client:
                                     self.sender.hideCursor(1, self.curs[1])
                             elif mouseLocations[x][2][0]==2:  # If the cursor is on projector 2
                                 wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                                if mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                                if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
                                     self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
                                     self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
                                     self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
@@ -460,7 +460,7 @@ class client:
                                     self.sender.hideCursor(1, self.curs[0])
                                     self.sender.hideCursor(1, self.curs[1])
                 else: # Runs if it is pointing that is to control the cursor
-                    for x in range(0, len(self.planes)-1):  # Finds where the last intersect point was
+                    for x in range(0, len(self.planes)):  # Finds where the last intersect point was
                         segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
                         if(segCheck == 1):
                             break
@@ -470,7 +470,7 @@ class client:
                     pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                     intersections = [1, 1, 1, 1, 1]
                     mouseLocations = []
-                    for x in range(0, len(self.planes)-1):
+                    for x in range(0, len(self.planes)):
                         segCheck2 = self.getTrackerData()[0][0]
                         segCheck3 = self.getTrackerData()[0][1]
                         segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
@@ -493,7 +493,7 @@ class client:
                             hvecangle = numpy.rad2deg(hvecangle)
                             vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
                             vvecangle = numpy.rad2deg(vvecangle)
-                            surfaces = ["front", "right", "back", "left", "ceiling"]
+                            surfaces = ["front", "right", "back", "left", "ceiling", "floor"]
                             isWallChange = False
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
@@ -533,7 +533,7 @@ class client:
                     if len(mouseLocations)!=0:
                         if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
                             wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                            if mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                            if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
                                 self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
                                 self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
                                 self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
@@ -549,7 +549,7 @@ class client:
                                 self.sender.hideCursor(1, self.curs[1])
                         elif mouseLocations[x][2][0] == 2:  # If the cursor is on projector 2
                             wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                            if mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                            if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
                                 self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
                                 self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
                                 self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
