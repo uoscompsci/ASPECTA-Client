@@ -1200,9 +1200,16 @@ class client:
                           'trace_angular_distance',
                           'target_icon',
                           'target_location',
-                          'depth_icons',
-                          'width_icons',
-                          'height_icons',
+                          'front_icons_tall',
+                          'front_icons_wide',
+                          'back_icons_tall',
+                          'back_icons_wide',
+                          'left_icons_tall',
+                          'left_icons_wide',
+                          'right_icons_tall',
+                          'right_icons_wide',
+                          'ceiling_icons_tall',
+                          'ceiling_icons_wide',
                           'icon_width',
                           'key_click_time',
                           'key_click_date',
@@ -1310,9 +1317,16 @@ class client:
                                              'trace_angular_distance': str(self.pathAngle(recordedPath)),
                                              'target_icon': self.targets[self.TARGETINI].getTargetIcon(self.currentLayout),
                                              'target_location': self.targets[self.TARGETINI].getTargetLocationProp(self.currentLayout),
-                                             'depth_icons': self.targets[self.TARGETINI].getTargetsDeep(),
-                                             'width_icons': self.targets[self.TARGETINI].getTargetsWide(),
-                                             'height_icons': self.targets[self.TARGETINI].getTargetsTall(),
+                                             'front_icons_tall': self.targets[self.TARGETINI].getFrontIconsTall(),
+                                             'front_icons_wide': self.targets[self.TARGETINI].getFrontIconsWide(),
+                                             'back_icons_tall': self.targets[self.TARGETINI].getBackIconsTall(),
+                                             'back_icons_wide': self.targets[self.TARGETINI].getBackIconsWide(),
+                                             'left_icons_tall': self.targets[self.TARGETINI].getLeftIconsTall(),
+                                             'left_icons_wide': self.targets[self.TARGETINI].getLeftIconsWide(),
+                                             'right_icons_tall': self.targets[self.TARGETINI].getRightIconsTall(),
+                                             'right_icons_wide': self.targets[self.TARGETINI].getRightIconsWide(),
+                                             'ceiling_icons_tall': self.targets[self.TARGETINI].getCeilingIconsTall(),
+                                             'ceiling_icons_wide': self.targets[self.TARGETINI].getCeilingIconsWide(),
                                              'icon_width': self.targets[self.TARGETINI].getTargetDimension(),
                                              'key_click_time': str(self.keyClickTime.time().hour).zfill(2) + ":" +
                                                            str(self.keyClickTime.time().minute).zfill(2) + ":" +
@@ -1375,9 +1389,16 @@ class client:
         return self.conditionCounter[condition1 + "," + condition2]
 
 class Targets:
-    NO_TARGETS_WIDE = None
-    NO_TARGETS_TALL = None
-    NO_TARGETS_DEEP = None
+    CEILING_WIDE = None
+    CEILING_TALL = None
+    FRONT_WIDE = None
+    FRONT_TALL = None
+    BACK_WIDE = None
+    BACK_TALL = None
+    LEFT_WIDE = None
+    LEFT_TALL = None
+    RIGHT_WIDE = None
+    RIGHT_TALL = None
     TARGET_COUNT_LONG_SURFACE = None
     TARGET_COUNT_SQUARE_SURFACE = None
     KEY_X = None
@@ -1397,9 +1418,16 @@ class Targets:
         targetParser.read(filename)
 
         # Get all the configuration details from the targets.ini file
-        self.NO_TARGETS_WIDE = int(targetParser.get("configuration", "NO_TARGETS_WIDE"))
-        self.NO_TARGETS_TALL = int(targetParser.get("configuration", "NO_TARGETS_TALL"))
-        self.NO_TARGETS_DEEP = int(targetParser.get("configuration", "NO_TARGETS_DEEP"))
+        self.CEILING_WIDE = int(targetParser.get("configuration", "CEILING_WIDE"))
+        self.CEILING_TALL = int(targetParser.get("configuration", "CEILING_TALL"))
+        self.FRONT_WIDE = int(targetParser.get("configuration", "FRONT_WIDE"))
+        self.FRONT_TALL = int(targetParser.get("configuration", "FRONT_TALL"))
+        self.BACK_WIDE = int(targetParser.get("configuration", "BACK_WIDE"))
+        self.BACK_TALL = int(targetParser.get("configuration", "BACK_TALL"))
+        self.LEFT_WIDE = int(targetParser.get("configuration", "LEFT_WIDE"))
+        self.LEFT_TALL = int(targetParser.get("configuration", "LEFT_TALL"))
+        self.RIGHT_WIDE = int(targetParser.get("configuration", "RIGHT_WIDE"))
+        self.RIGHT_TALL = int(targetParser.get("configuration", "RIGHT_TALL"))
         self.TARGET_COUNT_LONG_SURFACE = int(targetParser.get("configuration", "TARGET_COUNT_LONG_SURFACE"))
         self.TARGET_COUNT_SQUARE_SURFACE = int(targetParser.get("configuration", "TARGET_COUNT_SQUARE_SURFACE"))
         self.KEY_X = int(targetParser.get("configuration", "KEY_X"))
@@ -1420,18 +1448,46 @@ class Targets:
             self.targets[x]['wallL'] = self.stringToTargetArray(wall3Str)
             self.targets[x]['wallR'] = self.stringToTargetArray(wall4Str)
             self.targets[x]['ceiling'] = self.stringToTargetArray(ceilingStr)
-        self.targetAreaTall = 1.0/self.NO_TARGETS_TALL
-        self.targetAreaWide = 1.0/self.NO_TARGETS_WIDE
-        self.targetAreaDepth = 1.0/self.NO_TARGETS_DEEP
+        self.targetAreaFTall = 1.0/self.FRONT_TALL
+        self.targetAreaFWide = 1.0/self.FRONT_WIDE
+        self.targetAreaBTall = 1.0/self.BACK_TALL
+        self.targetAreaBWide = 1.0/self.BACK_WIDE
+        self.targetAreaLTall = 1.0/self.LEFT_TALL
+        self.targetAreaLWide = 1.0/self.LEFT_WIDE
+        self.targetAreaRTall = 1.0/self.RIGHT_TALL
+        self.targetAreaRWide = 1.0/self.RIGHT_WIDE
+        self.targetAreaCTall = 1.0/self.CEILING_TALL
+        self.targetAreaCWide = 1.0/self.CEILING_WIDE
 
-    def getTargetsWide(self):
-        return self.NO_TARGETS_WIDE
+    def getCeilingIconsWide(self):
+        return self.CEILING_WIDE
 
-    def getTargetsTall(self):
-        return self.NO_TARGETS_TALL
+    def getCeilingIconsTall(self):
+        return self.CEILING_TALL
 
-    def getTargetsDeep(self):
-        return self.NO_TARGETS_DEEP
+    def getFrontIconsWide(self):
+        return self.FRONT_WIDE
+
+    def getFrontIconsTall(self):
+        return self.FRONT_TALL
+
+    def getBackIconsWide(self):
+        return self.BACK_WIDE
+
+    def getBackIconsTall(self):
+        return self.BACK_TALL
+
+    def getLeftIconsWide(self):
+        return self.LEFT_WIDE
+
+    def getLeftIconsTall(self):
+        return self.LEFT_TALL
+
+    def getRightIconsWide(self):
+        return self.RIGHT_WIDE
+
+    def getRightIconsTall(self):
+        return self.RIGHT_TALL
 
     def getTargetCountLongSurface(self):
         return self.TARGET_COUNT_LONG_SURFACE
@@ -1444,10 +1500,8 @@ class Targets:
 
     def getTargetKeyLocationProp(self):
         gridLoc = self.getTargetKeyLocation()
-        widthSegment = 1.0/self.getTargetsWide()
-        locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-        heightSegment = 1.0/self.getTargetsTall()
-        locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        locationX = (self.targetAreaFWide*gridLoc[0])-(self.targetAreaFWide/2)
+        locationY = (self.targetAreaFTall*gridLoc[1])-(self.targetAreaFTall/2)
         return locationX, locationY
 
     def getTargetIcon(self, layout):
@@ -1472,15 +1526,21 @@ class Targets:
     def getIdealTargetDimensions(self, wall):
         widthFull = 0
         heightFull = 0
-        if wall == "left" or wall == "right":
-            widthFull = self.targetAreaDepth * self.widths[wall]
-            heightFull = self.targetAreaTall * self.heights[wall]
-        elif wall == "front" or wall == "back":
-            widthFull = self.targetAreaWide * self.widths[wall]
-            heightFull = self.targetAreaTall * self.heights[wall]
+        if wall == "left":
+            widthFull = self.targetAreaLWide * self.widths[wall]
+            heightFull = self.targetAreaLTall * self.heights[wall]
+        elif wall == "right":
+            widthFull = self.targetAreaRWide * self.widths[wall]
+            heightFull = self.targetAreaRTall * self.heights[wall]
+        elif wall == "front":
+            widthFull = self.targetAreaFWide * self.widths[wall]
+            heightFull = self.targetAreaFTall * self.heights[wall]
+        elif wall == "back":
+            widthFull = self.targetAreaBWide * self.widths[wall]
+            heightFull = self.targetAreaBTall * self.heights[wall]
         elif wall == "ceiling":
-            widthFull = self.targetAreaWide * self.widths[wall]
-            heightFull = self.targetAreaDepth * self.heights[wall]
+            widthFull = self.targetAreaCWide * self.widths[wall]
+            heightFull = self.targetAreaCTall * self.heights[wall]
         idealTargetWidth = 0.75*widthFull
         idealTargetHeight = 0.75*heightFull
         return idealTargetWidth, idealTargetHeight
@@ -1522,21 +1582,21 @@ class Targets:
         locationY = 0
         wall = gridLoc[1]
         gridLoc = gridLoc[0]
-        if wall.lower() == "front" or wall.lower() == "back":
-            widthSegment = 1.0/self.getTargetsWide()
-            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-            heightSegment = 1.0/self.getTargetsTall()
-            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
-        elif wall.lower() == "left" or wall.lower() == "right":
-            widthSegment = 1.0/self.getTargetsDeep()
-            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-            heightSegment = 1.0/self.getTargetsTall()
-            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        if wall.lower() == "front":
+            locationX = (self.targetAreaFWide*gridLoc[0])-(self.targetAreaFWide/2)
+            locationY = (self.targetAreaFTall*gridLoc[1])-(self.targetAreaFTall/2)
+        elif wall.lower() == "back":
+            locationX = (self.targetAreaBWide*gridLoc[0])-(self.targetAreaBWide/2)
+            locationY = (self.targetAreaBTall*gridLoc[1])-(self.targetAreaBTall/2)
+        elif wall.lower() == "left":
+            locationX = (self.targetAreaLWide*gridLoc[0])-(self.targetAreaLWide/2)
+            locationY = (self.targetAreaLTall*gridLoc[1])-(self.targetAreaLTall/2)
+        elif wall.lower() == "right":
+            locationX = (self.targetAreaRWide*gridLoc[0])-(self.targetAreaRWide/2)
+            locationY = (self.targetAreaRTall*gridLoc[1])-(self.targetAreaRTall/2)
         elif wall.lower() == "ceiling":
-            widthSegment = 1.0/self.getTargetsWide()
-            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-            heightSegment = 1.0/self.getTargetsDeep()
-            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+            locationX = (self.targetAreaCWide*gridLoc[0])-(self.targetAreaCWide/2)
+            locationY = (self.targetAreaCTall*gridLoc[1])-(self.targetAreaCTall/2)
         return (locationX, locationY), wall
 
     def getDistractorLocation(self, layout, wall, targetNo):
@@ -1559,21 +1619,21 @@ class Targets:
         gridLoc = self.getDistractorLocation(layout, wall, targetNo)
         locationX = 0
         locationY = 0
-        if wall.lower() == "front" or wall.lower() == "back":
-            widthSegment = 1.0/self.getTargetsWide()
-            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-            heightSegment = 1.0/self.getTargetsTall()
-            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
-        elif wall.lower() == "left" or wall.lower() == "right":
-            widthSegment = 1.0/self.getTargetsDeep()
-            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-            heightSegment = 1.0/self.getTargetsTall()
-            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+        if wall.lower() == "front":
+            locationX = (self.targetAreaFWide*gridLoc[0])-(self.targetAreaFWide/2)
+            locationY = (self.targetAreaFTall*gridLoc[1])-(self.targetAreaFTall/2)
+        elif wall.lower() == "back":
+            locationX = (self.targetAreaBWide*gridLoc[0])-(self.targetAreaBWide/2)
+            locationY = (self.targetAreaBTall*gridLoc[1])-(self.targetAreaBTall/2)
+        elif wall.lower() == "left":
+            locationX = (self.targetAreaLWide*gridLoc[0])-(self.targetAreaLWide/2)
+            locationY = (self.targetAreaLTall*gridLoc[1])-(self.targetAreaLTall/2)
+        elif wall.lower() == "right":
+            locationX = (self.targetAreaRWide*gridLoc[0])-(self.targetAreaRWide/2)
+            locationY = (self.targetAreaRTall*gridLoc[1])-(self.targetAreaRTall/2)
         elif wall.lower() == "ceiling":
-            widthSegment = 1.0/self.getTargetsWide()
-            locationX = (widthSegment*gridLoc[0])-(widthSegment/2)
-            heightSegment = 1.0/self.getTargetsDeep()
-            locationY = (heightSegment*gridLoc[1])-(heightSegment/2)
+            locationX = (self.targetAreaCWide*gridLoc[0])-(self.targetAreaCWide/2)
+            locationY = (self.targetAreaCTall*gridLoc[1])-(self.targetAreaCTall/2)
         return locationX, locationY
 
     def getDistractorIcon(self, layout, wall, targetNo):
