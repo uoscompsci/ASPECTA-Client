@@ -95,7 +95,7 @@ class messageSender:
         if(message=="quit"):
             print '\033[1;31mShutting down client\033[1;m'
             self.loop=False
-        socket_list = [sys.stdin, self.s]
+        socket_list = [self.s]
         read_sockets = select.select(socket_list , [], [])[0]
         
         for sock in read_sockets:
@@ -529,12 +529,12 @@ class messageSender:
     def getSurfacePixelHeight(self,surfaceNo):
         height = self.sendMessage({'call' : 'get_surface_pixel_height',
                                    'surfaceNo' : str(surfaceNo)})
-        return height["height"]
+        return float(height["height"])
         
     def getSurfacePixelWidth(self,surfaceNo):
         width = self.sendMessage({'call' : 'get_surface_pixel_width',
                                   'surfaceNo' : str(surfaceNo)})
-        return width["width"]
+        return float(width["width"])
     
     def setSurfaceRealHeight(self,surfaceNo,height):
         self.sendMessage({'call' : 'set_surface_real_height',
@@ -549,12 +549,12 @@ class messageSender:
     def getSurfaceRealHeight(self,surfaceNo):
         height = self.sendMessage({'call' : 'get_surface_real_height',
                                    'surfaceNo' : str(surfaceNo)})
-        return height["height"]
+        return float(height["height"])
         
     def getSurfaceRealWidth(self,surfaceNo):
         width = self.sendMessage({'call' : 'get_surface_real_width',
                                   'surfaceNo' : str(surfaceNo)})
-        return width["width"]
+        return float(width["width"])
     
     def clearSurface(self,surfaceNo):
         self.sendMessage({'call' : 'clear_surface',
@@ -751,7 +751,7 @@ class messageSender:
                                 'cursorNo' : str(cursorNo),
                                 'xDist' : str(xDistance),
                                 'yDist' : str(yDistance)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
     
     def relocateCursor(self, cursorNo, x, y, coorSys, surfaceNo):
         self.sendMessage({'call' : 'relocate_cursor',
@@ -764,7 +764,7 @@ class messageSender:
     def getCursorPosition(self, cursorNo):
         loc = self.sendMessage({'call' : 'get_cursor_pos',
                                 'cursorNo' : str(cursorNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
     
     def rotateCursorClockwise(self, cursorNo, degrees):
         self.sendMessage({'call' : 'rotate_cursor_clockwise',
@@ -779,7 +779,7 @@ class messageSender:
     def getCursorRotation(self, cursorNo):
         rotation = self.sendMessage({'call' : 'get_cursor_rotation',
                                      'cursorNo' : str(cursorNo)})
-        return rotation["rotation"]
+        return float(rotation["rotation"])
     
     def getCursorMode(self, cursorNo):
         mode = self.sendMessage({'call' : 'get_cursor_mode',
@@ -813,12 +813,12 @@ class messageSender:
     def getCursorsSurface(self, cursorNo):
         surfaceNo = self.sendMessage({'call' : 'get_cursors_surface',
                                       'cursorNo' : str(cursorNo)})
-        return surfaceNo["surfaceNo"]
+        return int(surfaceNo["surfaceNo"])
     
     def isCursorVisible(self, cursorNo):
         visibility = self.sendMessage({'call' : 'isCursorVisible',
                                        'cursorNo' : str(cursorNo)})
-        return visibility["visibility"]
+        return bool(visibility["visibility"])
     
     def shiftCanvas(self, canvasNo, xDistance, yDistance, coorSys):
         self.sendMessage({'call' : 'move_canvas',
@@ -850,17 +850,17 @@ class messageSender:
     def getCanvasPosition(self, canvasNo):
         loc = self.sendMessage({'call' : 'get_canvas_pos',
                                 'canvasNo' : str(canvasNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
         
     def getCanvasWidth(self, canvasNo):
         width = self.sendMessage({'call' : 'get_canvas_width',
                                   'canvasNo' : str(canvasNo)})
-        return width["width"]
+        return float(width["width"])
         
     def getCanvasHeight(self, canvasNo):
         height = self.sendMessage({'call' : 'get_canvas_height',
                                    'canvasNo' : str(canvasNo)})
-        return height["height"]
+        return float(height["height"])
         
     def stretchCanvasDown(self, canvasNo, distance, coorSys):
         self.sendMessage({'call' : 'stretch_canvas_down',
@@ -899,7 +899,7 @@ class messageSender:
     def getCanvasSurface(self, canvasNo):
         surfaceNo = self.sendMessage({'call' : 'get_canvas_surface',
                                       'canvasNo' : str(canvasNo)})
-        return surfaceNo["surfaceNo"]
+        return int(surfaceNo["surfaceNo"])
     
     def shiftCircle(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_circle',
@@ -919,7 +919,7 @@ class messageSender:
     def getCirclePosition(self, elementNo):
         loc = self.sendMessage({'call' : 'get_circle_pos',
                                     'elementNo' : str(elementNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
     
     def getElementType(self, elementNo):
         typeName = self.sendMessage({'call' : 'get_element_type',
@@ -929,7 +929,7 @@ class messageSender:
     def getElementsCanvas(self, elementNo):
         canvasNo = self.sendMessage({'call' : 'get_elements_canvas',
                                      'elementNo' : str(elementNo)})
-        return canvasNo["canvasNo"]
+        return int(canvasNo["canvasNo"])
     
     def setCircleLineColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_circle_line_color',
@@ -953,7 +953,7 @@ class messageSender:
     def getCircleLineWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_circle_line_width',
                                  'elementNo' : str(elementNo)})
-        return width["width"]
+        return float(width["width"])
         
     def getCircleFillColor(self, elementNo):
         return self.colorTuple(self.sendMessage({'call' : 'get_circle_fill_color',
@@ -968,7 +968,7 @@ class messageSender:
     def getCircleRadius(self, elementNo):
         radius = self.sendMessage({'call' : 'get_circle_radius',
                                    'elementNo' : str(elementNo)})
-        return radius["radius"]
+        return float(radius["radius"])
     
     def setCircleSides(self, elementNo, sides):
         self.sendMessage({'call' : 'set_circle_sides',
@@ -978,7 +978,7 @@ class messageSender:
     def getCircleSides(self, elementNo):
         sides = self.sendMessage({'call' : 'get_circle_sides',
                                   'elementNo' : str(elementNo)})
-        return sides["sides"]
+        return int(sides["sides"])
     
     def shiftLine(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_line',
@@ -999,12 +999,12 @@ class messageSender:
     def getLineStart(self, elementNo):
         loc = self.sendMessage({'call' : 'get_line_start',
                                 'elementNo' : str(elementNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
     
     def getLineEnd(self, elementNo):
         loc = self.sendMessage({'call' : 'get_line_end',
                                 'elementNo' : str(elementNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
     
     def setLineStart(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'relocate_line_start',
@@ -1037,7 +1037,7 @@ class messageSender:
     def getLineWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_line_width',
                                   'elementNo' : str(elementNo)})
-        return width["width"]
+        return float(width["width"])
     
     def addLineStripPoint(self, elementNo, x, y, coorSys):
         self.sendMessage({'call' : 'add_line_strip_point',
@@ -1058,7 +1058,7 @@ class messageSender:
         loc = self.sendMessage({'call' : 'get_line_strip_point',
                                 'elementNo' : str(elementNo),
                                 'index' : str(pointNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
         
     def shiftLineStrip(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_line_strip',
@@ -1101,12 +1101,12 @@ class messageSender:
     def getLineStripWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_line_strip_width',
                                   'elementNo' : str(elementNo)})
-        return width["width"]
+        return float(width["width"])
         
     def getLineStripPointCount(self, elementNo):
         count = self.sendMessage({'call' : 'get_line_strip_point_count',
                                   'elementNo' : str(elementNo)})
-        return count["count"]
+        return int(count["count"])
     
     def setLineStripContent(self, elementNo, content):
         converted = str(content[0][0]) + ":" + str(content[0][1])
@@ -1127,7 +1127,7 @@ class messageSender:
         loc = self.sendMessage({'call' : 'get_polygon_point',
                                 'elementNo' : str(elementNo),
                                 'index' : str(pointNo)})
-        return (loc["x"],loc["y"])
+        return (float(loc["x"]),float(loc["y"]))
     
     def shiftPolygon(self, elementNo, xDist, yDist, coorSys):
         self.sendMessage({'call' : 'shift_polygon',
@@ -1169,7 +1169,7 @@ class messageSender:
     def getPolygonLineWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_polygon_line_width',
                                  'elementNo' : str(elementNo)})
-        return width["width"]
+        return float(width["width"])
     
     def setPolygonLineColor(self, elementNo, color):
         self.sendMessage({'call' : 'set_polygon_line_color',
@@ -1184,7 +1184,7 @@ class messageSender:
     def getPolygonPointCount(self, elementNo):
         count = self.sendMessage({'call' : 'get_polygon_point_count',
                                   'elementNo' : str(elementNo)})
-        return count["count"]
+        return int(count["count"])
     
     def relocateRectangle(self, elementNo, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'set_rectangle_top_left',
@@ -1269,7 +1269,7 @@ class messageSender:
     def getRectangleLineWidth(self, elementNo):
         width = self.sendMessage({'call' : 'get_rectangle_line_width',
                                  'elementNo' : str(elementNo)})
-        return width["width"]
+        return float(width["width"])
     
     def relocateTexRectangle(self, elementNo, x, y, coorSys, canvasNo):
         self.sendMessage({'call' : 'set_texrectangle_top_left',
@@ -1370,7 +1370,7 @@ class messageSender:
     def getTextPosition(self, elementNo):
         loc = self.sendMessage({'call' : 'get_text_pos',
                                 'elementNo' : str(elementNo)})
-        return [loc["x"],loc["y"]]
+        return [float(loc["x"]),float(loc["y"])]
     
     def getTextWidth(self, text, font, pointSize):
         width = self.sendMessage({'call' : 'get_text_width',
@@ -1406,7 +1406,7 @@ class messageSender:
     def getPointSize(self, elementNo):
         size = self.sendMessage({'call' : 'get_text_point_size',
                                  'elementNo' : str(elementNo)})
-        return size["size"]
+        return int(size["size"])
     
     def getFont(self, elementNo):
         font = self.sendMessage({'call' : 'get_text_font',
@@ -1438,7 +1438,7 @@ class messageSender:
     def checkElementVisibility(self, elementNo):
         visibility = self.sendMessage({'call' : 'check_element_visibility',
                                        'elementNo' : str(elementNo)})
-        return visibility["visible"]
+        return bool(visibility["visible"])
         
     def hideSetupSurface(self):
         self.sendMessage({'call' : 'hide_setup_surface'})
@@ -1447,7 +1447,7 @@ class messageSender:
         self.sendMessage({'call' : 'show_setup_surface'})
         
     def getSetupSurfaceVisibility(self):
-        return self.sendMessage({'call' : 'get_setup_surface_visibility'})
+        return bool(self.sendMessage({'call' : 'get_setup_surface_visibility'}))
         
     def getClickedElements(self, surfaceNo, x, y):
         elements = self.sendMessage({'call' : 'get_clicked_elements',
