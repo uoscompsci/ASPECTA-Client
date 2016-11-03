@@ -369,7 +369,7 @@ class client:
                         oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
                         curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
-                        intersections = [1, 1, 1, 1, 1]
+                        intersections = [1, 1, 1, 1, 1, 1]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
@@ -427,38 +427,44 @@ class client:
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                         if len(mouseLocations)!=0:
-                            if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
-                                wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                                if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
-                                    self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
-                                    self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
-                                    self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
-                                    self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                    self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
-                                    self.mouseProjector = 1
-                                    self.mouseSurface = mouseLocations[x][2][1]
-                                    self.sender.showCursor(1, self.curs[0 + x])
-                                else:
-                                    self.sender.hideCursor(2, self.curs[2])
-                                    self.sender.hideCursor(2, self.curs[3])
-                                    self.sender.hideCursor(1, self.curs[0])
-                                    self.sender.hideCursor(1, self.curs[1])
-                            elif mouseLocations[x][2][0]==2:  # If the cursor is on projector 2
-                                wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                                if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
-                                    self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
-                                    self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
-                                    self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
-                                    self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                    self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
-                                    self.mouseProjector = 2
-                                    self.mouseSurface = mouseLocations[x][2][1]
-                                    self.sender.showCursor(2, self.curs[2+x])
-                                else:
-                                    self.sender.hideCursor(2, self.curs[2])
-                                    self.sender.hideCursor(2, self.curs[3])
-                                    self.sender.hideCursor(1, self.curs[0])
-                                    self.sender.hideCursor(1, self.curs[1])
+                            if mouseLocations[x][2]!=None:
+                                if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
+                                    wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
+                                    if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                                        self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
+                                        self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
+                                        self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
+                                        self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                        self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
+                                        self.mouseProjector = 1
+                                        self.mouseSurface = mouseLocations[x][2][1]
+                                        self.sender.showCursor(1, self.curs[0 + x])
+                                    else:
+                                        self.sender.hideCursor(2, self.curs[2])
+                                        self.sender.hideCursor(2, self.curs[3])
+                                        self.sender.hideCursor(1, self.curs[0])
+                                        self.sender.hideCursor(1, self.curs[1])
+                                elif mouseLocations[x][2][0]==2:  # If the cursor is on projector 2
+                                    wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
+                                    if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                                        self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
+                                        self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
+                                        self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
+                                        self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                        self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
+                                        self.mouseProjector = 2
+                                        self.mouseSurface = mouseLocations[x][2][1]
+                                        self.sender.showCursor(2, self.curs[2+x])
+                                    else:
+                                        self.sender.hideCursor(2, self.curs[2])
+                                        self.sender.hideCursor(2, self.curs[3])
+                                        self.sender.hideCursor(1, self.curs[0])
+                                        self.sender.hideCursor(1, self.curs[1])
+                            else:
+                                self.sender.hideCursor(2, self.curs[2])
+                                self.sender.hideCursor(2, self.curs[3])
+                                self.sender.hideCursor(1, self.curs[0])
+                                self.sender.hideCursor(1, self.curs[1])
                 else: # Runs if it is pointing that is to control the cursor
                     for x in range(0, len(self.planes)):  # Finds where the last intersect point was
                         segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
@@ -468,7 +474,7 @@ class client:
                     axes = self.getHeadAxes()
                     lastHeadLoc = axes[0]  # From now on the current head location is used
                     pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
-                    intersections = [1, 1, 1, 1, 1]
+                    intersections = [1, 1, 1, 1, 1, 1]
                     mouseLocations = []
                     for x in range(0, len(self.planes)):
                         segCheck2 = self.getTrackerData()[0][0]
@@ -498,11 +504,11 @@ class client:
                             if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
                                 mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                 if len(mouseLocations) == 1 and self.state == 2:
-                                    if surfaces[x] != self.currentSurface: #Current surface is what was last recorded as the current surfrace
+                                    if surfaces[x] != self.currentSurface: #Current surface is what was last recorded as the current surface
                                         if surfaces[x] not in self.alreadyPassed:
                                             self.passedSurfaces += 1
                                             self.alreadyPassed.append(surfaces[x])
-                                        self.currentSurface = surfaces[x] #What is this doing?
+                                        self.currentSurface = surfaces[x] #Updates the current surface to the new one
                                         isWallChange = True
                             else:
                                 intersections[x] = 0
@@ -531,39 +537,44 @@ class client:
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if len(mouseLocations)!=0:
-                        if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
-                            wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                            if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
-                                self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
-                                self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
-                                self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
-                                self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
-                                self.mouseProjector = 1
-                                self.mouseSurface = mouseLocations[x][2][1]
-                                self.sender.showCursor(1, self.curs[0 + x])
-                            else:
-                                self.sender.hideCursor(2, self.curs[2])
-                                self.sender.hideCursor(2, self.curs[3])
-                                self.sender.hideCursor(1, self.curs[0])
-                                self.sender.hideCursor(1, self.curs[1])
-                        elif mouseLocations[x][2][0] == 2:  # If the cursor is on projector 2
-                            wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
-                            if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
-                                self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
-                                self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
-                                self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
-                                self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
-                                self.mouseProjector = 2
-                                self.mouseSurface = mouseLocations[x][2][1]
-                                self.sender.showCursor(2, self.curs[2 + x])
-                            else:
-                                self.sender.hideCursor(2, self.curs[2])
-                                self.sender.hideCursor(2, self.curs[3])
-                                self.sender.hideCursor(1, self.curs[0])
-                                self.sender.hideCursor(1, self.curs[1])
-
+                        if mouseLocations[x][2]!=None:
+                            if mouseLocations[x][2][0] == 1:  # If the cursor is on projector 1
+                                wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
+                                if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                                    self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
+                                    self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
+                                    self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
+                                    self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                    self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
+                                    self.mouseProjector = 1
+                                    self.mouseSurface = mouseLocations[x][2][1]
+                                    self.sender.showCursor(1, self.curs[0 + x])
+                                else:
+                                    self.sender.hideCursor(2, self.curs[2])
+                                    self.sender.hideCursor(2, self.curs[3])
+                                    self.sender.hideCursor(1, self.curs[0])
+                                    self.sender.hideCursor(1, self.curs[1])
+                            elif mouseLocations[x][2][0] == 2:  # If the cursor is on projector 2
+                                wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
+                                if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
+                                    self.sender.hideCursor(1, self.curs[0])  # Hide cursors on other projector
+                                    self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
+                                    self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
+                                    self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                    self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
+                                    self.mouseProjector = 2
+                                    self.mouseSurface = mouseLocations[x][2][1]
+                                    self.sender.showCursor(2, self.curs[2 + x])
+                                else:
+                                    self.sender.hideCursor(2, self.curs[2])
+                                    self.sender.hideCursor(2, self.curs[3])
+                                    self.sender.hideCursor(1, self.curs[0])
+                                    self.sender.hideCursor(1, self.curs[1])
+                        else:
+                            self.sender.hideCursor(2, self.curs[2])
+                            self.sender.hideCursor(2, self.curs[3])
+                            self.sender.hideCursor(1, self.curs[0])
+                            self.sender.hideCursor(1, self.curs[1])
     def pathLength(self, path):
         totalLength = 0
         for x in range(1, len(path)): #The first is skipped because the "start" point was before recording
@@ -1050,6 +1061,7 @@ class client:
         temp = parser.get('RoomSetup', 'ceilingSurface')
         temp = temp.split(";")
         self.wall2ProjectorSurface["ceiling"] = (int(temp[0]), int(temp[1]))
+        self.wall2ProjectorSurface["floor"] = None
 
 
         tkinterThread = threading.Thread(target=self.tkinthread, args=())  # Creates the display thread
