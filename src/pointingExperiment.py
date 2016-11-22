@@ -117,7 +117,10 @@ class client:
                     if (event.button == 1):
                         lClickRelTime = datetime.datetime.now()
                         elapsedSecs = (lClickRelTime - self.lClickTime).total_seconds()  # Checks how long the button was depressed
-                        if (elapsedSecs < 0.15):
+                        if (elapsedSecs < 0.5):
+                            if self.state == 0.25:
+                                self.isKeyHit()
+                                self.confirmClick = True
                             if self.state == 0.5:
                                 self.foundClick = True
                             if self.state == 1:
@@ -145,7 +148,7 @@ class client:
                         rClickRelTime = datetime.datetime.now()
                         elapsedSecs = (
                         rClickRelTime - self.rClickTime).total_seconds()  # Checks how long the button was depressed
-                        if (elapsedSecs < 0.15):
+                        if (elapsedSecs < 0.5):
                             pass
                         else:
                             pass
@@ -350,6 +353,7 @@ class client:
         startTime = datetime.datetime.now()
         segCheck2 = self.getTrackerData()[0][0]
         segCheck3 = self.getTrackerData()[0][1]
+        oldLoc = None
         while (self.quit == False):
             time.sleep(1.0 / 60)
             if (self.mouseLock == True):
@@ -403,26 +407,32 @@ class client:
                                                 self.alreadyPassed.append(surfaces[x])
                                             self.currentSurface = surfaces[x]
                                             isWallChange = True
+                                        if oldLoc is None:
+                                            oldLoc = self.intersect
+                                        moveDuration = (temptime - startTime).total_seconds()
+                                        startTime = temptime
+                                        distance = 0
+                                        angle = 0
+                                        degreesPerSecond = 0
+                                        distanceUnitsPerSecond = 0
+                                        if isWallChange:
+                                            oldLoc = self.intersect;
+                                        if not isWallChange and moveDuration != 0:
+                                            distance = self.distBetweenPoints(self.intersect, oldLoc)
+                                            angle = self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
+                                            degreesPerSecond = angle / moveDuration
+                                            distanceUnitsPerSecond = distance / moveDuration
+                                        self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldLoc,
+                                                                 "endPoint": self.intersect, "distance": distance,
+                                                                 "angle": angle, "angularVelocity": degreesPerSecond,
+                                                                 "velocity": distanceUnitsPerSecond,
+                                                                 "time": str(temptime.time().hour).zfill(2) +
+                                                                         ":" + str(temptime.time().minute).zfill(2) +
+                                                                         ":" + str(temptime.time().second).zfill(2)})
+                                        oldLoc = self.intersect
                                 else:
                                     intersections[x] = 0
                                 temptime = datetime.datetime.now()
-                                if self.state==2:
-                                    moveDuration = (temptime-startTime).total_seconds()
-                                    startTime = temptime
-                                    distance = self.distBetweenPoints(self.intersect, oldIntersect)
-                                    angle = self.angleBetweenVectors(self.intersect-lastHeadLoc, oldIntersect-lastHeadLoc)
-                                    degreesPerSecond = 0
-                                    distanceUnitsPerSecond = 0
-                                    if not isWallChange:
-                                        degreesPerSecond = angle/moveDuration
-                                        distanceUnitsPerSecond = distance/moveDuration
-                                    self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
-                                                             "endPoint": self.intersect, "distance": distance,
-                                                             "angle": angle, "angularVelocity": degreesPerSecond,
-                                                             "velocity": distanceUnitsPerSecond,
-                                                             "time": str(temptime.time().hour).zfill(2) +
-                                                                     ":" + str(temptime.time().minute).zfill(2) +
-                                                                     ":" + str(temptime.time().second).zfill(2)})
 
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
@@ -510,30 +520,32 @@ class client:
                                             self.alreadyPassed.append(surfaces[x])
                                         self.currentSurface = surfaces[x] #Updates the current surface to the new one
                                         isWallChange = True
+                                    if oldLoc is None:
+                                        oldLoc = self.intersect
+                                    moveDuration = (temptime - startTime).total_seconds()
+                                    startTime = temptime
+                                    distance = 0
+                                    angle = 0
+                                    degreesPerSecond = 0
+                                    distanceUnitsPerSecond = 0
+                                    if isWallChange:
+                                        oldLoc = self.intersect;
+                                    if not isWallChange and moveDuration != 0:
+                                        distance = self.distBetweenPoints(self.intersect, oldLoc)
+                                        angle = self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
+                                        degreesPerSecond = angle / moveDuration
+                                        distanceUnitsPerSecond = distance / moveDuration
+                                    self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldLoc,
+                                                             "endPoint": self.intersect, "distance": distance,
+                                                             "angle": angle, "angularVelocity": degreesPerSecond,
+                                                             "velocity": distanceUnitsPerSecond,
+                                                             "time": str(temptime.time().hour).zfill(2) +
+                                                                     ":" + str(temptime.time().minute).zfill(2) +
+                                                                     ":" + str(temptime.time().second).zfill(2)})
+                                    oldLoc = self.intersect
                             else:
                                 intersections[x] = 0
                             temptime = datetime.datetime.now()
-                            if self.state == 2:
-                                moveDuration = (temptime - startTime).total_seconds()
-                                startTime = temptime
-                                distance = self.distBetweenPoints(self.intersect, oldIntersect)
-                                angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
-                                                                 oldIntersect - lastHeadLoc) # TODO SHOULDN'T BE HEAD LOC
-                                degreesPerSecond = 0
-                                distanceUnitsPerSecond = 0
-                                if not isWallChange and moveDuration != 0:
-                                    degreesPerSecond = angle / moveDuration
-                                    distanceUnitsPerSecond = distance / moveDuration
-                                elif moveDuration == 0:
-                                    degreesPerSecond = 0
-                                    distanceUnitsPerSecond = 0
-                                self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldIntersect,
-                                                         "endPoint": self.intersect, "distance": distance,
-                                                         "angle": angle, "angularVelocity": degreesPerSecond,
-                                                         "velocity": distanceUnitsPerSecond,
-                                                         "time": str(temptime.time().hour).zfill(2) +
-                                                                 ":" + str(temptime.time().minute).zfill(2) +
-                                                                 ":" + str(temptime.time().second).zfill(2)})
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if len(mouseLocations)!=0:
@@ -676,10 +688,12 @@ class client:
         targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
         self.border = (projector, self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1)), canvas)
 
+    def drawKeyLayoutBorder(self, layoutNo):
+        self.drawKeyBorder("front", layoutNo)
+
     def drawKeyLayout(self, layoutNo):
         targetIcon = self.targets[self.TARGETINI].getTargetIcon(layoutNo)
         keyLocation = self.targets[self.TARGETINI].getTargetKeyLocationProp()
-        self.drawKeyBorder("front", layoutNo)
         self.drawTarget("front", keyLocation[0], keyLocation[1], targetIcon)
 
     def drawTargetLayout(self, layoutNo):
@@ -784,6 +798,8 @@ class client:
                 hdist = abs(part1 - part2)
 
                 diagDist = sqrt(pow(vdist, 2) + pow(hdist, 2))
+            elif(targetWall.lower() == "front"):
+                diagDist = sqrt(pow(abs(targetGridY-startY), 2) + pow(abs(targetGridX-startX), 2))
             else:
                 print "Invalid target wall"
             return diagDist
@@ -863,7 +879,7 @@ class client:
         start, target = self.getStartAndTargetLocs(layout)
         return self.distBetweenPoints(start, target)
 
-    def getSurfaceWidthRemLeft(self, realPointX, realPointY, wall): #TODO Are coordinates FROM TR or BR?
+    def getSurfaceWidthRemLeft(self, realPointX, realPointY, wall):
         wall = self.wallToPlaneIndex[wall.lower()]
         realEdgeX, realEdgeY = 0, realPointY
         wallTL = self.planes[wall][2]
@@ -1098,7 +1114,7 @@ class client:
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
         # self.sender.loadDefinedSurfaces("DEFAULT")
-        self.sender.loadDefinedSurfaces(2, "Test1Wall")
+        self.sender.loadDefinedSurfaces(2, "Test1WallReal")
         self.sender.loadDefinedSurfaces(1, "AllMinusFront")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
@@ -1265,21 +1281,31 @@ class client:
 
                     # Run experimental process
                     if self.state == 0:
-                        self.drawKeyLayout(self.currentLayout)
-                        if not self.parallelTask:
+                        self.drawKeyLayoutBorder(self.currentLayout)
+                        if not self.parallelTask:  # If asynchronous
+                            self.state = 0.25
+                            self.confirmClick = False
+                            # Proceed to 0.25
+                        else:  # If synchronous
+                            self.drawKeyLayout(self.currentLayout)
+                            self.state = 1
+                            self.keyHit = False
+                            # Proceed to 1
+                    elif self.state == 0.25:
+                        if self.confirmClick:
+                            self.drawKeyLayout(self.currentLayout)
                             self.drawTargetLayout(self.currentLayout)
                             self.state = 0.5
                             self.foundClick = False
-                            self.findTimer = datetime.datetime.now()
-                        else:
-                            self.state = 1
-                            self.keyHit = False
+                            self.findTimer = datetime.datetime.now()  # Start finding timer
+                            # Proceed to 0.5
                     elif self.state == 0.5:
-                        if self.foundClick:
+                        if self.foundClick:  # If the key is clicked to say the target has been found
                             clicktime = datetime.datetime.now()
-                            self.clickelapsedsecs = (clicktime - self.findTimer)
+                            self.clickelapsedsecs = (clicktime - self.findTimer)  # Save the finding elapsed time
                             self.state = 1
                             self.keyHit = False
+                            # Proceed to 1
                     elif self.state == 1:
                         if self.keyHit:
                             if self.parallelTask:
@@ -1291,7 +1317,6 @@ class client:
                             self.currentSurface = 'front'
                             self.state = 2
                             self.targetHit = False
-
                     elif self.state == 2:
                         if self.targetHit:
                             self.state = 0
