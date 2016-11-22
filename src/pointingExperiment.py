@@ -589,8 +589,14 @@ class client:
                             self.sender.hideCursor(1, self.curs[1])
     def pathLength(self, path):
         totalLength = 0
-        for x in range(1, len(path)): #The first is skipped because the "start" point was before recording
-            totalLength += path[x]["distance"]
+        pointList = []
+        for x in range(0, len(path)-1):
+            startPlusOne = path[x+1]["startPoint"]
+            end = path[x]["endPoint"]
+            if(startPlusOne==end):
+                pointList.append(end)
+        for y in range(0, len(pointList)-1):
+            totalLength += self.distBetweenPoints(pointList[y], pointList[y+1])
         return totalLength
 
     def pathAngle(self, path):
