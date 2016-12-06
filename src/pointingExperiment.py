@@ -428,7 +428,8 @@ class client:
                                                                  "velocity": distanceUnitsPerSecond,
                                                                  "time": str(temptime.time().hour).zfill(2) +
                                                                          ":" + str(temptime.time().minute).zfill(2) +
-                                                                         ":" + str(temptime.time().second).zfill(2)})
+                                                                         ":" + str(temptime.time().second).zfill(2) +
+                                                                         ":" + str(temptime.time().microsecond).zfill(6)})
                                         oldLoc = self.intersect
                                 else:
                                     intersections[x] = 0
@@ -541,7 +542,8 @@ class client:
                                                              "velocity": distanceUnitsPerSecond,
                                                              "time": str(temptime.time().hour).zfill(2) +
                                                                      ":" + str(temptime.time().minute).zfill(2) +
-                                                                     ":" + str(temptime.time().second).zfill(2)})
+                                                                     ":" + str(temptime.time().second).zfill(2) +
+                                                                     ":" + str(temptime.time().microsecond).zfill(6)})
                                     oldLoc = self.intersect
                             else:
                                 intersections[x] = 0
@@ -593,7 +595,7 @@ class client:
         for x in range(0, len(path)-1):
             startPlusOne = path[x+1]["startPoint"]
             end = path[x]["endPoint"]
-            if(startPlusOne==end):
+            if startPlusOne.all() == end.all():
                 pointList.append(end)
         for y in range(0, len(pointList)-1):
             totalLength += self.distBetweenPoints(pointList[y], pointList[y+1])
