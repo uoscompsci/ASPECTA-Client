@@ -22,13 +22,6 @@ class generator():
     TARGET_COUNT_SQUARE_SURFACE = 4
     KEY_X = 2
     KEY_Y = 2
-
-    POSSIBLE_C = [(4, 8), (5, 5), (2, 4), (4, 7), (3, 6)]
-    POSSIBLE_L = [(5, 3), (8, 2), (3, 3), (5, 4), (9, 2)]
-    POSSIBLE_R = [(4, 3), (6, 2), (3, 3), (5, 2), (3, 3)]
-    POSSIBLE_F = [(4, 3), (2, 5), (4, 2), (3, 4), (5, 3)]
-    POSSIBLE_B = [(2, 5), (4, 3), (3, 4), (4, 4), (5, 5)]
-
     x = 0
     y = 0
     icon = 0
@@ -36,43 +29,30 @@ class generator():
     usedIcons = []
     numberOfImages = 0
     availableImages = []
-    total_target_count = TARGET_COUNT_LONG_SURFACE * 3 + TARGET_COUNT_SQUARE_SURFACE * 2
-    debugCount = 0
 
-    def getXYandIcon(self, wall, isTarget):
+    def getXYandIcon(self, wall):
         xWidth = 0
         yWidth = 0
-        possibleTargets = []
         if wall == "front":
-            possibleTargets = self.POSSIBLE_F
             xWidth = self.FRONT_WIDE
             yWidth = self.FRONT_TALL
         elif wall == "back":
-            possibleTargets = self.POSSIBLE_B
             xWidth = self.BACK_WIDE
             yWidth = self.BACK_TALL
         elif wall == "left":
-            possibleTargets = self.POSSIBLE_L
             xWidth = self.LEFT_WIDE
             yWidth = self.LEFT_TALL
         elif wall == "right":
-            possibleTargets = self.POSSIBLE_R
             xWidth = self.RIGHT_WIDE
             yWidth = self.RIGHT_TALL
         elif wall == "ceiling":
-            possibleTargets = self.POSSIBLE_C
             xWidth = self.CEILING_WIDE
             yWidth = self.CEILING_TALL
-        xPick = randint(1, xWidth)
-        yPick = randint(1, yWidth)
-        if not isTarget:
-            while (xPick, yPick) in self.usedLocs or (xPick, yPick) in possibleTargets:
-                xPick = randint(1, xWidth)
-                yPick = randint(1, yWidth)
-        else:
-            while (xPick, yPick) not in possibleTargets:
-                xPick = randint(1, xWidth)
-                yPick = randint(1, yWidth)
+        xPick = randint(2, xWidth-1)
+        yPick = randint(2, yWidth-1)
+        while (xPick, yPick) in self.usedLocs:
+            xPick = randint(2, xWidth-1)
+            yPick = randint(2, yWidth-1)
         self.x = xPick
         self.y = yPick
         self.usedLocs.append((self.x, self.y))
@@ -81,8 +61,6 @@ class generator():
             iconPick = self.availableImages[randint(0, self.numberOfImages-1)]
         self.icon = iconPick
         self.usedIcons.append(self.icon)
-        if isTarget:
-            self.debugCount += 1
 
     def clearUsedLocs(self):
         self.checkForDuplicates(self.usedLocs)
@@ -106,7 +84,7 @@ class generator():
         for x in range(0, len(self.availableImages)):
             self.availableImages[x] = self.availableImages[x]
         self.numberOfImages = len(self.availableImages)
-        fo = open("targets.ini", "wb")
+        fo = open("targets.ini", "wb"):/
         fo.write("[configuration]\n")
         fo.write("CEILING_WIDE=" + str(self.CEILING_WIDE) + "\n")
         fo.write("CEILING_TALL=" + str(self.CEILING_TALL) + "\n")
@@ -123,109 +101,58 @@ class generator():
         fo.write("KEY_X=" + str(self.KEY_X) + "\n")
         fo.write("KEY_Y=" + str(self.KEY_Y) + "\n\n")
         for w in range(1,101):
-            target = randint(0, self.total_target_count)
-            count = 0
             fo.write("[" + str(w) + "]\n")
             fo.write("wallF=")
-            targetIcon = ""
-            if count != target:
-                self.getXYandIcon("front", False)
-                while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
-                    self.getXYandIcon("front", False)
-            else:
-                self.getXYandIcon("front", True)
-                targetIcon = self.icon
+            self.getXYandIcon("front")
+            while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
+                self.getXYandIcon("front")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
-                if count != target:
-                    self.getXYandIcon("front", False)
-                    while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
-                        self.getXYandIcon("front", False)
-                else:
-                    self.getXYandIcon("front", True)
-                    targetIcon = self.icon
+                self.getXYandIcon("front")
+                while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
+                    self.getXYandIcon("front")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallB=")
-            if count != target:
-                self.getXYandIcon("back", False)
-            else:
-                self.getXYandIcon("back", True)
-                targetIcon = self.icon
+            self.getXYandIcon("back")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
             for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
                 fo.write(";")
-                if count != target:
-                    self.getXYandIcon("back", False)
-                else:
-                    self.getXYandIcon("back", True)
-                    targetIcon = self.icon
+                self.getXYandIcon("back")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallL=")
-            if count != target:
-                self.getXYandIcon("left", False)
-            else:
-                self.getXYandIcon("left", True)
-                targetIcon = self.icon
+            self.getXYandIcon("left")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
-                if count != target:
-                    self.getXYandIcon("left", False)
-                else:
-                    self.getXYandIcon("left", True)
-                    targetIcon = self.icon
+                self.getXYandIcon("left")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("wallR=")
-            if count != target:
-                self.getXYandIcon("right", False)
-            else:
-                self.getXYandIcon("right", True)
-                targetIcon = self.icon
+            self.getXYandIcon("right")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
-                if count != target:
-                    self.getXYandIcon("right", False)
-                else:
-                    self.getXYandIcon("right", True)
-                    targetIcon = self.icon
+                self.getXYandIcon("right")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
             self.clearUsedLocs()
             fo.write("ceiling=")
-            if count != target:
-                self.getXYandIcon("ceiling", False)
-            else:
-                self.getXYandIcon("ceiling", True)
-                targetIcon = self.icon
+            self.getXYandIcon("ceiling")
             fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
             for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
                 fo.write(";")
-                if count != target:
-                    self.getXYandIcon("ceiling", False)
-                else:
-                    self.getXYandIcon("ceiling", True)
-                    targetIcon = self.icon
+                self.getXYandIcon("ceiling")
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
-            fo.write("target=" + targetIcon)
+            iconIndex = randint(0,len(self.usedIcons)-1)
+            icon = self.usedIcons[iconIndex]
+            fo.write("target=" + str(icon))
             fo.write("\n\n")
             self.clearUsedLocs()
             self.clearUsedIcons()
