@@ -236,19 +236,27 @@ class client:
 
     def getHeadAxes(self):
         data = self.getTrackerData()[1]
+        print "DATALENGTH = " + str(len(data))
 
         #Retrieve the points on the trackers and place them in an array
-        point1 = scipy.array([data[0][0], data[0][1], data[0][2]])
-        point2 = scipy.array([data[1][0], data[1][1], data[1][2]])
-        point3 = scipy.array([data[2][0], data[2][1], data[2][2]])
-        points = [point1, point2, point3]
+        print "DATA[2] = " + str(data[2])
+        point1 = scipy.array([data[2][0], data[2][1], data[2][2]])
+        print "DATA[3] = " + str(data[3])
+        point2 = scipy.array([data[3][0], data[3][1], data[3][2]])
+        print "DATA[4] = " + str(data[4])
+        point3 = scipy.array([data[4][0], data[4][1], data[4][2]])
+        print "DATA[5] = " + str(data[5])
+        point4 = scipy.array([data[5][0], data[5][1], data[5][2]])
+        print "DATA[6] = " + str(data[6])
+        point5 = scipy.array([data[6][0], data[6][1], data[6][2]])
+        points = [point1, point2, point3, point4, point5]
 
         #Get the indexes of the closest two points in the array
         minlength = -1
         minpoint1Index = 0
         minpoint2Index = 0
-        for x in range(0,len(points)):
-            for y in range(0,len(points)):
+        for x in range(0, len(points)):
+            for y in range(0, len(points)):
                 distance = self.distBetweenPoints(points[x], points[y])
                 if(distance!=0):
                     if(distance < minlength or minlength == -1):
@@ -256,46 +264,50 @@ class client:
                         minpoint1Index = x
                         minpoint2Index = y
 
-        #Save the head location as the point directly in the middle of the closest points
-        headLoc = (points[minpoint1Index]+points[minpoint2Index])/2
+        point1Dist = 0
+        point2Dist = 0
+        for x in range(0, len(points)):
+            if x != minpoint1Index and x != minpoint2Index:
+                distancePt1 = self.distBetweenPoints(points[x], points[minpoint1Index])
+                point1Dist += distancePt1
+                distancePt2 = self.distBetweenPoints(points[x], points[minpoint2Index])
+                point2Dist += distancePt2
 
-        #Find the preliminary upward vector to use as a rotation axis to find the forward vector
-        vec1 = points[0]-points[1]
-        vec2 = points[2]-points[1]
+        back = None
+        front = None
+        if (point1Dist < point2Dist):
+            back = points[minpoint1Index]
+            front = points[minpoint2Index]
+        else:
+            back = points[minpoint2Index]
+            front = points[minpoint1Index]
+        forwardVec = front - back
+        headLoc = back
+
+        #Calculated closest to back other than front
+        closestDist  = -1
+        closestIndex = -1
+        for x in range(0, len(points)):
+            if x != minpoint1Index and x != minpoint2Index:
+                tempDistance = self.distBetweenPoints(points[x], back)
+                if(tempDistance < closestDist or closestDist == -1):
+                    closestDist = tempDistance
+                    closestIndex = x
+
+
+        #Find the upward vector
+        vec1 = front-back
+        vec2 = points[closestIndex]-back
         normal = numpy.cross(vec1, vec2)
         if(normal[1]<0):
             normal[0] = -normal[0]
             normal[1] = -normal[1]
             normal[2] = -normal[2]
-        preUp = scipy.array([normal[0], normal[1], normal[2]])
+        upwardVec = scipy.array([normal[0], normal[1], normal[2]])
 
-        #Define the two potential forward vectors
-        forwardVecTest1 = self.rotateVector(points[minpoint2Index]-points[minpoint1Index],preUp,90)
-        forwardVecTest2 = self.rotateVector(points[minpoint2Index]-points[minpoint1Index],preUp,-90)
+        #Find the horizontal vector
+        horizontalVec = numpy.cross(forwardVec, upwardVec)
 
-        #Work out the index of the extra tracker ball
-        extraPointIndex = 0
-        if(minpoint1Index==0 or minpoint2Index==0):
-            extraPointIndex = 1
-            if(minpoint1Index==1 or minpoint2Index==1):
-                extraPointIndex = 2
-
-        #Work out which forward vector is the true one (the one which doesn't point in the direction of the extra ball)
-        forwardVec = forwardVecTest2
-        location1 = headLoc+forwardVecTest1
-        location2 = headLoc+forwardVecTest2
-        distance1 = self.distBetweenPoints(location1, points[extraPointIndex])
-        distance2 = self.distBetweenPoints(location2, points[extraPointIndex])
-        if distance2<distance1:
-            forwardVec = forwardVecTest1
-
-        #Realign the upward vector to ensure it is perpendicular to the forward vector
-        upwardVec = self.normalizeVec(self.projectOntoPlane(preUp, forwardVec))
-
-        #Define the horizontal vector as the cross product of the forward vector and upward vector
-        horizontalVec = self.normalizeVec(numpy.cross(upwardVec, forwardVec))
-
-        #Return all the head details
         return headLoc, forwardVec, upwardVec, horizontalVec
 
     # Returns vector after setting magnitude to 1
@@ -409,6 +421,7 @@ class client:
                                             isWallChange = True
                                         if oldLoc is None:
                                             oldLoc = self.intersect
+                                        temptime = datetime.datetime.now()
                                         moveDuration = (temptime - startTime).total_seconds()
                                         startTime = temptime
                                         distance = 0
@@ -429,11 +442,85 @@ class client:
                                                                  "time": str(temptime.time().hour).zfill(2) +
                                                                          ":" + str(temptime.time().minute).zfill(2) +
                                                                          ":" + str(temptime.time().second).zfill(2) +
-                                                                         ":" + str(temptime.time().microsecond).zfill(6)})
+                                                                         ":" + str(temptime.time().microsecond).zfill(6),
+                                                                 "moveDuration": str(moveDuration),
+                                                                 "trackerLoc": "",
+                                                                 "trackerVec": ""})
                                         oldLoc = self.intersect
-                                else:
-                                    intersections[x] = 0
-                                temptime = datetime.datetime.now()
+                                else:  # Runs if not pointing at projectable area
+                                    if 0 <= x <= 3:  # Runs if the surface is a wall and not the ceiling or floor
+                                        intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
+                                        diagVec = intersections[x] - self.planes[x][2]
+                                        hVec = self.planes[x][6] - self.planes[x][7]
+                                        vVec = self.planes[x][5] - self.planes[x][7]
+                                        hdot = diagVec.dot(hVec)
+                                        vdot = diagVec.dot(vVec)
+                                        hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
+                                        vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
+                                        hproj = (hdot / pow(hVecDist, 2)) * hVec
+                                        vproj = (vdot / pow(vVecDist, 2)) * vVec
+                                        hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
+                                        vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
+                                        hProp = hProjDist / hVecDist
+                                        vProp = vProjDist / vVecDist
+                                        hvecangle = scipy.arccos(hdot / (self.length(diagVec) * self.length(hVec)))
+                                        hvecangle = numpy.rad2deg(hvecangle)
+                                        vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
+                                        vvecangle = numpy.rad2deg(vvecangle)
+                                        surfaces = ["front", "right", "back", "left"]
+                                        isWallChange = False
+                                        if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:  # Runs if pointing at non-projectable area of wall
+                                            mouseLocations.append((hProp, 0, self.wall2ProjectorSurface[surfaces[x]]))
+                                            if len(mouseLocations) == 1 and self.state == 2:
+                                                if surfaces[x] != self.currentSurface:
+                                                    if surfaces[x] not in self.alreadyPassed:
+                                                        self.passedSurfaces += 1
+                                                        self.alreadyPassed.append(surfaces[x])
+                                                    self.currentSurface = surfaces[x]
+                                                    isWallChange = True
+                                                end = self.planes[x][6]
+                                                start = self.planes[x][7]
+                                                vec = end-start
+                                                vec = vec*hProp
+                                                self.intersect = start + vec
+                                                if oldLoc is None:
+                                                    oldLoc = self.intersect
+                                                temptime = datetime.datetime.now()
+                                                moveDuration = (temptime - startTime).total_seconds()
+                                                startTime = temptime
+                                                distance = 0
+                                                angle = 0
+                                                degreesPerSecond = 0
+                                                distanceUnitsPerSecond = 0
+                                                if isWallChange:
+                                                    oldLoc = self.intersect;
+                                                if not isWallChange and moveDuration != 0:
+                                                    distance = self.distBetweenPoints(self.intersect, oldLoc)
+                                                    angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
+                                                                                     oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
+                                                    degreesPerSecond = angle / moveDuration
+                                                    distanceUnitsPerSecond = distance / moveDuration
+                                                self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldLoc,
+                                                                         "endPoint": self.intersect,
+                                                                         "distance": distance,
+                                                                         "angle": angle,
+                                                                         "angularVelocity": degreesPerSecond,
+                                                                         "velocity": distanceUnitsPerSecond,
+                                                                         "time": str(temptime.time().hour).zfill(2) +
+                                                                                 ":" + str(
+                                                                             temptime.time().minute).zfill(2) +
+                                                                                 ":" + str(
+                                                                             temptime.time().second).zfill(2) +
+                                                                                 ":" + str(
+                                                                             temptime.time().microsecond).zfill(6),
+                                                                         "moveDuration": str(moveDuration),
+                                                                         "trackerLoc": "",
+                                                                         "trackerVec": ""})
+                                                oldLoc = self.intersect
+                                        else:
+                                            intersections[x] = 0
+                                    else:
+                                        intersections[x] = 0
 
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
@@ -523,7 +610,8 @@ class client:
                                         isWallChange = True
                                     if oldLoc is None:
                                         oldLoc = self.intersect
-                                    moveDuration = (temptime - startTime).total_seconds()
+                                    temptime = datetime.datetime.now()
+                                    moveDuration = (temptime - startTime).total_seconds() # start of just passed movement - start
                                     startTime = temptime
                                     distance = 0
                                     angle = 0
@@ -536,6 +624,11 @@ class client:
                                         angle = self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
                                         degreesPerSecond = angle / moveDuration
                                         distanceUnitsPerSecond = distance / moveDuration
+                                    segCheck2Print = str(segCheck2)
+                                    segCheck3Print = str(segCheck3)
+                                    for z in range(0, 3):
+                                        segCheck2Print = segCheck2Print.replace(",", "")
+                                        segCheck3Print = segCheck3Print.replace(",", "")
                                     self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldLoc,
                                                              "endPoint": self.intersect, "distance": distance,
                                                              "angle": angle, "angularVelocity": degreesPerSecond,
@@ -543,11 +636,14 @@ class client:
                                                              "time": str(temptime.time().hour).zfill(2) +
                                                                      ":" + str(temptime.time().minute).zfill(2) +
                                                                      ":" + str(temptime.time().second).zfill(2) +
-                                                                     ":" + str(temptime.time().microsecond).zfill(6)})
+                                                                     ":" + str(temptime.time().microsecond).zfill(6),
+                                                             "moveDuration": str(moveDuration),
+                                                             "trackerLoc": str(segCheck2Print),
+                                                             "trackerVec": str(segCheck3Print)})
                                     oldLoc = self.intersect
                             else:
                                 intersections[x] = 0
-                            temptime = datetime.datetime.now()
+                            temptime = datetime.datetime.now() # Temptime is start of next movement
                     # NOTE - Secondary cursors are now never used but still exist just in case
                     x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
                     if len(mouseLocations)!=0:
@@ -1415,7 +1511,7 @@ class client:
         with open("results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                           str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                           ".csv", 'w') as traceFile:
-            traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity\n")
+            traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity,time,trackerLoc,trackerVec\n")
             for index in range(0, len(recordedPath)):
                 traceFile.write(str(recordedPath[index]["userLoc"]) + "," +
                                 str(recordedPath[index]["startPoint"]) + "," +
@@ -1424,7 +1520,9 @@ class client:
                                 str(recordedPath[index]["angle"]) + "," +
                                 str(recordedPath[index]["angularVelocity"]) + "," +
                                 str(recordedPath[index]["velocity"]) + "," +
-                                str(recordedPath[index]["time"]) + "\n")
+                                str(recordedPath[index]["time"]) + "," +
+                                str(recordedPath[index]["trackerLoc"]) + "," +
+                                str(recordedPath[index]["trackerVec"]) + "\n")
         print "Wrote path file \"results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" + str(self.getTrialNumForCond(CONDITION1, CONDITION2)) + ".csv\""
 
     def incrementTrialNumForCond(self, condition1, condition2):
