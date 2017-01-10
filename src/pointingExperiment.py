@@ -357,6 +357,56 @@ class client:
         curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])
         return curVec
 
+    def testPath(self, recordedPath):
+        layout = []
+        lines = []
+        trackerLocs = []
+        removalCount = 0
+
+        DIST_THRESH = 0.1
+
+        for x in range(0, len(recordedPath)):
+            lines.append(recordedPath[x])
+            trackerLoc = recordedPath[x]["trackerLoc"]
+            trackerLoc[0] = float(trackerLoc[0])
+            trackerLoc[1] = float(trackerLoc[1])
+            trackerLoc[2] = float(trackerLoc[2])
+            trackerLocs.append(trackerLoc)
+
+        highIndexes = []
+        for x in range(1, len(trackerLocs)-1):
+            if self.distBetweenPoints(trackerLocs[x], trackerLocs[x+1]) > DIST_THRESH:
+                highIndexes.append(x)
+
+        for x in range(0, len(highIndexes)):
+            if highIndexes[x] != highIndexes[x+1] - 1:
+                measurements = []
+                for y in range(highIndexes[x] + 1, highIndexes[x+1]):
+                    measurements.append(self.distBetweenPoints(trackerLocs[y], trackerLocs[y+1]))
+                avg = measurements[0]
+                for y in range(1, len(measurements)):
+                    avg += measurements[y]
+                avg /= len(measurements)
+                if avg < 0.03:
+                    print "Remove " + str(highIndexes[x]+2) + " to " + str(highIndexes[x+1]+1) + " = " + str(avg)
+                    removalCount+=1
+            else:
+                if x < len(highIndexes)-1:
+                    if x != len(highIndexes)-2:
+                        if highIndexes[x+1] != highIndexes[x+2] - 1:
+                            if x > 0:
+                                if highIndexes[x-1] != highIndexes[x] - 1:
+                                    print "Remove " + str(highIndexes[x+1]+1)
+                                    removalCount+=1
+                            else:
+                                print "Remove " + str(highIndexes[x+1]+1)
+                                removalCount+=1
+                    else:
+                        print "Remove " + str(highIndexes[x+1] + 1)
+                        removalCount+=1
+        return removalCount
+
+
     # Loops until the program is closed and monitors mouse movement
     def mouseMovement(self):
         axes = self.getHeadAxes()
@@ -1493,6 +1543,7 @@ class client:
                                              'no_walls_needed': wallsneeded})
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
+                            removalCount = self.testPath(recordedPath)
                             pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
                                                                                                 recordedPath]))
                             pathWriteThread.start()
@@ -1511,7 +1562,7 @@ class client:
         with open("results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                           str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                           ".csv", 'w') as traceFile:
-            traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity,time,trackerLoc,trackerVec\n")
+            traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity,trackerLoc,trackerVec\n")
             for index in range(0, len(recordedPath)):
                 traceFile.write(str(recordedPath[index]["userLoc"]) + "," +
                                 str(recordedPath[index]["startPoint"]) + "," +
