@@ -123,7 +123,7 @@ class generator():
         fo.write("KEY_X=" + str(self.KEY_X) + "\n")
         fo.write("KEY_Y=" + str(self.KEY_Y) + "\n\n")
         for w in range(1,101):
-            target = randint(0, self.total_target_count)
+            target = randint(0, self.total_target_count-1)
             count = 0
             fo.write("[" + str(w) + "]\n")
             fo.write("wallF=")
