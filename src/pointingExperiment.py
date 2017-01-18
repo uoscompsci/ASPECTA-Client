@@ -236,18 +236,12 @@ class client:
 
     def getHeadAxes(self):
         data = self.getTrackerData()[1]
-        print "DATALENGTH = " + str(len(data))
 
         #Retrieve the points on the trackers and place them in an array
-        print "DATA[2] = " + str(data[2])
         point1 = scipy.array([data[2][0], data[2][1], data[2][2]])
-        print "DATA[3] = " + str(data[3])
         point2 = scipy.array([data[3][0], data[3][1], data[3][2]])
-        print "DATA[4] = " + str(data[4])
         point3 = scipy.array([data[4][0], data[4][1], data[4][2]])
-        print "DATA[5] = " + str(data[5])
         point4 = scipy.array([data[5][0], data[5][1], data[5][2]])
-        print "DATA[6] = " + str(data[6])
         point5 = scipy.array([data[6][0], data[6][1], data[6][2]])
         points = [point1, point2, point3, point4, point5]
 
@@ -358,6 +352,7 @@ class client:
         return curVec
 
     def testPath(self, recordedPath):
+        print "-------------------------------------------"
         layout = []
         lines = []
         trackerLocs = []
@@ -368,6 +363,8 @@ class client:
         for x in range(0, len(recordedPath)):
             lines.append(recordedPath[x])
             trackerLoc = recordedPath[x]["trackerLoc"]
+            trackerLoc = trackerLoc[1:-1]
+            trackerLoc = trackerLoc.split(" ")
             trackerLoc[0] = float(trackerLoc[0])
             trackerLoc[1] = float(trackerLoc[1])
             trackerLoc[2] = float(trackerLoc[2])
@@ -378,7 +375,7 @@ class client:
             if self.distBetweenPoints(trackerLocs[x], trackerLocs[x+1]) > DIST_THRESH:
                 highIndexes.append(x)
 
-        for x in range(0, len(highIndexes)):
+        for x in range(0, len(highIndexes)-1):
             if highIndexes[x] != highIndexes[x+1] - 1:
                 measurements = []
                 for y in range(highIndexes[x] + 1, highIndexes[x+1]):
@@ -404,6 +401,8 @@ class client:
                     else:
                         print "Remove " + str(highIndexes[x+1] + 1)
                         removalCount+=1
+
+        print "==============================================="
         return removalCount
 
 
@@ -443,7 +442,7 @@ class client:
                                 intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                                 diagVec = intersections[x] - self.planes[x][2]
                                 hVec = self.planes[x][3] - self.planes[x][2]
-                                vVec = self.planes[x][7] - self.planes[x][2]
+                                vVec = self.planes[x][5] - self.planes[x][2]  # Projectable area
                                 hdot = diagVec.dot(hVec)
                                 vdot = diagVec.dot(vVec)
                                 hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
@@ -460,7 +459,7 @@ class client:
                                 vvecangle = numpy.rad2deg(vvecangle)
                                 surfaces = ["front", "right", "back", "left", "ceiling", "floor"]
                                 isWallChange = False
-                                if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:
+                                if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:  # Runs if in projectable area
                                     mouseLocations.append((hProp, vProp, self.wall2ProjectorSurface[surfaces[x]]))
                                     if len(mouseLocations) == 1 and self.state == 2:
                                         if surfaces[x]!=self.currentSurface:
@@ -498,11 +497,13 @@ class client:
                                                                  "trackerVec": ""})
                                         oldLoc = self.intersect
                                 else:  # Runs if not pointing at projectable area
+                                    print "Non-projectable cursor location"
                                     if 0 <= x <= 3:  # Runs if the surface is a wall and not the ceiling or floor
+                                        print "Surface not ceiling or floor"
                                         intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
-                                        diagVec = intersections[x] - self.planes[x][2]
-                                        hVec = self.planes[x][6] - self.planes[x][7]
-                                        vVec = self.planes[x][5] - self.planes[x][7]
+                                        diagVec = intersections[x] - self.planes[x][5]
+                                        hVec = self.planes[x][4] - self.planes[x][5]
+                                        vVec = self.planes[x][7] - self.planes[x][5]
                                         hdot = diagVec.dot(hVec)
                                         vdot = diagVec.dot(vVec)
                                         hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
@@ -1283,12 +1284,12 @@ class client:
         now = datetime.datetime.now()
 
         self.targets = {}
-        order = {}
+        order = []
         foundLayouts = []
         with open("order1.csv", "rb") as f:
             records = csv.DictReader(f)
             for row in records:
-                order[row['number']] = row
+                order.append(row)
                 if row['targetfile'] not in foundLayouts:
                     foundLayouts.append(row['targetfile'])
         for x in range(0, len(foundLayouts)):
@@ -1420,14 +1421,14 @@ class client:
                     self.background.blit(text, textpos)
                     self.getInput(False)
 
-                    self.currentLayout = int(order[str(orderIndex)]['layout'])
-                    self.TARGETINI = order[str(orderIndex)]['targetfile']
-                    CONDITION1 = order[str(orderIndex)]['condition1']
+                    self.currentLayout = int(order[orderIndex-1]['layout'])
+                    self.TARGETINI = order[orderIndex-1]['targetfile']
+                    CONDITION1 = order[orderIndex-1]['condition1']
                     if CONDITION1 == "pointing":
                         self.mouseTask = False
                     else:
                         self.mouseTask = True
-                    CONDITION2 = order[str(orderIndex)]['condition2']
+                    CONDITION2 = order[orderIndex-1]['condition2']
                     if CONDITION2 == "synchronous":
                         self.parallelTask = True
                     else:
@@ -1544,8 +1545,30 @@ class client:
                             #self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
                             removalCount = self.testPath(recordedPath)
+                            if removalCount > 6:  # Likely problematic readings
+                                print "Need to redo layout (count = " + str(removalCount) + ")"
+                                index = 0
+                                found = False
+                                for x in range(orderIndex + 1, len(order)):  # Loop through the remaining tasks
+                                    if found == False:
+                                        if order[x-1]['switch'] == 'yes':  # If current point is a switch point insert here
+                                            index = x
+                                            found = True
+                                        if x == len(order) - 1:  # If at end point in order list append to end
+                                            index = x + 1
+                                            found = True
+                                if index == len(order):
+                                    order.append(order[orderIndex-1])
+                                    order[len(order)-1]['switch'] = 'no'
+                                    print "REAPPENDING AT END"
+                                else:
+                                    order.insert(index-1, order[orderIndex-1])
+                                    order[index-1]['switch'] = 'no'
+                                    print "REAPPENDING AT " + str(index - 1)
+                            print "----------------------------------------------"
                             pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
-                                                                                                recordedPath]))
+                                                                                                recordedPath,
+                                                                                                 order[orderIndex-1]['number']]))
                             pathWriteThread.start()
                             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.alreadyPassed = ['front']
@@ -1558,8 +1581,8 @@ class client:
         time.sleep(0.2)
         pygame.quit()
 
-    def writePathFile(self, CONDITION1, CONDITION2, recordedPath):
-        with open("results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+    def writePathFile(self, CONDITION1, CONDITION2, recordedPath, taskNo):
+        with open("results/" + str(self.USERNO) + "_" + str(taskNo) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
                           str(self.getTrialNumForCond(CONDITION1, CONDITION2)) +
                           ".csv", 'w') as traceFile:
             traceFile.write("userLoc,startPoint,endPoint,distance,angle,angularVelocity,velocity,trackerLoc,trackerVec\n")
@@ -1834,7 +1857,6 @@ class Targets:
         icon = None
         if wall.lower() == "front":
             icon = self.targets[layout]['wallF'][targetNo][1]
-            print "Showing front icon " + icon
         elif wall.lower() == "back":
             icon = self.targets[layout]['wallB'][targetNo][1]
         elif wall.lower() == "left":
