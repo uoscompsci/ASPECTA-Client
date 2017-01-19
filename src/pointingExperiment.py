@@ -521,7 +521,7 @@ class client:
                                         surfaces = ["front", "right", "back", "left"]
                                         isWallChange = False
                                         if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:  # Runs if pointing at non-projectable area of wall
-                                            mouseLocations.append((hProp, 0, self.wall2ProjectorSurface[surfaces[x]]))
+                                            mouseLocations.append((hProp, 0, self.wall2ProjectorSurface[surfaces[x]]))  # Place the mouse at the correct location
                                             if len(mouseLocations) == 1 and self.state == 2:
                                                 if surfaces[x] != self.currentSurface:
                                                     if surfaces[x] not in self.alreadyPassed:
@@ -529,11 +529,11 @@ class client:
                                                         self.alreadyPassed.append(surfaces[x])
                                                     self.currentSurface = surfaces[x]
                                                     isWallChange = True
-                                                end = self.planes[x][6]
-                                                start = self.planes[x][7]
+                                                end = self.planes[x][4]
+                                                start = self.planes[x][5]
                                                 vec = end-start
                                                 vec = vec*hProp
-                                                self.intersect = start + vec
+                                                self.intersect = start + vec  # Correct the intersection
                                                 if oldLoc is None:
                                                     oldLoc = self.intersect
                                                 temptime = datetime.datetime.now()
