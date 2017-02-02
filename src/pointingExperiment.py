@@ -275,7 +275,8 @@ class client:
         else:
             back = points[minpoint2Index]
             front = points[minpoint1Index]
-        forwardVec = front - back
+        tempDist = self.distBetweenPoints(front, back)
+        forwardVec = self.normalizeVec(front-back)
         headLoc = back
 
         #Calculated closest to back other than front
@@ -297,10 +298,10 @@ class client:
             normal[0] = -normal[0]
             normal[1] = -normal[1]
             normal[2] = -normal[2]
-        upwardVec = scipy.array([normal[0], normal[1], normal[2]])
+        upwardVec = self.normalizeVec(scipy.array([normal[0], normal[1], normal[2]]))
 
         #Find the horizontal vector
-        horizontalVec = numpy.cross(forwardVec, upwardVec)
+        horizontalVec = self.normalizeVec(numpy.cross(upwardVec, forwardVec))
 
         return headLoc, forwardVec, upwardVec, horizontalVec
 
@@ -347,8 +348,8 @@ class client:
         return curVec
 
     def getNewVec(self, axes, oldIntersectVec, xdist, ydist):
-        changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, axes[1], axes[2], axes[3])
-        curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])
+        changeHoriz, changeVert = self.getRotationFromVectors(oldIntersectVec, axes[1], axes[2], axes[3])  # Gets current rotations
+        curVec = self.rotateForwardVectorByMouse(xdist, ydist, changeHoriz, changeVert, axes[1], axes[2])  # Applies the rotations to the existing roations
         return curVec
 
     def testPath(self, recordedPath):
@@ -428,12 +429,12 @@ class client:
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if(segCheck == 1):
                                 break
-                        oldIntersect = self.intersect  # Saves the last intersect point
-                        axes = self.getHeadAxes()
-                        lastHeadLoc = axes[0]  # From now on the current head location is used
+                        oldIntersect = self.intersect  # Backs the current intersect up
+                        axes = self.getHeadAxes()  # Gather updated head position readings
+                        lastHeadLoc = axes[0]  # Update stored head position
                         oldIntersectVec = self.normalizeVec(oldIntersect - lastHeadLoc)  # Gets the vector that now points from the head to cursor
                         pygame.mouse.set_pos([self.winWidth / 2, self.winHeight / 2])  # Returns cursor to the middle of the window
-                        curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)
+                        curVec = self.getNewVec(axes, oldIntersectVec, xdist, ydist)  # Applies the mouse movement to curvec
                         intersections = [1, 1, 1, 1, 1, 1]
                         mouseLocations = []
                         for x in range(0, len(self.planes)):
@@ -497,9 +498,9 @@ class client:
                                                                  "trackerVec": ""})
                                         oldLoc = self.intersect
                                 else:  # Runs if not pointing at projectable area
-                                    print "Non-projectable cursor location"
+                                    #print "Non-projectable cursor location"
                                     if 0 <= x <= 3:  # Runs if the surface is a wall and not the ceiling or floor
-                                        print "Surface not ceiling or floor"
+                                        #print "Surface not ceiling or floor"
                                         intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
                                         diagVec = intersections[x] - self.planes[x][5]
                                         hVec = self.planes[x][4] - self.planes[x][5]
@@ -520,8 +521,8 @@ class client:
                                         vvecangle = numpy.rad2deg(vvecangle)
                                         surfaces = ["front", "right", "back", "left"]
                                         isWallChange = False
-                                        if (0 <= hProp <= 1) and (0 <= vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:  # Runs if pointing at non-projectable area of wall
-                                            mouseLocations.append((hProp, 0, self.wall2ProjectorSurface[surfaces[x]]))  # Place the mouse at the correct location
+                                        if (0 <= hProp <= 1) and (0 < vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:  # Runs if pointing at non-projectable area of wall
+                                            mouseLocations.append((hProp, 1, self.wall2ProjectorSurface[surfaces[x]]))  # Place the mouse at the correct location
                                             if len(mouseLocations) == 1 and self.state == 2:
                                                 if surfaces[x] != self.currentSurface:
                                                     if surfaces[x] not in self.alreadyPassed:
