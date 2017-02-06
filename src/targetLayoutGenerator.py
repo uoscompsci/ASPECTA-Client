@@ -29,6 +29,9 @@ class generator():
     POSSIBLE_F = [(4, 3), (2, 5), (4, 2), (3, 4), (5, 3)]
     POSSIBLE_B = [(2, 5), (4, 3), (3, 4), (4, 4), (5, 5)]
 
+    target_counter = {}
+    targetWall = ""
+
     x = 0
     y = 0
     icon = 0
@@ -39,7 +42,13 @@ class generator():
     total_target_count = TARGET_COUNT_LONG_SURFACE * 3 + TARGET_COUNT_SQUARE_SURFACE * 2
     debugCount = 0
 
-    def getXYandIcon(self, wall, isTarget):
+    def getXYandIcon(self, wall, isTarget, synchronous, pointing):
+        synch = "synch"
+        if not synchronous:
+            synch = "asynch"
+        point = "point"
+        if not pointing:
+            point = "persp"
         xWidth = 0
         yWidth = 0
         possibleTargets = []
@@ -70,9 +79,26 @@ class generator():
                 xPick = randint(1, xWidth)
                 yPick = randint(1, yWidth)
         else:
-            while (xPick, yPick) not in possibleTargets:
-                xPick = randint(1, xWidth)
-                yPick = randint(1, yWidth)
+            wallno = randint(0, len(self.walls)-1)
+            layoutno = randint(0, len(self.POSSIBLE_F)-1)
+            while self.target_counter[self.walls[wallno] + "-" + str(layoutno)][synch + "-" + point] == 3:
+                wallno = randint(0, len(self.walls)-1)
+                layoutno = randint(0, len(self.POSSIBLE_F)-1)
+            self.target_counter[self.walls[wallno] + "-" + str(layoutno)][synch + "-" + point] += 1
+            wallList = []
+            if self.walls[wallno] == "front":
+                wallList = self.POSSIBLE_F
+            elif self.walls[wallno] == "back":
+                wallList = self.POSSIBLE_B
+            elif self.walls[wallno] == "left":
+                wallList = self.POSSIBLE_L
+            elif self.walls[wallno] == "right":
+                wallList = self.POSSIBLE_R
+            elif self.walls[wallno] == "ceiling":
+                wallList = self.POSSIBLE_C
+            xPick = wallList[layoutno][0]
+            yPick = wallList[layoutno][1]
+            self.targetWall = self.walls[wallno]
         self.x = xPick
         self.y = yPick
         self.usedLocs.append((self.x, self.y))
@@ -102,6 +128,12 @@ class generator():
 
 
     def buildFile(self):
+        reps = 3
+        self.walls = ["ceiling", "front", "back", "left", "right"]
+        for x in range(0, len(self.walls)):
+            for y in range(0, len(self.POSSIBLE_F)):
+                self.target_counter[self.walls[x] + "-" + str(y)] = {"synch-point": 0, "asynch-point": 0, "synch-persp": 0, "asynch-persp": 0}
+
         self.availableImages = [f for f in listdir("img/") if isfile(join("img/", f))]
         for x in range(0, len(self.availableImages)):
             self.availableImages[x] = self.availableImages[x]
@@ -122,113 +154,382 @@ class generator():
         fo.write("TARGET_COUNT_SQUARE_SURFACE=" + str(self.TARGET_COUNT_SQUARE_SURFACE) + "\n")
         fo.write("KEY_X=" + str(self.KEY_X) + "\n")
         fo.write("KEY_Y=" + str(self.KEY_Y) + "\n\n")
-        for w in range(1,101):
-            target = randint(0, self.total_target_count-1)
-            count = 0
-            fo.write("[" + str(w) + "]\n")
+
+
+        synchronous = True
+        pointing = True
+        for w in range(0, 75):
+            fo.write("[" + str(w+1) + "]\n")
+            self.getXYandIcon("ceiling", True, synchronous, pointing)
+            targetx = self.x
+            targety = self.y
+            targetIcon = self.icon
+            wall = self.targetWall
+            ceilingTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            frontTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            backTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            rightTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            leftTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            if wall == "ceiling":
+                ceilingTargetCount -= 1
+            elif wall == "front":
+                frontTargetCount -= 1
+            elif wall == "back":
+                backTargetCount -= 1
+            elif wall == "left":
+                leftTargetCount -= 1
+            elif wall == "right":
+                rightTargetCount -= 1
+
             fo.write("wallF=")
-            targetIcon = ""
-            if count != target:
-                self.getXYandIcon("front", False)
-                while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
-                    self.getXYandIcon("front", False)
-            else:
-                self.getXYandIcon("front", True)
-                targetIcon = self.icon
-            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
-            for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
-                fo.write(";")
-                if count != target:
-                    self.getXYandIcon("front", False)
-                    while self.x == self.KEY_X and self.y == self.KEY_Y:  # Stop overlap with key
-                        self.getXYandIcon("front", False)
+            first = True
+            for z in range(0, frontTargetCount):
+                if first:
+                    if wall == "front":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
                 else:
-                    self.getXYandIcon("front", True)
-                    targetIcon = self.icon
+                    fo.write(";")
+                self.getXYandIcon("front", False, synchronous, pointing)
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
-            self.clearUsedLocs()
+
             fo.write("wallB=")
-            if count != target:
-                self.getXYandIcon("back", False)
-            else:
-                self.getXYandIcon("back", True)
-                targetIcon = self.icon
-            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
-            for z in range(1, self.TARGET_COUNT_SQUARE_SURFACE):
-                fo.write(";")
-                if count != target:
-                    self.getXYandIcon("back", False)
+            first = True
+            for z in range(0, backTargetCount):
+                if first:
+                    if wall == "back":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
                 else:
-                    self.getXYandIcon("back", True)
-                    targetIcon = self.icon
+                    fo.write(";")
+                self.getXYandIcon("back", False, synchronous, pointing)
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
-            self.clearUsedLocs()
+
             fo.write("wallL=")
-            if count != target:
-                self.getXYandIcon("left", False)
-            else:
-                self.getXYandIcon("left", True)
-                targetIcon = self.icon
-            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
-            for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
-                fo.write(";")
-                if count != target:
-                    self.getXYandIcon("left", False)
+            first = True
+            for z in range(0, leftTargetCount):
+                if first:
+                    if wall == "left":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
                 else:
-                    self.getXYandIcon("left", True)
-                    targetIcon = self.icon
+                    fo.write(";")
+                self.getXYandIcon("left", False, synchronous, pointing)
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
-            self.clearUsedLocs()
+
             fo.write("wallR=")
-            if count != target:
-                self.getXYandIcon("right", False)
-            else:
-                self.getXYandIcon("right", True)
-                targetIcon = self.icon
-            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
-            for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
-                fo.write(";")
-                if count != target:
-                    self.getXYandIcon("right", False)
+            first = True
+            for z in range(0, rightTargetCount):
+                if first:
+                    if wall == "right":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
                 else:
-                    self.getXYandIcon("right", True)
-                    targetIcon = self.icon
+                    fo.write(";")
+                self.getXYandIcon("right", False, synchronous, pointing)
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
-            self.clearUsedLocs()
+
             fo.write("ceiling=")
-            if count != target:
-                self.getXYandIcon("ceiling", False)
-            else:
-                self.getXYandIcon("ceiling", True)
-                targetIcon = self.icon
-            fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-            count += 1
-            for z in range(1, self.TARGET_COUNT_LONG_SURFACE):
-                fo.write(";")
-                if count != target:
-                    self.getXYandIcon("ceiling", False)
+            first = True
+            for z in range(0, ceilingTargetCount):
+                if first:
+                    if wall == "ceiling":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
                 else:
-                    self.getXYandIcon("ceiling", True)
-                    targetIcon = self.icon
+                    fo.write(";")
+                self.getXYandIcon("ceiling", False, synchronous, pointing)
                 fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
-                count += 1
             fo.write("\n")
             fo.write("target=" + targetIcon)
             fo.write("\n\n")
             self.clearUsedLocs()
             self.clearUsedIcons()
+
+        for w in range(75, 150):
+            synchronous = False
+            fo.write("[" + str(w+1) + "]\n")
+            self.getXYandIcon("ceiling", True, synchronous, pointing)
+            targetx = self.x
+            targety = self.y
+            targetIcon = self.icon
+            wall = self.targetWall
+            ceilingTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            frontTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            backTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            rightTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            leftTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            if wall == "ceiling":
+                ceilingTargetCount -= 1
+            elif wall == "front":
+                frontTargetCount -= 1
+            elif wall == "back":
+                backTargetCount -= 1
+            elif wall == "left":
+                leftTargetCount -= 1
+            elif wall == "right":
+                rightTargetCount -= 1
+
+            fo.write("wallF=")
+            first = True
+            for z in range(0, frontTargetCount):
+                if first:
+                    if wall == "front":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("front", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallB=")
+            first = True
+            for z in range(0, backTargetCount):
+                if first:
+                    if wall == "back":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("back", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallL=")
+            first = True
+            for z in range(0, leftTargetCount):
+                if first:
+                    if wall == "left":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("left", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallR=")
+            first = True
+            for z in range(0, rightTargetCount):
+                if first:
+                    if wall == "right":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("right", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("ceiling=")
+            first = True
+            for z in range(0, ceilingTargetCount):
+                if first:
+                    if wall == "ceiling":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("ceiling", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+            fo.write("target=" + targetIcon)
+            fo.write("\n\n")
+            self.clearUsedLocs()
+            self.clearUsedIcons()
+
+        for w in range(150, 225):
+            synchronous = True
+            pointing = False
+            fo.write("[" + str(w+1) + "]\n")
+            self.getXYandIcon("ceiling", True, synchronous, pointing)
+            targetx = self.x
+            targety = self.y
+            targetIcon = self.icon
+            wall = self.targetWall
+            ceilingTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            frontTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            backTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            rightTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            leftTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            if wall == "ceiling":
+                ceilingTargetCount -= 1
+            elif wall == "front":
+                frontTargetCount -= 1
+            elif wall == "back":
+                backTargetCount -= 1
+            elif wall == "left":
+                leftTargetCount -= 1
+            elif wall == "right":
+                rightTargetCount -= 1
+
+            fo.write("wallF=")
+            first = True
+            for z in range(0, frontTargetCount):
+                if first:
+                    if wall == "front":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("front", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallB=")
+            first = True
+            for z in range(0, backTargetCount):
+                if first:
+                    if wall == "back":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("back", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallL=")
+            first = True
+            for z in range(0, leftTargetCount):
+                if first:
+                    if wall == "left":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("left", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallR=")
+            first = True
+            for z in range(0, rightTargetCount):
+                if first:
+                    if wall == "right":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("right", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("ceiling=")
+            first = True
+            for z in range(0, ceilingTargetCount):
+                if first:
+                    if wall == "ceiling":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("ceiling", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+            fo.write("target=" + targetIcon)
+            fo.write("\n\n")
+            self.clearUsedLocs()
+            self.clearUsedIcons()
+
+        for w in range(225, 300):
+            synchronous = False
+            fo.write("[" + str(w+1) + "]\n")
+            self.getXYandIcon("ceiling", True, synchronous, pointing)
+            targetx = self.x
+            targety = self.y
+            targetIcon = self.icon
+            wall = self.targetWall
+            ceilingTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            frontTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            backTargetCount = self.TARGET_COUNT_SQUARE_SURFACE
+            rightTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            leftTargetCount = self.TARGET_COUNT_LONG_SURFACE
+            if wall == "ceiling":
+                ceilingTargetCount -= 1
+            elif wall == "front":
+                frontTargetCount -= 1
+            elif wall == "back":
+                backTargetCount -= 1
+            elif wall == "left":
+                leftTargetCount -= 1
+            elif wall == "right":
+                rightTargetCount -= 1
+
+            fo.write("wallF=")
+            first = True
+            for z in range(0, frontTargetCount):
+                if first:
+                    if wall == "front":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("front", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallB=")
+            first = True
+            for z in range(0, backTargetCount):
+                if first:
+                    if wall == "back":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("back", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallL=")
+            first = True
+            for z in range(0, leftTargetCount):
+                if first:
+                    if wall == "left":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("left", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("wallR=")
+            first = True
+            for z in range(0, rightTargetCount):
+                if first:
+                    if wall == "right":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("right", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+
+            fo.write("ceiling=")
+            first = True
+            for z in range(0, ceilingTargetCount):
+                if first:
+                    if wall == "ceiling":
+                        fo.write(str(targetx) + "," + str(targety) + ":" + targetIcon + ";")
+                    first = False
+                else:
+                    fo.write(";")
+                self.getXYandIcon("ceiling", False, synchronous, pointing)
+                fo.write(str(self.x) + "," + str(self.y) + ":" + self.icon)
+            fo.write("\n")
+            fo.write("target=" + targetIcon)
+            fo.write("\n\n")
+            self.clearUsedLocs()
+            self.clearUsedIcons()
+        print str(self.target_counter)
         fo.close()
 
 gen = generator()
