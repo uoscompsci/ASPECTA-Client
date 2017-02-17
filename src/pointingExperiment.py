@@ -1,23 +1,25 @@
-from Tkinter import *
+import csv
+import datetime
+import datetime
+import glob
 import math
-from messageSender import *
+import os
+import os.path
 import pygame
+import threading
+import time
+import tkMessageBox
+from Tkinter import *
+from math import sqrt, fabs
+from pygame.locals import *
+from random import randint
+from threading import Thread
+import numpy
 import scipy
 import scipy.linalg
-import numpy
-import threading
-from threading import Thread
-import time
-from pygame.locals import *
-import datetime
-import tkMessageBox
 import tkSimpleDialog
-from math import sqrt, fabs
-import csv
-from random import randint
-import datetime
-import os.path
-import os, glob
+from messageSender import *
+
 
 
 class MyDialog(tkSimpleDialog.Dialog):
@@ -81,6 +83,8 @@ class client:
     conditionCounter = {"pointing,synchronous": 0, "perspective,synchronous": 0,
                         "pointing,asynchronous": 0, "perspective,asynchronous": 0}
     alreadyPassed = ["front"]
+    doubleClickTime = datetime.datetime.now()
+    unclickable = False
 
 
     # Checks for mouse button and keyboard
@@ -146,9 +150,14 @@ class client:
                     # Runs if the right mouse button has been released
                     if (event.button == 3):
                         rClickRelTime = datetime.datetime.now()
-                        elapsedSecs = (
-                        rClickRelTime - self.rClickTime).total_seconds()  # Checks how long the button was depressed
+                        elapsedSecs = (rClickRelTime - self.rClickTime).total_seconds()  # Checks how long the button was depressed
                         if (elapsedSecs < 0.5):
+                            if self.state==2:
+                                backupDoubleClickTime = self.doubleClickTime
+                                self.doubleClickTime = datetime.datetime.now()
+                                clickGap = (self.doubleClickTime-backupDoubleClickTime).total_seconds()
+                                if(clickGap < 1):
+                                    self.unclickable = True
                             pass
                         else:
                             pass
@@ -202,6 +211,7 @@ class client:
             # print "Ray facing away from surface"
             return 3
 
+    #  Magnitude of vector
     def length(self, v):
         return scipy.sqrt(v.dot(v))
 
@@ -366,7 +376,7 @@ class client:
             trackerLoc = recordedPath[x]["trackerLoc"]
             trackerLoc = trackerLoc[1:-1]
             trackerLoc = trackerLoc.split(" ")
-            trackerLoc[0] = float(trackerLoc[0])
+            trackerLoc[0] = float(trackerLoc[0])  # TODO COULD NOT CONVERT STRING TO FLOAT PERSP
             trackerLoc[1] = float(trackerLoc[1])
             trackerLoc[2] = float(trackerLoc[2])
             trackerLocs.append(trackerLoc)
@@ -440,20 +450,20 @@ class client:
                         for x in range(0, len(self.planes)):
                             segCheck = self.segmentPlane(self.planes[x], lastHeadLoc, curVec)
                             if segCheck == 1:
-                                intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
-                                diagVec = intersections[x] - self.planes[x][2]
+                                intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])  # Backup intersection for current plane
+                                diagVec = intersections[x] - self.planes[x][2]  # Find vector between intersection and upper left corner
                                 hVec = self.planes[x][3] - self.planes[x][2]
-                                vVec = self.planes[x][5] - self.planes[x][2]  # Projectable area
-                                hdot = diagVec.dot(hVec)
-                                vdot = diagVec.dot(vVec)
-                                hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
-                                vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
-                                hproj = (hdot / pow(hVecDist, 2)) * hVec
-                                vproj = (vdot / pow(vVecDist, 2)) * vVec
-                                hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
-                                vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
-                                hProp = hProjDist / hVecDist
-                                vProp = vProjDist / vVecDist
+                                vVec = self.planes[x][7] - self.planes[x][2]
+                                hdot = diagVec.dot(hVec)  # Proportion of the diagonal vector that goes horizontally
+                                vdot = diagVec.dot(vVec)  # Proportion of the diagonal vector that goes vertically
+                                hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))  # Wall width
+                                vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))  # Wall height
+                                hproj = (hdot / pow(hVecDist, 2)) * hVec  # Horizontal projection vector
+                                vproj = (vdot / pow(vVecDist, 2)) * vVec  # Vertical projection vector
+                                hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))  # Horizontal distance
+                                vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))  # Vertical distance
+                                hProp = hProjDist / hVecDist  # Proportional horizontal position
+                                vProp = vProjDist / vVecDist  # Proportional vertical position
                                 hvecangle = scipy.arccos(hdot / (self.length(diagVec) * self.length(hVec)))
                                 hvecangle = numpy.rad2deg(hvecangle)
                                 vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
@@ -497,89 +507,35 @@ class client:
                                                                  "trackerLoc": "",
                                                                  "trackerVec": ""})
                                         oldLoc = self.intersect
-                                else:  # Runs if not pointing at projectable area
-                                    #print "Non-projectable cursor location"
-                                    if 0 <= x <= 3:  # Runs if the surface is a wall and not the ceiling or floor
-                                        #print "Surface not ceiling or floor"
-                                        intersections[x] = scipy.array([self.intersect[0], self.intersect[1], self.intersect[2]])
-                                        diagVec = intersections[x] - self.planes[x][5]
-                                        hVec = self.planes[x][4] - self.planes[x][5]
-                                        vVec = self.planes[x][7] - self.planes[x][5]
-                                        hdot = diagVec.dot(hVec)
-                                        vdot = diagVec.dot(vVec)
-                                        hVecDist = sqrt(pow(hVec[0], 2) + pow(hVec[1], 2) + pow(hVec[2], 2))
-                                        vVecDist = sqrt(pow(vVec[0], 2) + pow(vVec[1], 2) + pow(vVec[2], 2))
-                                        hproj = (hdot / pow(hVecDist, 2)) * hVec
-                                        vproj = (vdot / pow(vVecDist, 2)) * vVec
-                                        hProjDist = sqrt(pow(hproj[0], 2) + pow(hproj[1], 2) + pow(hproj[2], 2))
-                                        vProjDist = sqrt(pow(vproj[0], 2) + pow(vproj[1], 2) + pow(vproj[2], 2))
-                                        hProp = hProjDist / hVecDist
-                                        vProp = vProjDist / vVecDist
-                                        hvecangle = scipy.arccos(hdot / (self.length(diagVec) * self.length(hVec)))
-                                        hvecangle = numpy.rad2deg(hvecangle)
-                                        vvecangle = scipy.arccos(vdot / (self.length(diagVec) * self.length(vVec)))
-                                        vvecangle = numpy.rad2deg(vvecangle)
-                                        surfaces = ["front", "right", "back", "left"]
-                                        isWallChange = False
-                                        if (0 <= hProp <= 1) and (0 < vProp <= 1) and hvecangle <= 90 and vvecangle <= 90:  # Runs if pointing at non-projectable area of wall
-                                            mouseLocations.append((hProp, 1, self.wall2ProjectorSurface[surfaces[x]]))  # Place the mouse at the correct location
-                                            if len(mouseLocations) == 1 and self.state == 2:
-                                                if surfaces[x] != self.currentSurface:
-                                                    if surfaces[x] not in self.alreadyPassed:
-                                                        self.passedSurfaces += 1
-                                                        self.alreadyPassed.append(surfaces[x])
-                                                    self.currentSurface = surfaces[x]
-                                                    isWallChange = True
-                                                end = self.planes[x][4]
-                                                start = self.planes[x][5]
-                                                vec = end-start
-                                                vec = vec*hProp
-                                                self.intersect = start + vec  # Correct the intersection
-                                                if oldLoc is None:
-                                                    oldLoc = self.intersect
-                                                temptime = datetime.datetime.now()
-                                                moveDuration = (temptime - startTime).total_seconds()
-                                                startTime = temptime
-                                                distance = 0
-                                                angle = 0
-                                                degreesPerSecond = 0
-                                                distanceUnitsPerSecond = 0
-                                                if isWallChange:
-                                                    oldLoc = self.intersect;
-                                                if not isWallChange and moveDuration != 0:
-                                                    distance = self.distBetweenPoints(self.intersect, oldLoc)
-                                                    angle = self.angleBetweenVectors(self.intersect - lastHeadLoc,
-                                                                                     oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
-                                                    degreesPerSecond = angle / moveDuration
-                                                    distanceUnitsPerSecond = distance / moveDuration
-                                                self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldLoc,
-                                                                         "endPoint": self.intersect,
-                                                                         "distance": distance,
-                                                                         "angle": angle,
-                                                                         "angularVelocity": degreesPerSecond,
-                                                                         "velocity": distanceUnitsPerSecond,
-                                                                         "time": str(temptime.time().hour).zfill(2) +
-                                                                                 ":" + str(
-                                                                             temptime.time().minute).zfill(2) +
-                                                                                 ":" + str(
-                                                                             temptime.time().second).zfill(2) +
-                                                                                 ":" + str(
-                                                                             temptime.time().microsecond).zfill(6),
-                                                                         "moveDuration": str(moveDuration),
-                                                                         "trackerLoc": "",
-                                                                         "trackerVec": ""})
-                                                oldLoc = self.intersect
-                                        else:
-                                            intersections[x] = 0
-                                    else:
-                                        intersections[x] = 0
+                                else:
+                                    intersections[x] = 0
+                                temptime = datetime.datetime.now()  # Temptime is start of next movement
 
                         #  NOTE - Secondary cursors are now never used but still exist just in case
                         x = 0  # This makes the ceiling always low priority and priority of walls is in clockwise order
+
                         if len(mouseLocations)!=0:
                             if mouseLocations[x][2]!=None:
                                 if mouseLocations[x][2][0]==1:  # If the cursor is on projector 1
                                     wall = self.projCanvasToWall(mouseLocations[x][2][0], mouseLocations[x][2][1])
+                                    if (mouseLocations[x][1] / self.upperProjectionProp[wall]) > 1:  # If mouse is in unprojectable area
+                                        mouseLocations[x] = (mouseLocations[x][0], self.upperProjectionProp[wall], mouseLocations[x][2])
+                                        xLoc = mouseLocations[x][0]
+                                        wallIndex = 0
+                                        if wall == "front":
+                                            wallIndex = 0
+                                        elif wall == "right":
+                                            wallIndex = 1
+                                        elif wall == "back":
+                                            wallIndex = 2
+                                        elif wall == "left":
+                                            wallIndex = 3
+                                        BL = self.planes[wallIndex][5]
+                                        BR = self.planes[wallIndex][4]
+                                        vec = BR - BL
+                                        corvec = vec * xLoc
+                                        loc = BL + corvec
+                                        curVec = loc - lastHeadLoc
                                     if wall != "floor" and mouseLocations[x][1] < self.upperProjectionProp[wall]:
                                         self.sender.hideCursor(2, self.curs[2])  # Hide cursors on other projector
                                         self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
@@ -1474,7 +1430,73 @@ class client:
                             self.state = 2
                             self.targetHit = False
                     elif self.state == 2:
-                        if self.targetHit:
+                        if self.unclickable:
+                            self.state = 0
+                            targetWall = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[1]
+                            recordedPath = self.currentPath
+                            self.currentPath = []
+                            self.incrementTrialNumForCond(CONDITION1, CONDITION2)
+                            if self.parallelTask:
+                                self.clickelapsedsecs = 0
+                            targetLocation = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)
+                            writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
+                                             'condition2': CONDITION2,  # Synchronous vs asychronous
+                                             'target_ini': self.TARGETINI,
+                                             'target_layout': self.currentLayout,
+                                             'no_distractors_long': self.targets[
+                                                 self.TARGETINI].getTargetCountLongSurface(),
+                                             'no_distractors_square': self.targets[
+                                                 self.TARGETINI].getTargetCountSquareSurface(),
+                                             'trial_num_cond': self.getTrialNumForCond(CONDITION1, CONDITION2),
+                                             'direct_dist': self.getDirectDists(self.currentLayout),
+                                             'angular_dist': self.getRotationalDists(self.currentLayout),
+                                             'surface_dist': self.getPlanarDists(self.currentLayout),
+                                             'trace_file': "trace_" + CONDITION1 + "_" + CONDITION2 + "_" +
+                                                           str(self.getTrialNumForCond(CONDITION1,
+                                                                                       CONDITION2)) + ".csv",
+                                             'trace_distance': "FAIL",
+                                             'trace_angular_distance': "FAIL",
+                                             'target_icon': self.targets[self.TARGETINI].getTargetIcon(
+                                                 self.currentLayout),
+                                             'target_location': self.targets[self.TARGETINI].getTargetLocationProp(
+                                                 self.currentLayout),
+                                             'front_icons_tall': self.targets[self.TARGETINI].getFrontIconsTall(),
+                                             'front_icons_wide': self.targets[self.TARGETINI].getFrontIconsWide(),
+                                             'back_icons_tall': self.targets[self.TARGETINI].getBackIconsTall(),
+                                             'back_icons_wide': self.targets[self.TARGETINI].getBackIconsWide(),
+                                             'left_icons_tall': self.targets[self.TARGETINI].getLeftIconsTall(),
+                                             'left_icons_wide': self.targets[self.TARGETINI].getLeftIconsWide(),
+                                             'right_icons_tall': self.targets[self.TARGETINI].getRightIconsTall(),
+                                             'right_icons_wide': self.targets[self.TARGETINI].getRightIconsWide(),
+                                             'ceiling_icons_tall': self.targets[self.TARGETINI].getCeilingIconsTall(),
+                                             'ceiling_icons_wide': self.targets[self.TARGETINI].getCeilingIconsWide(),
+                                             'icon_width': self.targets[self.TARGETINI].getTargetDimension(),
+                                             'key_click_time': "FAIL",
+                                             'key_click_date': "FAIL",
+                                             'target_click_time': "FAIL",
+                                             'target_click_date': "FAIL",
+                                             'head_coordinates': "FAIL",  # For perspective
+                                             'tracker_coordinates': "FAIL",  # For pointing
+                                             'finding_duration': "FAIL",  # For asynchronous
+                                             'moving_duration': "FAIL",
+                                             'max_mouse_angular_velocity': "FAIL",
+                                             'max_mouse_velocity': "FAIL",
+                                             'no_walls_passed': "FAIL",
+                                             'no_walls_needed': "FAIL"})
+                            # self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
+                            self.clearTargetLayout()
+                            pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
+                                                                                                 recordedPath,
+                                                                                                 order[orderIndex - 1][
+                                                                                                     'number']]))
+                            pathWriteThread.start()
+                            writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
+                            self.alreadyPassed = ['front']
+                            orderIndex += 1
+                            print "Skipped"
+
+                            self.unclickable = False
+                        elif self.targetHit:
                             self.state = 0
                             self.targetClickTime = datetime.datetime.now()
                             targetWall = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[1]
@@ -1547,7 +1569,6 @@ class client:
                             self.clearTargetLayout()
                             removalCount = self.testPath(recordedPath)
                             if removalCount > 6:  # Likely problematic readings
-                                print "Need to redo layout (count = " + str(removalCount) + ")"
                                 index = 0
                                 found = False
                                 for x in range(orderIndex + 1, len(order)):  # Loop through the remaining tasks
@@ -1561,15 +1582,12 @@ class client:
                                 if index == len(order):
                                     order.append(order[orderIndex-1])
                                     order[len(order)-1]['switch'] = 'no'
-                                    print "REAPPENDING AT END"
                                 else:
                                     order.insert(index-1, order[orderIndex-1])
                                     order[index-1]['switch'] = 'no'
-                                    print "REAPPENDING AT " + str(index - 1)
-                            print "----------------------------------------------"
                             pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
                                                                                                 recordedPath,
-                                                                                                 order[orderIndex-1]['number']]))
+                                                                                                 order[orderIndex-1]['layout']]))
                             pathWriteThread.start()
                             writer = csv.DictWriter(trialDetailsCSV, fieldnames=fieldnames)
                             self.alreadyPassed = ['front']

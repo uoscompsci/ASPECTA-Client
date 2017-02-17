@@ -84,7 +84,7 @@ class generator():
         for x in range(0, len(self.availableImages)):
             self.availableImages[x] = self.availableImages[x]
         self.numberOfImages = len(self.availableImages)
-        fo = open("targets.ini", "wb")
+        fo = open("targets_OLD.ini", "wb")
         fo.write("[configuration]\n")
         fo.write("CEILING_WIDE=" + str(self.CEILING_WIDE) + "\n")
         fo.write("CEILING_TALL=" + str(self.CEILING_TALL) + "\n")

@@ -1,12 +1,13 @@
-from Tkinter import *
-from messageSender import *
+import datetime
 import pygame
 import threading
 import time
-from pygame.locals import *
-import datetime
 import tkMessageBox
+from Tkinter import *
+from pygame.locals import *
 import tkSimpleDialog
+from messageSender import *
+
 
 class MyDialog(tkSimpleDialog.Dialog):
 	def body(self, master):
