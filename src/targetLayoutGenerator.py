@@ -75,7 +75,7 @@ class generator():
         xPick = randint(1, xWidth)
         yPick = randint(1, yWidth)
         if not isTarget:
-            while (xPick, yPick) in self.usedLocs or (xPick, yPick) in possibleTargets:
+            while (xPick, yPick) in self.usedLocs or (xPick, yPick) in possibleTargets or xPick == self.KEY_X and yPick == self.KEY_Y:
                 xPick = randint(1, xWidth)
                 yPick = randint(1, yWidth)
         else:
@@ -529,7 +529,6 @@ class generator():
             fo.write("\n\n")
             self.clearUsedLocs()
             self.clearUsedIcons()
-        print str(self.target_counter)
         fo.close()
 
 gen = generator()
