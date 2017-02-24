@@ -43,6 +43,7 @@ class client:
     AGE = 0
     GENDER = 'M'
     SEQUENCENO = 0
+    TEST = True
     FRONTCANVASPROJ = 2
     RIGHTCANVASPROJ = 1
     BACKCANVASPROJ = 1
@@ -85,6 +86,7 @@ class client:
     alreadyPassed = ["front"]
     doubleClickTime = datetime.datetime.now()
     unclickable = False
+    headBackup = scipy.array([])
 
 
     # Checks for mouse button and keyboard
@@ -247,13 +249,42 @@ class client:
     def getHeadAxes(self):
         data = self.getTrackerData()[1]
 
+        if math.isnan(data[2][0]):
+            print "Saving head tracker crash"
+            return self.headBackup
+
         #Retrieve the points on the trackers and place them in an array
         point1 = scipy.array([data[2][0], data[2][1], data[2][2]])
         point2 = scipy.array([data[3][0], data[3][1], data[3][2]])
         point3 = scipy.array([data[4][0], data[4][1], data[4][2]])
         point4 = scipy.array([data[5][0], data[5][1], data[5][2]])
         point5 = scipy.array([data[6][0], data[6][1], data[6][2]])
-        points = [point1, point2, point3, point4, point5]
+        point6 = scipy.array([data[7][0], data[7][1], data[7][2]])
+        points = [point1, point2, point3, point4, point5, point6]
+
+        averages = []
+        for x in range(0, len(points)):
+            temp = 0
+            for y in range(0, len(points)):
+                if x != y:
+                    temp += self.distBetweenPoints(points[x], points[y])
+            temp /= len(points)
+            averages.append(temp)
+
+        highestIndex = 0
+        highestValue = averages[0]
+
+        for x in range(1, len(averages)):
+            if averages[x]>highestValue:
+                highestValue = averages[x]
+                highestIndex = x
+
+        newPoints = []
+        for x in range(0, len(points)):
+            if x != highestIndex:
+                newPoints.append(points[x])
+
+        points = newPoints
 
         #Get the indexes of the closest two points in the array
         minlength = -1
@@ -313,7 +344,9 @@ class client:
         #Find the horizontal vector
         horizontalVec = self.normalizeVec(numpy.cross(upwardVec, forwardVec))
 
-        return headLoc, forwardVec, upwardVec, horizontalVec
+        self.headBackup = (headLoc, forwardVec, upwardVec, horizontalVec)
+
+        return self.headBackup
 
     # Returns vector after setting magnitude to 1
     def normalizeVec(self, vec):
@@ -376,6 +409,8 @@ class client:
             trackerLoc = recordedPath[x]["trackerLoc"]
             trackerLoc = trackerLoc[1:-1]
             trackerLoc = trackerLoc.split(" ")
+            if recordedPath[x]["trackerLoc"] == "":
+                trackerLoc = [0, 0, 0]
             trackerLoc[0] = float(trackerLoc[0])  # TODO COULD NOT CONVERT STRING TO FLOAT PERSP
             trackerLoc[1] = float(trackerLoc[1])
             trackerLoc[2] = float(trackerLoc[2])
@@ -799,6 +834,42 @@ class client:
         x, y = self.targets[self.TARGETINI].getTargetKeyLocationProp()
         targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
         self.border = (projector, self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1)), canvas)
+
+    def screenFlash(self):
+        projectorR, canvasR = self.wallToProjCanvas("right")
+        projectorF, canvasF = self.wallToProjCanvas("front")
+        projectorB, canvasB = self.wallToProjCanvas("back")
+        projectorL, canvasL = self.wallToProjCanvas("left")
+        projectorC, canvasC = self.wallToProjCanvas("ceiling")
+        front = self.sender.newRectangle(projectorF, canvasF, 0, 1, 1, 1, "prop", (1, 0, 0, 1), 1, (1, 0, 0, 1))
+        back = self.sender.newRectangle(projectorB, canvasB, 0, 1, 1, 1, "prop", (1, 0, 0, 1), 1, (1, 0, 0, 1))
+        left = self.sender.newRectangle(projectorL, canvasL, 0, 1, 1, 1, "prop", (1, 0, 0, 1), 1, (1, 0, 0, 1))
+        right = self.sender.newRectangle(projectorR, canvasR, 0, 1, 1, 1, "prop", (1, 0, 0, 1), 1, (1, 0, 0, 1))
+        ceiling = self.sender.newRectangle(projectorC, canvasC, 0, 1, 1, 1, "prop", (1, 0, 0, 1), 1, (1, 0, 0, 1))
+        self.sender.hideElement(projectorF, front)
+        self.sender.hideElement(projectorB, back)
+        self.sender.hideElement(projectorL, left)
+        self.sender.hideElement(projectorR, right)
+        self.sender.hideElement(projectorC, ceiling)
+        for x in range(0,3):
+            self.sender.showElement(projectorF, front)
+            self.sender.showElement(projectorB, back)
+            self.sender.showElement(projectorL, left)
+            self.sender.showElement(projectorR, right)
+            self.sender.showElement(projectorC, ceiling)
+            time.sleep(1)
+            self.sender.hideElement(projectorF, front)
+            self.sender.hideElement(projectorB, back)
+            self.sender.hideElement(projectorL, left)
+            self.sender.hideElement(projectorR, right)
+            self.sender.hideElement(projectorC, ceiling)
+            time.sleep(1)
+        self.sender.removeElement(projectorF, front, canvasF)
+        self.sender.removeElement(projectorB, back, canvasB)
+        self.sender.removeElement(projectorL, left, canvasL)
+        self.sender.removeElement(projectorR, right, canvasR)
+        self.sender.removeElement(projectorC, ceiling, canvasC)
+
 
     def drawKeyLayoutBorder(self, layoutNo):
         self.drawKeyBorder("front", layoutNo)
@@ -1243,7 +1314,10 @@ class client:
         self.targets = {}
         order = []
         foundLayouts = []
-        with open("order1.csv", "rb") as f:
+        orderFile = "order1.csv"
+        if self.TEST:
+            orderFile = "testOrder.csv"
+        with open(orderFile, "rb") as f:
             records = csv.DictReader(f)
             for row in records:
                 order.append(row)
@@ -1393,6 +1467,9 @@ class client:
 
                     # Run experimental process
                     if self.state == 0:
+                        if (order[orderIndex-1]['switch']) == "yes":
+                            screenFlashThread = threading.Thread(target=self.screenFlash, args=([]))
+                            screenFlashThread.start()
                         self.drawKeyLayoutBorder(self.currentLayout)
                         if not self.parallelTask:  # If asynchronous
                             self.state = 0.25
