@@ -39,11 +39,13 @@ class MyDialog(tkSimpleDialog.Dialog):
 
 class client:
     __slots__ = ['ppe']
+
     USERNO = 0
     AGE = 0
     GENDER = 'M'
+
     SEQUENCENO = 0
-    TEST = True
+    TEST = False
     FRONTCANVASPROJ = 2
     RIGHTCANVASPROJ = 1
     BACKCANVASPROJ = 1
@@ -831,7 +833,7 @@ class client:
     def drawKeyBorder(self, wall, layout):
         projector, canvas = self.wallToProjCanvas(wall)
         targetDim = self.targets[self.TARGETINI].getTargetDimensionProp(wall)
-        x, y = self.targets[self.TARGETINI].getTargetKeyLocationProp()
+        x, y = 0.5, 0.5
         targetDim = [targetDim[0]/75*100, targetDim[1]/75*100]
         self.border = (projector, self.sender.newRectangle(projector, canvas, x - (targetDim[0]/2), y + (targetDim[1]/2), targetDim[0], targetDim[1], "prop", (1, 0, 0, 1), 5, (0, 0, 0, 1)), canvas)
 
@@ -876,8 +878,7 @@ class client:
 
     def drawKeyLayout(self, layoutNo):
         targetIcon = self.targets[self.TARGETINI].getTargetIcon(layoutNo)
-        keyLocation = self.targets[self.TARGETINI].getTargetKeyLocationProp()
-        self.drawTarget("front", keyLocation[0], keyLocation[1], targetIcon)
+        self.drawTarget("front", 0.5, 0.5, targetIcon)
 
     def drawTargetLayout(self, layoutNo):
         for x in range(0, self.targets[self.TARGETINI].getTargetCountSquareSurface()):
@@ -924,7 +925,7 @@ class client:
         mouseCanvas = self.surfaceToCanvas[(self.mouseProjector, self.mouseSurface)]
         wallName = self.projCanvasToWall(self.mouseProjector, mouseCanvas[1]).lower()
         if wallName.lower() == "front":
-            keyLocationProp = self.targets[self.TARGETINI].getTargetKeyLocationProp()
+            keyLocationProp = (0.5, 0.5)
             targetDim = self.targets[self.TARGETINI].getTargetDimensionProp("front")
             targetDim = targetDim[0]/75*100, targetDim[1]/75*100
             xLeftTarget = keyLocationProp[0] - (targetDim[0] / 2)
@@ -1748,7 +1749,7 @@ class Targets:
 
         # Get all the target locations from the targets.ini file
         self.targets = {}
-        for x in range(1,101):
+        for x in range(1,301):
             wall1Str = targetParser.get(str(x), 'wallF')
             wall2Str = targetParser.get(str(x), 'wallB')
             wall3Str = targetParser.get(str(x), 'wallL')
