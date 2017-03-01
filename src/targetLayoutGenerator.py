@@ -16,7 +16,7 @@ class generator():
     LEFT_TALL = 6
 
     RIGHT_WIDE = 10
-    RIGHT_TALL = 4
+    RIGHT_TALL = 6
 
     TARGET_COUNT_LONG_SURFACE = 8
     TARGET_COUNT_SQUARE_SURFACE = 4
@@ -24,9 +24,9 @@ class generator():
     KEY_Y = 2
 
     POSSIBLE_C = [(4, 8), (5, 5), (2, 4), (4, 7), (3, 6)]
-    POSSIBLE_L = [(5, 3), (8, 2), (3, 3), (5, 4), (9, 2)]
-    POSSIBLE_R = [(4, 3), (6, 2), (2, 3), (5, 2), (3, 3)]
-    POSSIBLE_F = [(4, 3), (2, 5), (4, 2), (3, 4), (5, 3)]
+    POSSIBLE_L = [(3, 2), (4, 4), (6, 4), (7, 3), (8, 5)]
+    POSSIBLE_R = [(3, 5), (4, 3), (5, 4), (7, 4), (8, 2)]
+    POSSIBLE_F = [(2, 3), (2, 5), (4, 2), (3, 5), (5, 3)]
     POSSIBLE_B = [(2, 5), (4, 3), (3, 4), (4, 4), (5, 5)]
 
     target_counter = {}
@@ -74,8 +74,9 @@ class generator():
             yWidth = self.CEILING_TALL
         xPick = randint(1, xWidth)
         yPick = randint(1, yWidth)
+        keyBlocked = [(3, 3), (3, 4), (4, 3), (4, 4)]
         if not isTarget:
-            while (xPick, yPick) in self.usedLocs or (xPick, yPick) in possibleTargets or xPick == self.KEY_X and yPick == self.KEY_Y:
+            while (xPick, yPick) in self.usedLocs or (xPick, yPick) in possibleTargets or wall == "front" and (xPick, yPick) in keyBlocked:
                 xPick = randint(1, xWidth)
                 yPick = randint(1, yWidth)
         else:
