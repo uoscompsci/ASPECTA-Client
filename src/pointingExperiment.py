@@ -45,7 +45,7 @@ class client:
     GENDER = 'M'
 
     SEQUENCENO = 0
-    TEST = False
+    TEST = True
     FRONTCANVASPROJ = 2
     RIGHTCANVASPROJ = 1
     BACKCANVASPROJ = 1
@@ -89,7 +89,71 @@ class client:
     doubleClickTime = datetime.datetime.now()
     unclickable = False
     headBackup = scipy.array([])
+    cursorQueue = []
+    trailCursors = {1: {}, 2: {}}
 
+
+    def enqueueCursor(self, x, y, wall, projector):
+        if len(self.cursorQueue) == 0:
+            self.cursorQueue.append((x, y, wall, projector))
+        elif len(self.cursorQueue) == 1:
+            self.cursorQueue.append(self.cursorQueue[0])
+            self.cursorQueue[0] = (x, y, wall, projector)
+        elif len(self.cursorQueue) == 2:
+            self.cursorQueue.append(self.cursorQueue[1])
+            self.cursorQueue[1] = self.cursorQueue[0]
+            self.cursorQueue[0] = (x, y, wall, projector)
+        elif len(self.cursorQueue) == 3:
+            self.cursorQueue.append(self.cursorQueue[2])
+            self.cursorQueue[2] = self.cursorQueue[1]
+            self.cursorQueue[1] = self.cursorQueue[0]
+            self.cursorQueue[0] = (x, y, wall, projector)
+        elif len(self.cursorQueue) == 4:
+            self.cursorQueue[3] = self.cursorQueue[2]
+            self.cursorQueue[2] = self.cursorQueue[1]
+            self.cursorQueue[1] = self.cursorQueue[0]
+            self.cursorQueue[0] = (x, y, wall, projector)
+
+        if len(self.cursorQueue) == 1:
+            c1 = self.cursorQueue[0]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 2, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 3, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
+        elif len(self.cursorQueue) == 2:
+            c1 = self.cursorQueue[0]
+            c2 = self.cursorQueue[1]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
+            self.moveCursorGhost(c1[3], 3, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
+        elif len(self.cursorQueue) == 3:
+            c1 = self.cursorQueue[0]
+            c2 = self.cursorQueue[1]
+            c3 = self.cursorQueue[2]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
+            self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
+            self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
+        elif len(self.cursorQueue) == 4:
+            c1 = self.cursorQueue[0]
+            c2 = self.cursorQueue[1]
+            c3 = self.cursorQueue[2]
+            c4 = self.cursorQueue[3]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
+            self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
+            self.moveCursorGhost(c4[3], 4, c4[0], c4[1], "prop", c4[2])  # C4
+
+    def moveCursorGhost(self, projector, trailCursorNo, x, y, coorSys, wall):
+        if projector==1:
+            self.sender.hideCursor(2, self.trailCursors[2][trailCursorNo])
+            self.sender.showCursor(1, self.trailCursors[1][trailCursorNo])
+            self.sender.relocateCursor(1, self.trailCursors[1][trailCursorNo], x, y, coorSys, wall)
+        else:
+            self.sender.hideCursor(1, self.trailCursors[1][trailCursorNo])
+            self.sender.showCursor(2, self.trailCursors[2][trailCursorNo])
+            self.sender.relocateCursor(2, self.trailCursors[2][trailCursorNo], x, y, coorSys, wall)
 
     # Checks for mouse button and keyboard
     def getInput(self, get_point):
@@ -127,16 +191,20 @@ class client:
                         elapsedSecs = (lClickRelTime - self.lClickTime).total_seconds()  # Checks how long the button was depressed
                         if (elapsedSecs < 0.5):
                             if self.state == 0.25:
-                                self.isKeyHit()
-                                self.confirmClick = True
+                                if self.isKeyHit():
+                                    self.confirmClick = True
                             if self.state == 0.5:
                                 self.foundClick = True
+                                pygame.mixer.music.load("found.wav")
+                                pygame.mixer.music.play()
                             if self.state == 1:
                                 if self.isKeyHit():
                                     self.keyHit = True
                             if self.state == 2:
                                 if self.isTargetHit(self.currentLayout):
                                     self.targetHit = True
+                                    pygame.mixer.music.load("correct.wav")
+                                    pygame.mixer.music.play()
                         else:
                             pass
                     # Runs if the middle mouse button has been released
@@ -162,6 +230,8 @@ class client:
                                 clickGap = (self.doubleClickTime-backupDoubleClickTime).total_seconds()
                                 if(clickGap < 1):
                                     self.unclickable = True
+                                    pygame.mixer.music.load("error.wav")
+                                    pygame.mixer.music.play()
                             pass
                         else:
                             pass
@@ -243,7 +313,7 @@ class client:
         return out
 
     def distToAngle(self, dist):
-        return dist*0.1
+        return dist*0.05
 
     def distBetweenPoints(self, point1, point2):
         return sqrt(pow((point1[0]-point2[0]),2) + pow((point1[1]-point2[1]),2) + pow((point1[2]-point2[2]),2))
@@ -252,7 +322,6 @@ class client:
         data = self.getTrackerData()[1]
 
         if math.isnan(data[2][0]):
-            print "Saving head tracker crash"
             return self.headBackup
 
         #Retrieve the points on the trackers and place them in an array
@@ -1173,6 +1242,26 @@ class client:
         self.curs.append(self.sender.newCursor(2, 1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(2, self.curs[1])
 
+        self.trailCursors[1][4] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(1, self.trailCursors[1][4])
+        self.trailCursors[2][4] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(2, self.trailCursors[2][4])
+
+        self.trailCursors[1][3] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(1, self.trailCursors[1][3])
+        self.trailCursors[2][3] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(2, self.trailCursors[2][3])
+
+        self.trailCursors[1][2] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(1, self.trailCursors[1][2])
+        self.trailCursors[2][2] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(2, self.trailCursors[2][2])
+
+        self.trailCursors[1][1] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(1, self.trailCursors[1][1])
+        self.trailCursors[2][1] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.hideCursor(2, self.trailCursors[2][1])
+
     def wallToProjCanvas(self, wall):
         for x in range(0, len(self.wallCanvases)):
             if self.sender.getCanvasName(self.wallCanvases[x][0], self.wallCanvases[x][1]) == wall.lower():
@@ -1493,8 +1582,13 @@ class client:
                         if self.foundClick:  # If the key is clicked to say the target has been found
                             clicktime = datetime.datetime.now()
                             self.clickelapsedsecs = (clicktime - self.findTimer)  # Save the finding elapsed time
-                            self.state = 1
-                            self.keyHit = False
+                            self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
+                            self.keyClickTime = datetime.datetime.now()
+                            self.currentPath = []
+                            self.passedSurfaces = 0
+                            self.currentSurface = 'front'
+                            self.state = 2
+                            self.targetHit = False
                             # Proceed to 1
                     elif self.state == 1:
                         if self.keyHit:
@@ -1749,7 +1843,7 @@ class Targets:
 
         # Get all the target locations from the targets.ini file
         self.targets = {}
-        for x in range(1,301):
+        for x in range(1,241):
             wall1Str = targetParser.get(str(x), 'wallF')
             wall2Str = targetParser.get(str(x), 'wallB')
             wall3Str = targetParser.get(str(x), 'wallL')
