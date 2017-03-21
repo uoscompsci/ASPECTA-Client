@@ -23,11 +23,11 @@ class generator():
     KEY_X = 2
     KEY_Y = 2
 
-    POSSIBLE_C = [(4, 8), (5, 5), (2, 4), (4, 7), (3, 6)]
-    POSSIBLE_L = [(3, 2), (4, 4), (6, 4), (7, 3), (8, 5)]
-    POSSIBLE_R = [(3, 5), (4, 3), (5, 4), (7, 4), (8, 2)]
-    POSSIBLE_F = [(2, 3), (2, 5), (4, 2), (3, 5), (5, 3)]
-    POSSIBLE_B = [(2, 5), (4, 3), (3, 4), (4, 4), (5, 5)]
+    POSSIBLE_C = [(4, 8), (5, 5), (2, 4), (3, 6)]
+    POSSIBLE_L = [(3, 2), (4, 4), (7, 3), (8, 5)]
+    POSSIBLE_R = [(3, 5), (4, 3), (7, 4), (8, 2)]
+    POSSIBLE_F = [(2, 3), (4, 2), (3, 5), (5, 3)]
+    POSSIBLE_B = [(2, 5), (4, 3), (3, 4), (5, 5)]
 
     target_counter = {}
     targetWall = ""
@@ -159,7 +159,7 @@ class generator():
 
         synchronous = True
         pointing = True
-        for w in range(0, 75):
+        for w in range(0, 60):
             fo.write("[" + str(w+1) + "]\n")
             self.getXYandIcon("ceiling", True, synchronous, pointing)
             targetx = self.x
@@ -251,7 +251,7 @@ class generator():
             self.clearUsedLocs()
             self.clearUsedIcons()
 
-        for w in range(75, 150):
+        for w in range(60, 120):
             synchronous = False
             fo.write("[" + str(w+1) + "]\n")
             self.getXYandIcon("ceiling", True, synchronous, pointing)
@@ -344,7 +344,7 @@ class generator():
             self.clearUsedLocs()
             self.clearUsedIcons()
 
-        for w in range(150, 225):
+        for w in range(120, 180):
             synchronous = True
             pointing = False
             fo.write("[" + str(w+1) + "]\n")
@@ -438,7 +438,7 @@ class generator():
             self.clearUsedLocs()
             self.clearUsedIcons()
 
-        for w in range(225, 300):
+        for w in range(180, 240):
             synchronous = False
             fo.write("[" + str(w+1) + "]\n")
             self.getXYandIcon("ceiling", True, synchronous, pointing)
