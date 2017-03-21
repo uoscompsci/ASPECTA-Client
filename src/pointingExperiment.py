@@ -109,37 +109,45 @@ class client:
             self.cursorQueue[1] = self.cursorQueue[0]
             self.cursorQueue[0] = (x, y, wall, projector)
         elif len(self.cursorQueue) == 4:
+            self.cursorQueue.append(self.cursorQueue[3])
+            self.cursorQueue[3] = self.cursorQueue[2]
+            self.cursorQueue[2] = self.cursorQueue[1]
+            self.cursorQueue[1] = self.cursorQueue[0]
+            self.cursorQueue[0] = (x, y, wall, projector)
+        elif len(self.cursorQueue) == 5:
+            self.cursorQueue[4] = self.cursorQueue[3]
             self.cursorQueue[3] = self.cursorQueue[2]
             self.cursorQueue[2] = self.cursorQueue[1]
             self.cursorQueue[1] = self.cursorQueue[0]
             self.cursorQueue[0] = (x, y, wall, projector)
 
-        if len(self.cursorQueue) == 1:
-            c1 = self.cursorQueue[0]
+
+        if len(self.cursorQueue) == 2:
+            c1 = self.cursorQueue[1]
             self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c1[3], 2, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c1[3], 3, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
-        elif len(self.cursorQueue) == 2:
-            c1 = self.cursorQueue[0]
-            c2 = self.cursorQueue[1]
+        elif len(self.cursorQueue) == 3:
+            c1 = self.cursorQueue[1]
+            c2 = self.cursorQueue[2]
             self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
             self.moveCursorGhost(c1[3], 3, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
-        elif len(self.cursorQueue) == 3:
-            c1 = self.cursorQueue[0]
-            c2 = self.cursorQueue[1]
-            c3 = self.cursorQueue[2]
+        elif len(self.cursorQueue) == 4:
+            c1 = self.cursorQueue[1]
+            c2 = self.cursorQueue[2]
+            c3 = self.cursorQueue[3]
             self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
             self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
             self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
-        elif len(self.cursorQueue) == 4:
-            c1 = self.cursorQueue[0]
-            c2 = self.cursorQueue[1]
-            c3 = self.cursorQueue[2]
-            c4 = self.cursorQueue[3]
+        elif len(self.cursorQueue) == 5:
+            c1 = self.cursorQueue[1]
+            c2 = self.cursorQueue[2]
+            c3 = self.cursorQueue[3]
+            c4 = self.cursorQueue[4]
             self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
             self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
             self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
@@ -148,12 +156,12 @@ class client:
     def moveCursorGhost(self, projector, trailCursorNo, x, y, coorSys, wall):
         if projector==1:
             self.sender.hideCursor(2, self.trailCursors[2][trailCursorNo])
-            self.sender.showCursor(1, self.trailCursors[1][trailCursorNo])
             self.sender.relocateCursor(1, self.trailCursors[1][trailCursorNo], x, y, coorSys, wall)
+            self.sender.showCursor(1, self.trailCursors[1][trailCursorNo])
         else:
             self.sender.hideCursor(1, self.trailCursors[1][trailCursorNo])
-            self.sender.showCursor(2, self.trailCursors[2][trailCursorNo])
             self.sender.relocateCursor(2, self.trailCursors[2][trailCursorNo], x, y, coorSys, wall)
+            self.sender.showCursor(2, self.trailCursors[2][trailCursorNo])
 
     # Checks for mouse button and keyboard
     def getInput(self, get_point):
@@ -647,6 +655,7 @@ class client:
                                         self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
                                         self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
                                         self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                        self.enqueueCursor(mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall],self.curs[0 + x], 1)
                                         self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
                                         self.mouseProjector = 1
                                         self.mouseSurface = mouseLocations[x][2][1]
@@ -663,6 +672,7 @@ class client:
                                         self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
                                         self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
                                         self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                        self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], self.curs[2 + x], 2)
                                         self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
                                         self.mouseProjector = 2
                                         self.mouseSurface = mouseLocations[x][2][1]
@@ -769,6 +779,7 @@ class client:
                                     self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
                                     self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
                                     self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                    self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], self.curs[0 + x], 1)
                                     self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
                                     self.mouseProjector = 1
                                     self.mouseSurface = mouseLocations[x][2][1]
@@ -785,6 +796,7 @@ class client:
                                     self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
                                     self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
                                     self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
+                                    self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], self.curs[2 + x], 2)
                                     self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
                                     self.mouseProjector = 2
                                     self.mouseSurface = mouseLocations[x][2][1]
