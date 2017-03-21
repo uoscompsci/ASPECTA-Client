@@ -805,6 +805,16 @@ class messageSender:
                                            'cursorNo': str(cursorNo)})
         return [loc["x"], loc["y"]]
 
+    def getCursorOpacity(self, projector, cursorNo):
+        opacity = self.sendMessage(projector, {'call': 'get_cursor_opacity',
+                                               'cursorNo': str(cursorNo)})
+        return float(opacity)
+
+    def setCursorOpacity(self, projector, cursorNo, opacity):
+        self.sendMessage(projector, {'call': 'set_cursor_opacity',
+                                     'cursorNo': str(cursorNo),
+                                     'opacity': str(opacity)})
+
     def rotateCursorClockwise(self, projector, cursorNo, degrees):
         self.sendMessage(projector, {'call': 'rotate_cursor_clockwise',
                                      'cursorNo': str(cursorNo),
