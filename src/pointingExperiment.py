@@ -91,6 +91,8 @@ class client:
     headBackup = scipy.array([])
     cursorQueue = []
     trailCursors = {1: {}, 2: {}}
+    cumulativeDist = 0
+    cumulativeAngle = 0
 
 
     def enqueueCursor(self, x, y, wall, projector):
@@ -603,10 +605,14 @@ class client:
                                         degreesPerSecond = 0
                                         distanceUnitsPerSecond = 0
                                         if isWallChange:
+                                            self.cumulativeDist += self.distBetweenPoints(self.intersect, oldLoc)
+                                            self.cumulativeAngle += self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)
                                             oldLoc = self.intersect;
                                         if not isWallChange and moveDuration != 0:
                                             distance = self.distBetweenPoints(self.intersect, oldLoc)
+                                            self.cumulativeDist += distance
                                             angle = self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
+                                            self.cumulativeAngle += angle
                                             degreesPerSecond = angle / moveDuration
                                             distanceUnitsPerSecond = distance / moveDuration
                                         self.currentPath.append({"userLoc": lastHeadLoc, "startPoint": oldLoc,
@@ -619,7 +625,9 @@ class client:
                                                                          ":" + str(temptime.time().microsecond).zfill(6),
                                                                  "moveDuration": str(moveDuration),
                                                                  "trackerLoc": "",
-                                                                 "trackerVec": ""})
+                                                                 "trackerVec": "",
+                                                                 "cumulative_dist": "",
+                                                                 "cumulative_angle": ""})
                                         oldLoc = self.intersect
                                 else:
                                     intersections[x] = 0
@@ -655,7 +663,7 @@ class client:
                                         self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
                                         self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
                                         self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                        self.enqueueCursor(mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall],self.curs[0 + x], 1)
+                                        self.enqueueCursor(mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], mouseLocations[x][2][1], 1)
                                         self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
                                         self.mouseProjector = 1
                                         self.mouseSurface = mouseLocations[x][2][1]
@@ -672,7 +680,7 @@ class client:
                                         self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
                                         self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
                                         self.sender.relocateCursor(2, self.curs[2+x], mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                        self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], self.curs[2 + x], 2)
+                                        self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], mouseLocations[x][2][1], 2)
                                         self.mouseLocationProp = (mouseLocations[x][0], 1.0-mouseLocations[x][1]/self.upperProjectionProp[wall])
                                         self.mouseProjector = 2
                                         self.mouseSurface = mouseLocations[x][2][1]
@@ -742,10 +750,14 @@ class client:
                                     degreesPerSecond = 0
                                     distanceUnitsPerSecond = 0
                                     if isWallChange:
+                                        self.cumulativeDist += self.distBetweenPoints(self.intersect, oldLoc)
+                                        self.cumulativeAngle += self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)
                                         oldLoc = self.intersect;
                                     if not isWallChange and moveDuration != 0:
                                         distance = self.distBetweenPoints(self.intersect, oldLoc)
+                                        self.cumulativeDistance += distance
                                         angle = self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
+                                        self.cumulativeAngle += angle
                                         degreesPerSecond = angle / moveDuration
                                         distanceUnitsPerSecond = distance / moveDuration
                                     segCheck2Print = str(segCheck2)
@@ -763,7 +775,9 @@ class client:
                                                                      ":" + str(temptime.time().microsecond).zfill(6),
                                                              "moveDuration": str(moveDuration),
                                                              "trackerLoc": str(segCheck2Print),
-                                                             "trackerVec": str(segCheck3Print)})
+                                                             "trackerVec": str(segCheck3Print),
+                                                             "cumulative_dist": str(self.cumulativeDist),
+                                                             "cumulative_angle": str(self.cumulativeAngle)})
                                     oldLoc = self.intersect
                             else:
                                 intersections[x] = 0
@@ -779,7 +793,7 @@ class client:
                                     self.sender.hideCursor(2, self.curs[3])  # Hide cursors on other projector
                                     self.sender.hideCursor(1, self.curs[1])  # Hide other cursor on current projector
                                     self.sender.relocateCursor(1, self.curs[0 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                    self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], self.curs[0 + x], 1)
+                                    self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], mouseLocations[x][2][1], 1)
                                     self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
                                     self.mouseProjector = 1
                                     self.mouseSurface = mouseLocations[x][2][1]
@@ -796,7 +810,7 @@ class client:
                                     self.sender.hideCursor(1, self.curs[1])  # Hide cursors on other projector
                                     self.sender.hideCursor(2, self.curs[3])  # Hide other cursor on current projector
                                     self.sender.relocateCursor(2, self.curs[2 + x], mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall], "prop", mouseLocations[x][2][1])
-                                    self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], self.curs[2 + x], 2)
+                                    self.enqueueCursor(mouseLocations[x][0], 1.0 - mouseLocations[x][1] / self.upperProjectionProp[wall], mouseLocations[x][2][1], 2)
                                     self.mouseLocationProp = (mouseLocations[x][0], 1.0 - mouseLocations[x][1]/self.upperProjectionProp[wall])
                                     self.mouseProjector = 2
                                     self.mouseSurface = mouseLocations[x][2][1]
@@ -1255,23 +1269,31 @@ class client:
         self.sender.hideCursor(2, self.curs[1])
 
         self.trailCursors[1][4] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][4], 0.6)
         self.sender.hideCursor(1, self.trailCursors[1][4])
         self.trailCursors[2][4] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][4], 0.6)
         self.sender.hideCursor(2, self.trailCursors[2][4])
 
         self.trailCursors[1][3] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][3], 0.7)
         self.sender.hideCursor(1, self.trailCursors[1][3])
         self.trailCursors[2][3] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][3], 0.7)
         self.sender.hideCursor(2, self.trailCursors[2][3])
 
         self.trailCursors[1][2] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][2], 0.8)
         self.sender.hideCursor(1, self.trailCursors[1][2])
         self.trailCursors[2][2] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][2], 0.8)
         self.sender.hideCursor(2, self.trailCursors[2][2])
 
         self.trailCursors[1][1] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][1], 0.9)
         self.sender.hideCursor(1, self.trailCursors[1][1])
         self.trailCursors[2][1] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][1], 0.9)
         self.sender.hideCursor(2, self.trailCursors[2][1])
 
     def wallToProjCanvas(self, wall):
@@ -1593,7 +1615,7 @@ class client:
                     elif self.state == 0.5:
                         if self.foundClick:  # If the key is clicked to say the target has been found
                             clicktime = datetime.datetime.now()
-                            self.clickelapsedsecs = (clicktime - self.findTimer)  # Save the finding elapsed time
+                            self.clickelapsedsecs = (clicktime - self.findTimer).total_seconds()  # Save the finding elapsed time
                             self.sender.setRectangleLineColor(self.border[0], self.border[1], (0, 1, 0, 1))
                             self.keyClickTime = datetime.datetime.now()
                             self.currentPath = []
@@ -1669,6 +1691,8 @@ class client:
                                              'no_walls_needed': "FAIL"})
                             # self.incrementTrialNumCond(self.CONDITION1, self.CONDITION2)
                             self.clearTargetLayout()
+                            self.cumulativeDist = 0
+                            self.cumulativeAngle = 0
                             pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
                                                                                                  recordedPath,
                                                                                                  order[orderIndex - 1][
@@ -1769,6 +1793,8 @@ class client:
                                 else:
                                     order.insert(index-1, order[orderIndex-1])
                                     order[index-1]['switch'] = 'no'
+                            self.cumulativeDist = 0
+                            self.cumulativeAngle = 0
                             pathWriteThread = threading.Thread(target=self.writePathFile, args=([CONDITION1, CONDITION2,
                                                                                                 recordedPath,
                                                                                                  order[orderIndex-1]['layout']]))
@@ -1799,7 +1825,9 @@ class client:
                                 str(recordedPath[index]["velocity"]) + "," +
                                 str(recordedPath[index]["time"]) + "," +
                                 str(recordedPath[index]["trackerLoc"]) + "," +
-                                str(recordedPath[index]["trackerVec"]) + "\n")
+                                str(recordedPath[index]["trackerVec"]) + "," +
+                                str(recordedPath[index]["cumulative_dist"]) + "," +
+                                str(recordedPath[index]["cumulative_angle"]) + "\n")
         print "Wrote path file \"results/" + str(self.USERNO) + "_trace_" + CONDITION1 + "_" + CONDITION2 + "_" + str(self.getTrialNumForCond(CONDITION1, CONDITION2)) + ".csv\""
 
     def incrementTrialNumForCond(self, condition1, condition2):
@@ -1922,7 +1950,7 @@ class Targets:
         gridLoc = self.getTargetKeyLocation()
         locationX = (self.targetAreaFWide*gridLoc[0])-(self.targetAreaFWide/2)
         locationY = (self.targetAreaFTall*gridLoc[1])-(self.targetAreaFTall/2)
-        return locationX, locationY
+        return 0.5, 0.5
 
     def getTargetIcon(self, layout):
         return self.targets[layout]['target']
