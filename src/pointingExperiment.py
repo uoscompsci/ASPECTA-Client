@@ -1700,7 +1700,7 @@ class client:
                             if self.parallelTask:
                                 self.clickelapsedsecs = 0
                             targetLocation = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)
-                            wrPlot combined histograms in Riter.writerow({'condition1': CONDITION1,  # pointing vs perspective
+                            writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
                                              'target_layout': self.currentLayout,
