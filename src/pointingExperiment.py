@@ -45,7 +45,7 @@ class client:
     GENDER = 'M'
 
     SEQUENCENO = 0
-    TEST = True
+    TEST = False
     FRONTCANVASPROJ = 2
     RIGHTCANVASPROJ = 1
     BACKCANVASPROJ = 1
@@ -165,6 +165,54 @@ class client:
             self.sender.relocateCursor(2, self.trailCursors[2][trailCursorNo], x, y, coorSys, wall)
             self.sender.showCursor(2, self.trailCursors[2][trailCursorNo])
 
+    def padCursorTrail(self):
+        if len(self.cursorQueue)==5:
+            self.cursorQueue[4] = self.cursorQueue[3]
+            self.cursorQueue[3] = self.cursorQueue[2]
+            self.cursorQueue[2] = self.cursorQueue[1]
+            self.cursorQueue[1] = self.cursorQueue[0]
+        elif len(self.cursorQueue)==4:
+            self.cursorQueue[3] = self.cursorQueue[2]
+            self.cursorQueue[2] = self.cursorQueue[1]
+            self.cursorQueue[1] = self.cursorQueue[0]
+        elif len(self.cursorQueue)==3:
+            self.cursorQueue[2] = self.cursorQueue[1]
+            self.cursorQueue[1] = self.cursorQueue[0]
+        elif len(self.cursorQueue)==2:
+            self.cursorQueue[1] = self.cursorQueue[0]
+
+        if len(self.cursorQueue) == 2:
+            c1 = self.cursorQueue[1]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 2, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 3, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
+        elif len(self.cursorQueue) == 3:
+            c1 = self.cursorQueue[1]
+            c2 = self.cursorQueue[2]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
+            self.moveCursorGhost(c1[3], 3, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
+        elif len(self.cursorQueue) == 4:
+            c1 = self.cursorQueue[1]
+            c2 = self.cursorQueue[2]
+            c3 = self.cursorQueue[3]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
+            self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
+            self.moveCursorGhost(c1[3], 4, c1[0], c1[1], "prop", c1[2])  # C1
+        elif len(self.cursorQueue) == 5:
+            c1 = self.cursorQueue[1]
+            c2 = self.cursorQueue[2]
+            c3 = self.cursorQueue[3]
+            c4 = self.cursorQueue[4]
+            self.moveCursorGhost(c1[3], 1, c1[0], c1[1], "prop", c1[2])  # C1
+            self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
+            self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
+            self.moveCursorGhost(c4[3], 4, c4[0], c4[1], "prop", c4[2])  # C4
+
+
     # Checks for mouse button and keyboard
     def getInput(self, get_point):
         pos = pygame.mouse.get_pos()  # mouse shift
@@ -204,12 +252,15 @@ class client:
                                 if self.isKeyHit():
                                     self.confirmClick = True
                             if self.state == 0.5:
-                                self.foundClick = True
-                                pygame.mixer.music.load("found.wav")
-                                pygame.mixer.music.play()
+                                if self.isKeyHit():
+                                    self.foundClick = True
+                                    pygame.mixer.music.load("found.wav")
+                                    pygame.mixer.music.play()
                             if self.state == 1:
                                 if self.isKeyHit():
                                     self.keyHit = True
+                                    pygame.mixer.music.load("found.wav")
+                                    pygame.mixer.music.play()
                             if self.state == 2:
                                 if self.isTargetHit(self.currentLayout):
                                     self.targetHit = True
@@ -695,6 +746,8 @@ class client:
                                 self.sender.hideCursor(2, self.curs[3])
                                 self.sender.hideCursor(1, self.curs[0])
                                 self.sender.hideCursor(1, self.curs[1])
+                    else:
+                        self.padCursorTrail()
                 else: # Runs if it is pointing that is to control the cursor
                     for x in range(0, len(self.planes)):  # Finds where the last intersect point was
                         segCheck = self.segmentPlane(self.planes[x], segCheck2, segCheck3)
@@ -755,7 +808,7 @@ class client:
                                         oldLoc = self.intersect;
                                     if not isWallChange and moveDuration != 0:
                                         distance = self.distBetweenPoints(self.intersect, oldLoc)
-                                        self.cumulativeDistance += distance
+                                        self.cumulativeDist += distance
                                         angle = self.angleBetweenVectors(self.intersect - lastHeadLoc, oldLoc - lastHeadLoc)  # TODO SHOULDN'T BE HEAD LOC?
                                         self.cumulativeAngle += angle
                                         degreesPerSecond = angle / moveDuration
@@ -1421,7 +1474,7 @@ class client:
         self.sender.login(self.username)
         self.sender.setapp("CursorApp")
         # self.sender.loadDefinedSurfaces("DEFAULT")
-        self.sender.loadDefinedSurfaces(2, "Test1WallReal")
+        self.sender.loadDefinedSurfaces(2, "Test1Wall")
         self.sender.loadDefinedSurfaces(1, "AllMinusFront")
         self.loadWallCoordinates('layout.csv')
         self.initGUI()
@@ -1538,6 +1591,8 @@ class client:
                           'trace_angular_distance',
                           'target_icon',
                           'target_location',
+                          'target_grid_loc',
+                          'target_wall',
                           'front_icons_tall',
                           'front_icons_wide',
                           'back_icons_tall',
@@ -1645,7 +1700,7 @@ class client:
                             if self.parallelTask:
                                 self.clickelapsedsecs = 0
                             targetLocation = self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)
-                            writer.writerow({'condition1': CONDITION1,  # pointing vs perspective
+                            wrPlot combined histograms in Riter.writerow({'condition1': CONDITION1,  # pointing vs perspective
                                              'condition2': CONDITION2,  # Synchronous vs asychronous
                                              'target_ini': self.TARGETINI,
                                              'target_layout': self.currentLayout,
@@ -1666,6 +1721,8 @@ class client:
                                                  self.currentLayout),
                                              'target_location': self.targets[self.TARGETINI].getTargetLocationProp(
                                                  self.currentLayout),
+                                             'target_grid_loc': self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[0],
+                                             'target_wall': self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[1],
                                              'front_icons_tall': self.targets[self.TARGETINI].getFrontIconsTall(),
                                              'front_icons_wide': self.targets[self.TARGETINI].getFrontIconsWide(),
                                              'back_icons_tall': self.targets[self.TARGETINI].getBackIconsTall(),
@@ -1740,6 +1797,8 @@ class client:
                                              'trace_angular_distance': str(self.pathAngle(recordedPath)),
                                              'target_icon': self.targets[self.TARGETINI].getTargetIcon(self.currentLayout),
                                              'target_location': self.targets[self.TARGETINI].getTargetLocationProp(self.currentLayout),
+                                             'target_grid_loc': self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[0],
+                                             'target_wall': self.targets[self.TARGETINI].getTargetLocation(self.currentLayout)[1],
                                              'front_icons_tall': self.targets[self.TARGETINI].getFrontIconsTall(),
                                              'front_icons_wide': self.targets[self.TARGETINI].getFrontIconsWide(),
                                              'back_icons_tall': self.targets[self.TARGETINI].getBackIconsTall(),
