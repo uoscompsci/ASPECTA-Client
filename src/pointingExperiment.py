@@ -93,35 +93,43 @@ class client:
     trailCursors = {1: {}, 2: {}}
     cumulativeDist = 0
     cumulativeAngle = 0
+    trailCount = 0
 
 
     def enqueueCursor(self, x, y, wall, projector):
         if len(self.cursorQueue) == 0:
             self.cursorQueue.append((x, y, wall, projector))
+            self.trailCount=1
         elif len(self.cursorQueue) == 1:
             self.cursorQueue.append(self.cursorQueue[0])
             self.cursorQueue[0] = (x, y, wall, projector)
+            self.trailCount=2
         elif len(self.cursorQueue) == 2:
             self.cursorQueue.append(self.cursorQueue[1])
             self.cursorQueue[1] = self.cursorQueue[0]
             self.cursorQueue[0] = (x, y, wall, projector)
+            self.trailCount=3
         elif len(self.cursorQueue) == 3:
             self.cursorQueue.append(self.cursorQueue[2])
             self.cursorQueue[2] = self.cursorQueue[1]
             self.cursorQueue[1] = self.cursorQueue[0]
             self.cursorQueue[0] = (x, y, wall, projector)
+            self.trailCount=4
         elif len(self.cursorQueue) == 4:
             self.cursorQueue.append(self.cursorQueue[3])
             self.cursorQueue[3] = self.cursorQueue[2]
             self.cursorQueue[2] = self.cursorQueue[1]
             self.cursorQueue[1] = self.cursorQueue[0]
             self.cursorQueue[0] = (x, y, wall, projector)
+            self.trailCount=5
         elif len(self.cursorQueue) == 5:
             self.cursorQueue[4] = self.cursorQueue[3]
             self.cursorQueue[3] = self.cursorQueue[2]
             self.cursorQueue[2] = self.cursorQueue[1]
             self.cursorQueue[1] = self.cursorQueue[0]
             self.cursorQueue[0] = (x, y, wall, projector)
+            if self.trailCount<5:
+                self.trailCount+=1
 
 
         if len(self.cursorQueue) == 2:
@@ -211,6 +219,12 @@ class client:
             self.moveCursorGhost(c2[3], 2, c2[0], c2[1], "prop", c2[2])  # C2
             self.moveCursorGhost(c3[3], 3, c3[0], c3[1], "prop", c3[2])  # C3
             self.moveCursorGhost(c4[3], 4, c4[0], c4[1], "prop", c4[2])  # C4
+        if self.trailCount>0:
+            self.trailCount-=1
+
+        if((self.trailCount+1)!=5):
+            self.sender.hideCursor(1, self.trailCursors[1][self.trailCount+1])
+            self.sender.hideCursor(2, self.trailCursors[2][self.trailCount+1])
 
 
     # Checks for mouse button and keyboard
@@ -1311,6 +1325,35 @@ class client:
         self.surfaceToCanvas[(self.BACKCANVASPROJ, 2)] = self.wallCanvases[2]
         self.surfaceToCanvas[(self.LEFTCANVASPROJ, 3)] = self.wallCanvases[3]
         self.surfaceToCanvas[(self.CEILINGCANVASPROJ, 4)] = self.wallCanvases[4]
+
+        self.trailCursors[1][4] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][4], 0.4)
+        self.sender.hideCursor(1, self.trailCursors[1][4])
+        self.trailCursors[2][4] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][4], 0.4)
+        self.sender.hideCursor(2, self.trailCursors[2][4])
+
+        self.trailCursors[1][3] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][3], 0.5)
+        self.sender.hideCursor(1, self.trailCursors[1][3])
+        self.trailCursors[2][3] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][3], 0.5)
+        self.sender.hideCursor(2, self.trailCursors[2][3])
+
+        self.trailCursors[1][2] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][2], 0.6)
+        self.sender.hideCursor(1, self.trailCursors[1][2])
+        self.trailCursors[2][2] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][2], 0.6)
+        self.sender.hideCursor(2, self.trailCursors[2][2])
+
+        self.trailCursors[1][1] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(1, self.trailCursors[1][1], 0.7)
+        self.sender.hideCursor(1, self.trailCursors[1][1])
+        self.trailCursors[2][1] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
+        self.sender.setCursorOpacity(2, self.trailCursors[2][1], 0.7)
+        self.sender.hideCursor(2, self.trailCursors[2][1])
+
         self.curs = []
         self.curs.append(self.sender.newCursor(1, 1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(1, self.curs[0])
@@ -1320,34 +1363,6 @@ class client:
         self.sender.hideCursor(2, self.curs[0])
         self.curs.append(self.sender.newCursor(2, 1, 0.5, 0.5, "prop"))
         self.sender.hideCursor(2, self.curs[1])
-
-        self.trailCursors[1][4] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(1, self.trailCursors[1][4], 0.2)
-        self.sender.hideCursor(1, self.trailCursors[1][4])
-        self.trailCursors[2][4] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(2, self.trailCursors[2][4], 0.2)
-        self.sender.hideCursor(2, self.trailCursors[2][4])
-
-        self.trailCursors[1][3] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(1, self.trailCursors[1][3], 0.3)
-        self.sender.hideCursor(1, self.trailCursors[1][3])
-        self.trailCursors[2][3] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(2, self.trailCursors[2][3], 0.3)
-        self.sender.hideCursor(2, self.trailCursors[2][3])
-
-        self.trailCursors[1][2] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(1, self.trailCursors[1][2], 0.4)
-        self.sender.hideCursor(1, self.trailCursors[1][2])
-        self.trailCursors[2][2] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(2, self.trailCursors[2][2], 0.4)
-        self.sender.hideCursor(2, self.trailCursors[2][2])
-
-        self.trailCursors[1][1] = self.sender.newCursor(1, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(1, self.trailCursors[1][1], 0.5)
-        self.sender.hideCursor(1, self.trailCursors[1][1])
-        self.trailCursors[2][1] = self.sender.newCursor(2, 1, 0.5, 0.5, "prop")
-        self.sender.setCursorOpacity(2, self.trailCursors[2][1], 0.5)
-        self.sender.hideCursor(2, self.trailCursors[2][1])
 
     def wallToProjCanvas(self, wall):
         for x in range(0, len(self.wallCanvases)):
@@ -1493,7 +1508,7 @@ class client:
         foundLayouts = []
         orderFile = "order1.csv"
         if self.TEST:
-            orderFile = "testOrder.csv"
+            orderFile = "testOrder1.csv"
         with open(orderFile, "rb") as f:
             records = csv.DictReader(f)
             for row in records:
