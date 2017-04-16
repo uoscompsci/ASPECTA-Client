@@ -7,6 +7,7 @@ Make sure to install pip first as later ones depend on it for installation
 * python-pygame (```sudo apt-get install python-pygame```)
 * ujson (```sudo pip install ujson```)
 * tkinter (```sudo apt-get install python-tk```)
+* scipy (```sudo apt-get install python-scipy```)
 
 ### Recommended
 
