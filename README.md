@@ -11,4 +11,5 @@ Make sure to install pip first as later ones depend on it for installation
 
 ### Recommended
 
+* Ubuntu or Ubuntu-based Linux distribution (Tested with regular Ubuntu and Ubuntu Mate)
 * Jetbrains PyCharm Community (https://www.jetbrains.com/pycharm/download/#section=linux)
